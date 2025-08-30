@@ -1,4 +1,4 @@
-package kb_hack.backend.common.Superclass;
+package kb_hack.backend.domain.common.Superclass;
 
 import java.time.LocalDateTime;
 
