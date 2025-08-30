@@ -1,6 +1,6 @@
 package kb_hack.backend.domain.chat.entity;
 
-import kb_hack.backend.common.Superclass.BaseTimeEntity;
+import kb_hack.backend.domain.common.Superclass.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
