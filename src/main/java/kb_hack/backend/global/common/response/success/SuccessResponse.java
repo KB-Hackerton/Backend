@@ -1,9 +1,8 @@
 package kb_hack.backend.global.common.response.success;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import kb_hack.backend.global.common.enums.SuccessStatusCode;
+import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

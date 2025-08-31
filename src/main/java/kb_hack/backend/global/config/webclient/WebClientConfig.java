@@ -1,4 +1,4 @@
-package kb_hack.backend.global.webclient.config;
+package kb_hack.backend.global.config.webclient;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package kb_hack.backend.global.common.enums;
+package kb_hack.backend.global.common.exception.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,5 +18,4 @@ public enum SuccessStatusCode {
     private final HttpStatus httpStatus;
     private final String message;
 
-    //302 FOUND
 }
