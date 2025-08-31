@@ -1,0 +1,29 @@
+package kb_hack.backend.global.common.response.success;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import kb_hack.backend.global.common.enums.SuccessStatusCode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class SuccessResponse<T> {
+    private final int code;
+    private final String message;
+    private final T data;
+
+
+    //Data 있는 경우
+    public static <T> SuccessResponse<T> makeResponse (SuccessStatusCode successStatusCode, T data){
+       return new SuccessResponse<>(successStatusCode.getHttpStatus().value(), successStatusCode.getMessage(),data );
+    }
+
+    // 데이터가 없는 경우
+    public static SuccessResponse<Void> makeResponse(SuccessStatusCode successStatusCode) {
+        return new SuccessResponse<>(successStatusCode.getHttpStatus().value(), successStatusCode.getMessage(), null);
+    }
+
+
+}
