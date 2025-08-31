@@ -1,0 +1,10 @@
+services:
+  hackerton-locker-db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: hack
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
