@@ -2,17 +2,9 @@ package kb_hack.backend.global.common.exception.type;
 
 
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
-import org.flywaydb.core.api.ErrorCode;
 
-public class BadRequestException extends RuntimeException {
-    private final BadStatusCode badStatusCode;
-
+public class BadRequestException extends CustomException {
     public BadRequestException(BadStatusCode badStatusCode) {
-        super(badStatusCode.getMessage());
-        this.badStatusCode = badStatusCode;
-    }
-
-    public BadStatusCode getBadStatusCode() {
-        return badStatusCode;
+        super(badStatusCode);
     }
 }

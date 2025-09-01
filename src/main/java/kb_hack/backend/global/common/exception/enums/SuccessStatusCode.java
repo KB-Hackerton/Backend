@@ -11,8 +11,6 @@ public enum SuccessStatusCode {
     //200 OK
     LOGIN_SUCCESS(HttpStatus.OK,"로그인 성공!"),
     EMAIL_SEND_SUCCESS(HttpStatus.OK,"이메일 발송 성공!"),
-
-    //201 CREATED
     SIGNUP_SUCCESS(HttpStatus.CREATED,"회원 가입 성공!");
 
     private final HttpStatus httpStatus;

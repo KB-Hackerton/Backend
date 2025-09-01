@@ -2,15 +2,8 @@ package kb_hack.backend.global.common.exception.type;
 
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 
-public class NotFoundException extends RuntimeException {
-    private final BadStatusCode badStatusCode;
-
+public class NotFoundException extends CustomException {
     public NotFoundException(BadStatusCode badStatusCode) {
-        super(badStatusCode.getMessage());
-        this.badStatusCode = badStatusCode;
-    }
-
-    public BadStatusCode getBadStatusCode() {
-        return badStatusCode;
+        super(badStatusCode);
     }
 }
