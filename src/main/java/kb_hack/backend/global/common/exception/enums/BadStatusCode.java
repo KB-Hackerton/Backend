@@ -8,12 +8,11 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum BadStatusCode {
     //400 BAD REQUEST
-    INVALID_PASSWORD_EXCEPTION(HttpStatus.BAD_REQUEST, "비밀번호가 잘못되었습니다."),
     VERIFICATION_FAIL_EXCEPTION(HttpStatus.BAD_REQUEST, "인증 코드가 일치하지 않습니다."),
 
     //401 UNAUTHORIZED
     TOKEN_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
-
+    LOGIN_FAILURE_EXCEPTION(HttpStatus.UNAUTHORIZED,"아이디 혹은 비밀번호를 잘못 입력 했습니다."),
     // 403 Forbidden (주로 인가)
     INSUFFICIENT_PERMISSION_EXCEPTION(HttpStatus.FORBIDDEN,"접근 권한이 없습니다."),
 
