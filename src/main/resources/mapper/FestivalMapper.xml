@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kb_hack.backend.domain.festival.mapper.FestivalMapper">
+
+    <insert id="batchUpsert">
+        INSERT INTO festival (
+        festival_title, add1, add2, map_x, map_y,
+        event_startdate, event_enddate, first_image, tel,
+        telname, overview, content_id
+        ) VALUES
+
+        <foreach collection="list" item="f" separator=",">
+            (#{f.festivalTitle}, #{f.add1}, #{f.add2}, #{f.mapX}, #{f.mapY},
+            #{f.eventStartdate}, #{f.eventEnddate}, #{f.firstImage}, #{f.tel},
+            #{f.telName}, #{f.overview}, #{f.contentId})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        festival_title = VALUES(festival_title),
+        add1           = VALUES(add1),
+        add2           = VALUES(add2),
+        map_x          = VALUES(map_x),
+        map_y          = VALUES(map_y),
+        event_startdate= VALUES(event_startdate),
+        event_enddate  = VALUES(event_enddate),
+        first_image    = VALUES(first_image),
+        tel            = VALUES(tel),
+        telname        = VALUES(telname),
+        overview       = VALUES(overview)
+    </insert>
+
+
+</mapper>
