@@ -39,5 +39,4 @@ out/
 ## application.properties ##
 /src/main/resources/application.properties
 /mysql_data
-
-application-local.properties
+src/main/resources/application-local.properties
