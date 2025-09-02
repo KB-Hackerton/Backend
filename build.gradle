@@ -57,6 +57,10 @@ dependencies {
 	// 11.  WebClient를 사용하기 위한 WebFlux 스타터 추가
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+	// 12. 크롤링 위한 라이브러리
+	implementation 'org.jsoup:jsoup:1.15.3'
+	implementation 'org.seleniumhq.selenium:selenium-java:4.11.0'
+	implementation 'io.github.bonigarcia:webdrivermanager:5.4.1'
 
 	// 테스트를 위한 기본 스타터
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
