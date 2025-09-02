@@ -72,11 +72,11 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth)-> auth
-                        .requestMatchers("/", "/index.html").permitAll()
-                        .requestMatchers("/auth/login","/auth/refresh","/auth/password").permitAll()
+                        .requestMatchers("/", "/index.html","/swagger","/auth/login","/auth/refresh","/auth/password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/member-info").permitAll()
                         .requestMatchers("/test").hasRole("Member")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/crawl/admin").hasRole("Admin")
+                        .anyRequest().permitAll()
                 );
 
         http
