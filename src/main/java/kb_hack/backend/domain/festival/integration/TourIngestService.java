@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import kb_hack.backend.domain.festival.Festival;
 import kb_hack.backend.domain.festival.mapper.FestivalMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
