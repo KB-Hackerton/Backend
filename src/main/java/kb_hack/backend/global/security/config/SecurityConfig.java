@@ -72,13 +72,16 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth)-> auth
-                        .requestMatchers("/", "/index.html").permitAll()
-                        .requestMatchers("/auth/login","/auth/refresh","/auth/password").permitAll()
+                        .requestMatchers("/assets/**", "/favicon.ico", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**",
+                                "/v2/api-docs", "/v3/api-docs", "/webjars/**", "/swagger/**").permitAll()
+                        .requestMatchers("/", "/index.html","/swagger","/auth/login","/auth/refresh","/auth/password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/member-info").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/sos").permitAll()   // ✅ 추가
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()     // ✅ CORS preflight 허용
                         .requestMatchers("/test").hasRole("Member")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/crawl/admin").hasRole("Admin")
+
+                        .anyRequest().permitAll()
                 );
 
         http
