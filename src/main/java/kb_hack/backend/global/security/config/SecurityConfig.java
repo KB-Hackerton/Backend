@@ -75,6 +75,8 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index.html").permitAll()
                         .requestMatchers("/auth/login","/auth/refresh","/auth/password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/member-info").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/sos").permitAll()   // ✅ 추가
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()     // ✅ CORS preflight 허용
                         .requestMatchers("/test").hasRole("Member")
                         .anyRequest().authenticated()
                 );

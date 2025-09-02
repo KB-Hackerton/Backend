@@ -8,5 +8,5 @@ VALUES (1, '테스트상점', '서울시 어딘가', '101호', 'BIZ-0001', '2024
 
 -- 3. 멤버 1건
 -- ⚠️ status는 반드시 'active' (enum 소문자) 로!
-INSERT INTO member (business_id, member_email, password, member_name, kaka_id, status)
+INSERT INTO member (business_id, member_email, password, member_name, kakao_id, status)
 VALUES (1, 'test@local', '{noop}pass', '로컬유저', 'kakao-1', 'active');
