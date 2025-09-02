@@ -7,20 +7,26 @@ import kb_hack.backend.domain.festival.Festival;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class TourApiClient {
 
-    @Qualifier("tourApiWebClient")
+
+public class TourApiClient {
     private final WebClient webClient;
 
-    @Value("${tour.api.service-key}")
     private String serviceKey;
+    public TourApiClient(
+            @Qualifier("tourApiWebClient") WebClient webClient,
+            @Value("${tour.api.service-key}") String serviceKey
+    ) {
+        this.webClient = webClient;
+        this.serviceKey = serviceKey;
+    }
 
 
     public Mono<JsonNode> searchFestival2(String areaCode, String fromYmd, int page, int size) {

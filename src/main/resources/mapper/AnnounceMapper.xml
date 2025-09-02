@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kb_hack.backend.domain.announce.mapper.AnnounceMapper">
+    <insert id="insertAnnounce" parameterType="kb_hack.backend.domain.announce.Announce">
+        insert into announce
+        (  announce_title, link, author, exc_insttNm, description,
+           lcategory, pub_date, reqst_start_date, reqst_end_date,
+           taget_name, view_num, file_path_name, file_name,
+        how_to_register, call_company)
+        values (
+                   #{announceTitle}, #{link}, #{author}, #{excInsttNm}, #{description},
+                   #{lcategory}, #{pubDate}, #{startDate}, #{endDate},
+                   #{targetName}, #{viewNum}, #{filePathName}, #{fileName},
+                   #{howToRegister}, #{callCompany}
+               )
+    </insert>
+
+
+
+</mapper>
