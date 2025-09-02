@@ -33,7 +33,7 @@ public class BizinfoApiService {
     }
 
     public int fetchAndSaveBizinfo() throws Exception {
-        String hashtags = "금융,기술,인력,수출,내수,창업,경영,기타,부산,대구,울산,경북,경남";
+        String hashtags = "부산,대구,울산,경북,경남";
         int totalCount = 0;
 
         for (int pageIndex = 1; pageIndex <= 5; pageIndex++) {
@@ -83,9 +83,14 @@ public class BizinfoApiService {
                     }
                 }
 
+                String pblancUrl = item.path("pblancUrl").asText(null);
+                if (pblancUrl != null && !pblancUrl.startsWith("http")) {
+                    pblancUrl = "https://www.bizinfo.go.kr" + pblancUrl;
+                }
+
                 Announce announce = Announce.builder()
                         .announceTitle(item.path("pblancNm").asText(null))
-                        .link(item.path("pblancUrl").asText(null))
+                        .link(pblancUrl)
                         .author(item.path("jrsdInsttNm").asText(null))
                         .excInsttNm(item.path("excInsttNm").asText(null))
                         .description(item.path("bsnsSumryCn").asText(null))
