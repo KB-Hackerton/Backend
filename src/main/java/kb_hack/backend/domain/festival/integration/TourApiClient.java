@@ -8,13 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
+
 
 public class TourApiClient {
     private final WebClient webClient;
@@ -27,6 +27,7 @@ public class TourApiClient {
         this.webClient = webClient;
         this.serviceKey = serviceKey;
     }
+
 
     public Mono<JsonNode> searchFestival2(String areaCode, String fromYmd, int page, int size) {
         return webClient.get()
