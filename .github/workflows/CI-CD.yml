@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew clean bootJar -x test
 
       - name: 📢 Docker image 만들기
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/zibi-backserver .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/hackerton .
 
       - name: 📢 DockerHub에 로그인
         uses: docker/login-action@v2
@@ -49,30 +49,34 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD}}
 
       - name: 📢 DockerHub에 PUSH
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME}}/zibi-backserver
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME}}/hackerton
 
-#  deploy:
-#    runs-on: ubuntu-latest
-#    needs: build
-#    if: github.event_name == 'push'
-#    steps:
-#      - name: 📢SSH로 EC2에 접속해보자
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.EC2_HOST}}
-#          username: ${{ secrets.EC2_USERNAME}}
-#          key: ${{ secrets.EC2_PRIVATE_KEY}}
-#          script: |
-#            echo "✅ EC2 연결 성공!"
-#            echo "✅ Docker를 실행 시키기 위해 compose.yml 파일로 고고띠"
-#            cd ~/zibi
-#
-#            echo "✅ DockerHub 에서 이미지 가져오기(pull)"
-#            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/zibi-backserver
-#
-#            echo "✅ 이제 DockeCompose 돌리자!!"
-#            docker compose down
-#            docker compose up -d
-#
-#            echo "✅ PortForwarding을 8080으로 했으니깐 Public IP의 8080포트로 가자 "
-#            echo "✅ 포트 번호 적기 싫으면 compose파일에서 80->8080 으로 포트포워딩 하면 됨!!"
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push'
+    steps:
+      - name: 📢SSH로 EC2에 접속해보자
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST}}
+          username: ${{ secrets.EC2_USERNAME}}
+          key: ${{ secrets.EC2_PRIVATE_KEY}}
+          proxy_host: ${{ secrets.SSH_TUN_HOST }}  #  퍼블릭 IP를 가진 중간 서버
+          proxy_username: ${{ secrets.SSH_USER }}  # 터널링 서버의 사용자
+          proxy_key: ${{ secrets.SSH_PEM_KEY }}
+          port: 22
+          script: |
+            echo "✅ EC2 연결 성공!"
+            echo "✅ Docker를 실행 시키기 위해 compose.yml 파일로 고고띠"
+            cd ~/hackerton
+
+            echo "✅ DockerHub 에서 이미지 가져오기(pull)"
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/hackerton
+
+            echo "✅ 이제 DockeCompose 돌리자!!"
+            docker compose down
+            docker compose up -d
+
+            echo "✅ PortForwarding을 8080으로 했으니깐 Public IP의 8080포트로 가자 "
+            echo "✅ 배포 완료
