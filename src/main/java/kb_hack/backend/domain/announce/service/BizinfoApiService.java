@@ -36,7 +36,7 @@ public class BizinfoApiService {
         String hashtags = "부산,대구,울산,경북,경남";
         int totalCount = 0;
 
-        for (int pageIndex = 1; pageIndex <= 5; pageIndex++) {
+        for (int pageIndex = 1; pageIndex <= 9; pageIndex++) {
             final int currentPage = pageIndex;
             String result = webClient.get()
                     .uri(uriBuilder -> uriBuilder
