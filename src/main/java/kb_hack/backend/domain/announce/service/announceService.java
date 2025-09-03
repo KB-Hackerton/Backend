@@ -1,12 +1,14 @@
 package kb_hack.backend.domain.announce.service;
 
 import kb_hack.backend.domain.announce.Announce;
+import kb_hack.backend.domain.announce.dto.announceDetailDto;
 import kb_hack.backend.domain.announce.dto.announceDto;
 import kb_hack.backend.domain.announce.mapper.AnnounceMapper;
 import kb_hack.backend.domain.favorite.dto.FavoriteResponseDto;
 import kb_hack.backend.domain.favorite.mapper.FavoriteMapper;
 import kb_hack.backend.domain.favorite.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +22,9 @@ public class announceService {
 
     public List<announceDto> getAnnounceList(){
         List<Announce> announces= announceMapper.findAll();
-        //사용자의 즐겨찾기 목록 가져오기
+        //사용자의 즐겨찾기 목록  id 가져오기
         List<FavoriteResponseDto> favorites =favoriteService.getFavorites();
+        //[3,10,19]
         List<Long> favoriteIds = favorites.stream()
                 .map(FavoriteResponseDto::getAnnounceId)
                 .collect(Collectors.toList());
@@ -29,6 +32,13 @@ public class announceService {
         return announces.stream()
                 .map(announce -> announceDto.from(announce,favoriteIds.contains(announce.getAnnounceId())))
                 .collect(Collectors.toList());
+    }
 
+    public announceDetailDto getAnnounceDetail(@Param("announceId") Long announceId) {
+        Announce announce = announceMapper.findById(announceId);
+        if(announce==null){
+            return null;
+        }
+        return announceDetailDto.from(announce);
     }
 }
