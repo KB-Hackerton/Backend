@@ -21,7 +21,7 @@ public class announceDto {
     private boolean isFavorite;
 
     //announce => AnnounceDto
-    public static announceDto from(Announce announce) {
+    public static announceDto from(Announce announce,boolean isFavorite) {
         return  announceDto.builder()
                 .announceId(announce.getAnnounceId())
                 .title(announce.getAnnounceTitle())
