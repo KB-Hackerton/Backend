@@ -15,4 +15,13 @@
         WHERE announce_id = #{announceId}
           AND member_id = #{memberId}
     </delete>
+    <select id="findFavoritesByMemberId" parameterType="long" resultType="kb_hack.backend.domain.favorite.dto.FavoriteResponseDto">
+        SELECT a.announce_id    AS announceId,
+               a.announce_title AS announceTitle,
+               a.link           AS link
+        FROM member_favorite mf
+                 JOIN announce a ON mf.announce_id = a.announce_id
+        WHERE mf.member_id = #{memberId}
+        ORDER BY mf.created_at DESC
+    </select>
 </mapper>

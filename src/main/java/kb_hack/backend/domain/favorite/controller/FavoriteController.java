@@ -1,6 +1,9 @@
 package kb_hack.backend.domain.favorite.controller;
 
+import java.util.List;
+
 import kb_hack.backend.domain.favorite.dto.FavoriteRequestDto;
+import kb_hack.backend.domain.favorite.dto.FavoriteResponseDto;
 import kb_hack.backend.domain.favorite.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,11 @@ public class FavoriteController {
 	public ResponseEntity<String> removeFavorite(@PathVariable Long announceId) {
 		favoriteService.removeFavorite(announceId);
 		return ResponseEntity.ok("즐겨찾기에서 삭제되었습니다. (memberId=1)");
+	}
+
+	@GetMapping
+	public ResponseEntity<List<FavoriteResponseDto>> getFavorites() {
+		return ResponseEntity.ok(favoriteService.getFavorites());
 	}
 }
 
