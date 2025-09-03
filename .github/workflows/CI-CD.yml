@@ -1,7 +1,7 @@
 name: CI-CD.yml
 on:
   push:
-    branches: ["feature/13"]
+    branches: ["develop"]
 
 jobs:
   build:
@@ -79,4 +79,4 @@ jobs:
             docker compose up -d
 
             echo "✅ PortForwarding을 8080으로 했으니깐 Public IP의 8080포트로 가자 "
-            echo "✅ 배포 완료
+            echo "✅ 배포 완료"
