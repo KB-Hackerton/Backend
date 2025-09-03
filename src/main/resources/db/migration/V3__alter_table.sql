@@ -1,5 +1,5 @@
 DELETE FROM announce;
-
+delete from festival;
 ALTER TABLE announce AUTO_INCREMENT = 1;
 
 ALTER TABLE announce
