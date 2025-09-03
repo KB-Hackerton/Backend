@@ -10,4 +10,9 @@
         VALUES (#{announceId}, #{memberId}, NOW())
     </insert>
 
+    <delete id="deleteFavorite">
+        DELETE FROM member_favorite
+        WHERE announce_id = #{announceId}
+          AND member_id = #{memberId}
+    </delete>
 </mapper>

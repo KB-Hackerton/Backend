@@ -17,4 +17,10 @@ public class FavoriteService {
 		Long memberId = 1L; // 고정
 		favoriteMapper.insertFavorite(dto.getAnnounceId(), memberId);
 	}
+
+	@Transactional
+	public void removeFavorite(Long announceId) {
+		Long memberId = 1L; // 고정
+		favoriteMapper.deleteFavorite(announceId, memberId);
+	}
 }

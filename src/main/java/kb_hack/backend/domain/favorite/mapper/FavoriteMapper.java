@@ -7,5 +7,6 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface FavoriteMapper {
 	void insertFavorite(@Param("announceId") Long announceId, @Param("memberId") Long memberId);
+	void deleteFavorite(@Param("announceId") Long announceId, @Param("memberId") Long memberId);
 }
 
