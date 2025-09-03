@@ -24,7 +24,7 @@ public class TourIngestService {
     public Mono<Integer> ingestGyeongsang() {
         final String fromYmd = "20250101";
         final int pageSize   = 200;
-        final List<String> areas = List.of("35", "36","4","5","6","7");
+        final List<String> areas = List.of("35", "36","4","6","7");
         return Flux.fromIterable(areas)
                 .concatMap(area -> ingestAllPages(area, fromYmd, pageSize))
                 .reduce(0, Integer::sum);

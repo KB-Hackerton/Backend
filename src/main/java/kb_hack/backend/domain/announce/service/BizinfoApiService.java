@@ -88,6 +88,10 @@ public class BizinfoApiService {
                     pblancUrl = "https://www.bizinfo.go.kr" + pblancUrl;
                 }
 
+                String targetName = item.path("trgetNm").asText(null);
+                if(targetName!=null && targetName.contains("중소기업")){
+                    continue;
+                }
                 Announce announce = Announce.builder()
                         .announceTitle(item.path("pblancNm").asText(null))
                         .link(pblancUrl)
@@ -98,9 +102,9 @@ public class BizinfoApiService {
                         .pubDate(pubDate)
                         .startDate(startDate)
                         .endDate(endDate)
-                        .targetName(item.path("trgetNm").asText(null))
+                        .targetName(targetName)
                         .viewNum(item.path("inqireCo").asInt(0))
-                        .filePathName(item.path("flpthNm").asText(null))
+                        .filePathName(item.path("printFlpthNm").asText(null))
                         .fileName(item.path("fileNm").asText(null))
                         .howToRegister(item.path("reqstMthPapersCn").asText(null))
                         .callCompany(item.path("refrncNm").asText(null))
