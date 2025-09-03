@@ -1,0 +1,20 @@
+package kb_hack.backend.domain.favorite.service;
+
+import kb_hack.backend.domain.favorite.dto.FavoriteRequestDto;
+import kb_hack.backend.domain.favorite.mapper.FavoriteMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class FavoriteService {
+
+	private final FavoriteMapper favoriteMapper;
+
+	@Transactional
+	public void addFavorite(FavoriteRequestDto dto) {
+		Long memberId = 1L; // 고정
+		favoriteMapper.insertFavorite(dto.getAnnounceId(), memberId);
+	}
+}
