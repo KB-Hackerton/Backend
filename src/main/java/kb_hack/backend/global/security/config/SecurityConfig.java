@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth)-> auth
                         .requestMatchers("/assets/**", "/favicon.ico", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**",
                                 "/v2/api-docs", "/v3/api-docs", "/webjars/**", "/swagger/**").permitAll()
-                        .requestMatchers("/", "/index.html","/swagger","/auth/login","/auth/refresh","/auth/password").permitAll()
+                        .requestMatchers("/", "/index.html","/swagger","/auth/login","/auth/refresh","/auth/password","/check").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/member-info").permitAll()
                         .requestMatchers("/test").hasRole("Member")
                         .requestMatchers("/crawl/admin").hasRole("Admin")
