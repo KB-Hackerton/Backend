@@ -17,6 +17,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @Log4j2
@@ -94,6 +95,9 @@ public class GlobalExceptionHandler {
     // 나머지 5xx (예상치 못한 런타임 예외 등)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BadResponse> handle5xxError(Exception ex, HttpServletRequest request) {
+        if (ex instanceof NoResourceFoundException && request.getRequestURI().equals("/favicon.ico")) {
+            return ResponseEntity.notFound().build(); // 404로만 응답, 로그/디스코드 전송 X
+        }
         HttpStatus st = HttpStatus.INTERNAL_SERVER_ERROR;
 
         log.error("""
