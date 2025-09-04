@@ -24,4 +24,13 @@
         WHERE mf.member_id = #{memberId}
         ORDER BY mf.created_at DESC
     </select>
+
+    <select id="findAnnouncesByMemberId" parameterType="long"
+            resultType="kb_hack.backend.domain.announce.Announce">
+        SELECT a.*
+        FROM member_favorite mf
+                 JOIN announce a ON mf.announce_id = a.announce_id
+        WHERE mf.member_id = #{memberId}
+    </select>
+
 </mapper>

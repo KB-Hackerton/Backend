@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kb_hack.backend.domain.document.mapper.DocumentMapper">
+
+    <!-- 문서 저장 -->
+    <insert id="insertDocument">
+        INSERT INTO document (announce_id, title, description, created_at)
+        VALUES (#{announceId}, #{title}, #{description}, NOW())
+    </insert>
+
+    <!-- 즐겨찾기한 공고들의 제출서류 조회 -->
+    <select id="findDocumentsByMemberId" parameterType="long"
+            resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
+        SELECT d.document_id   AS documentId,
+               d.announce_id   AS announceId,
+               d.title,
+               d.description,
+               IF(mdc.status = 1, TRUE, FALSE) AS checked
+        FROM member_favorite mf
+                 JOIN document d ON mf.announce_id = d.announce_id
+                 LEFT JOIN member_document_check mdc
+                           ON d.document_id = mdc.document_id
+                               AND mdc.member_id = #{memberId}
+        WHERE mf.member_id = #{memberId}
+        ORDER BY d.created_at DESC
+    </select>
+
+    <!-- 체크/해제 (UPSERT) -->
+    <insert id="upsertDocumentCheck">
+        INSERT INTO member_document_check (document_id, member_id, status, checked_at, created_at)
+        VALUES (#{documentId}, #{memberId}, #{status}, NOW(), NOW())
+            ON DUPLICATE KEY UPDATE
+                                 status     = VALUES(status),
+                                 checked_at = NOW()
+    </insert>
+
+</mapper>
