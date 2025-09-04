@@ -16,7 +16,7 @@ public class ChecklistController {
 	private final DocumentService documentService;
 	private final ChecklistService checklistService;
 
-	/** (기존) 즐겨찾기 전체에서 PDF 제출서류 추출 & 저장 */
+	/** 즐겨찾기된 모든 공고의 서류 체크리스트 저장 */
 	@PostMapping("/extract")
 	public ResponseEntity<String> extractFromFavorites() {
 		Long memberId = 1L;
@@ -24,21 +24,21 @@ public class ChecklistController {
 		return ResponseEntity.ok(savedCount + "개의 제출서류가 저장되었습니다.");
 	}
 
-	/** ✅ 공고별: 제출서류 추출 & 저장 */
+	/** 공고별: 제출서류 추출 & 저장 */
 	@PostMapping("/{announceId}/extract")
 	public ResponseEntity<String> extractForAnnounce(@PathVariable Long announceId) {
 		int savedCount = documentService.extractAndSaveDocumentsForAnnounce(announceId);
 		return ResponseEntity.ok("[announceId=" + announceId + "] " + savedCount + "개의 제출서류가 저장되었습니다.");
 	}
 
-	/** (기존) 즐겨찾기 전체 체크리스트 조회 */
+	/** 모든 공고의 전체 체크리스트 조회 */
 	@GetMapping
 	public ResponseEntity<List<DocumentResponseDto>> getChecklist() {
 		Long memberId = 1L;
 		return ResponseEntity.ok(checklistService.getChecklist(memberId));
 	}
 
-	/** ✅ 공고별: 체크리스트 조회 */
+	/** 공고별: 체크리스트 조회 */
 	@GetMapping("/{announceId}")
 	public ResponseEntity<List<DocumentResponseDto>> getChecklistByAnnounce(@PathVariable Long announceId) {
 		Long memberId = 1L;
