@@ -11,6 +11,7 @@ public enum BadStatusCode {
     VERIFICATION_FAIL_EXCEPTION(HttpStatus.BAD_REQUEST, "인증 코드가 일치하지 않습니다."),
     INVALID_ACCESS_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST,"토큰이 유효하지 않습니다."),
     INVALID_AUTHORIZATION_HEADER_EXCEPTION(HttpStatus.BAD_REQUEST,"인증 헤더가 유효하지 않습니다"),
+    INVALID_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST,"파라미터를 잘못 입력 하셨습니다."),
 
 
     //401 UNAUTHORIZED

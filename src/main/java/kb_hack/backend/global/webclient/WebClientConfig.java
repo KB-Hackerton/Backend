@@ -1,4 +1,4 @@
-package kb_hack.backend.global.config.webclient;
+package kb_hack.backend.global.webclient;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +45,13 @@ public class WebClientConfig {
                         )
                         .build()
                 )
+                .build();
+    }
+
+    @Bean(name = "discordWebClient")
+    public WebClient discordWebClient() {
+        return WebClient.builder()
+                .defaultHeader("Content-Type", "application/json")
                 .build();
     }
 
