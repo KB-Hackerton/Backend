@@ -16,7 +16,7 @@ public class HttpFileUtil {
 		}
 	}
 
-	/** URL에서 파일을 받아 temp에 저장 (확장자는 fileName에서 따오고, 없으면 contentType으로 추정) */
+	/** URL에서 파일을 받아 temp 저장. 파일명/컨텐트타입 기반 확장자 추정 */
 	public static Fetched fetchToTemp(String urlStr) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
 		conn.setInstanceFollowRedirects(true);
@@ -25,7 +25,7 @@ public class HttpFileUtil {
 		conn.setReadTimeout(20000);
 
 		int code = conn.getResponseCode();
-		if (code / 100 != 2) throw new IOException("HTTP " + code);
+		if (code / 100 != 2) throw new IOException("HTTP " + code + " for " + urlStr);
 
 		String contentType = conn.getContentType(); // e.g. application/pdf
 		String disposition = conn.getHeaderField("Content-Disposition"); // filename="xxx.pdf"
@@ -76,4 +76,3 @@ public class HttpFileUtil {
 		return null;
 	}
 }
-
