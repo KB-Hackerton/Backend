@@ -66,6 +66,7 @@ jobs:
           proxy_username: ${{ secrets.SSH_USER }}  # 터널링 서버의 사용자
           proxy_key: ${{ secrets.SSH_PEM_KEY }}
           port: 22
+          command_timeout: 30m
           script: |
             echo "✅ EC2 연결 성공!"
             echo "✅ Docker를 실행 시키기 위해 compose.yml 파일로 고고띠"

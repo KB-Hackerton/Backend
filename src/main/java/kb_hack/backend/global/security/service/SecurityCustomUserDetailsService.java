@@ -4,7 +4,7 @@ import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 import kb_hack.backend.global.common.exception.type.NotFoundException;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import kb_hack.backend.global.security.entity.MemberVO;
-import kb_hack.backend.global.security.mapper.MemberMapper;
+import kb_hack.backend.global.security.mapper.SecurityMemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class SecurityCustomUserDetailsService implements UserDetailsService {
-    private final MemberMapper mapper;
+    private final SecurityMemberMapper mapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -80,6 +80,7 @@ public class GlobalExceptionHandler {
         HttpStatus st = HttpStatus.INTERNAL_SERVER_ERROR;
 
         log.error("""
+        
         ┌─ {} {}
         │ type    : {}
         │ method  : {}
@@ -112,6 +113,7 @@ public class GlobalExceptionHandler {
         HttpStatus st = HttpStatus.BAD_REQUEST;
 
         log.error("""
+        
         ┌─ {} {}
         │ type    : {}
         │ method  : {}
@@ -135,6 +137,7 @@ public class GlobalExceptionHandler {
     private static void makeErrorLogs(CustomException ex, HttpServletRequest req) {
         HttpStatus st = ex.getBadStatusCode().getHttpStatus();
         log.error("""
+        
         ┌─ {} {}
         │ type    : {}
         │ code    : {}
