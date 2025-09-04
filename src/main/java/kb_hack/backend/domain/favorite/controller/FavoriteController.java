@@ -2,6 +2,7 @@ package kb_hack.backend.domain.favorite.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kb_hack.backend.domain.favorite.dto.FavoriteRequestDto;
 import kb_hack.backend.domain.favorite.dto.FavoriteResponseDto;
 import kb_hack.backend.domain.favorite.service.FavoriteService;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Tag(name = "Favorite", description = "즐겨찾기 API")
 @RequestMapping("/api/favorites")
 @RequiredArgsConstructor
 public class FavoriteController {

@@ -1,5 +1,6 @@
 package kb_hack.backend.domain.document.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kb_hack.backend.domain.document.dto.*;
 import kb_hack.backend.domain.document.service.ChecklistService;
 import kb_hack.backend.domain.document.service.DocumentService;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Tag(name = "Checklist", description = "공고별 제출서류 체크리스트 API")
 @RequestMapping("/api/checklists")
 @RequiredArgsConstructor
 public class ChecklistController {
