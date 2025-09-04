@@ -104,10 +104,12 @@ public class BizinfoApiService {
                         .endDate(endDate)
                         .targetName(targetName)
                         .viewNum(item.path("inqireCo").asInt(0))
-                        .filePathName(item.path("printFlpthNm").asText(null))
+                        .filePathName(item.path("flpthNm").asText(null))
                         .fileName(item.path("fileNm").asText(null))
                         .howToRegister(item.path("reqstMthPapersCn").asText(null))
                         .callCompany(item.path("refrncNm").asText(null))
+                        .printFilePathName(item.path("printFlpthNm").asText(null))
+                        .printFileName(item.path("printFileNm").asText(null))
                         .build();
 
                 announceMapper.insertAnnounce(announce);

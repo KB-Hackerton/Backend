@@ -32,6 +32,9 @@ public class announceDetailDto {
     private String fileName;
     private String howToRegister;
     private String callCompany;
+    private String printFilePathName;
+    private String printFileName;
+
 
     public static announceDetailDto from(Announce announce) {
         return announceDetailDto.builder()
@@ -50,6 +53,8 @@ public class announceDetailDto {
                 .fileName(announce.getFileName())
                 .howToRegister(announce.getHowToRegister())
                 .callCompany(announce.getCallCompany())
+                .printFilePathName(announce.getPrintFilePathName())
+                .printFileName(announce.getPrintFileName())
                 .build();
     }
 }
