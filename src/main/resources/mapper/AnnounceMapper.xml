@@ -19,6 +19,8 @@
         <result property="fileName" column="file_name"/>
         <result property="howToRegister" column="how_to_register"/>
         <result property="callCompany" column="call_company"/>
+        <result property="printFileName" column="print_file_name"/>
+        <result property="printFilePathName" column="print_file_path_name"/>
     </resultMap>
 
 
@@ -27,12 +29,12 @@
         (  announce_title, link, author, exc_insttNm, description,
            lcategory, pub_date, reqst_start_date, reqst_end_date,
            taget_name, view_num, file_path_name, file_name,
-        how_to_register, call_company)
+        how_to_register, call_company ,print_file_name , print_file_path_name)
         values (
                    #{announceTitle}, #{link}, #{author}, #{excInsttNm}, #{description},
                    #{lcategory}, #{pubDate}, #{startDate}, #{endDate},
                    #{targetName}, #{viewNum}, #{filePathName}, #{fileName},
-                   #{howToRegister}, #{callCompany}
+                   #{howToRegister}, #{callCompany} ,#{printFileName} ,#{printFilePathName}
                )
     </insert>
 
@@ -50,7 +52,7 @@
         select announce_title, link, author, exc_insttNm, description,
                lcategory, pub_date, reqst_start_date, reqst_end_date,
                taget_name, view_num, file_path_name, file_name,
-               how_to_register, call_company
+               how_to_register, call_company ,print_file_name , print_file_path_name
         from announce
         where announce_id=#{announceId}
     </select>
