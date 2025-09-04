@@ -3,6 +3,22 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kb_hack.backend.domain.festival.mapper.FestivalMapper">
+    <resultMap id="festivalResultMap" type="kb_hack.backend.domain.festival.Festival">
+        <result property="festivalId" column="festival_id"/>
+        <result property="festivalTitle" column="festival_title"/>
+        <result property="add1" column="add1"/>
+        <result property="add2" column="add2"/>
+        <result property="eventStartdate" column="event_startdate"/>
+        <result property="eventEnddate" column="event_enddate"/>
+        <result property="firstImage" column="first_image"/>
+        <result property="tel" column="tel"/>
+        <result property="overview" column="overview"/>
+        <result property="contentId" column="content_id"/>
+        <result property="mapX" column="map_x"/>
+        <result property="mapY" column="map_y"/>
+        <result property="telName" column="telname"/>
+    </resultMap>
+
 
     <insert id="batchUpsert">
         INSERT INTO festival (
@@ -29,6 +45,23 @@
         telname        = VALUES(telname),
         overview       = VALUES(overview)
     </insert>
+    <select id="findAll" resultMap="festivalResultMap">
+        select
+            festival_id,
+            festival_title,
+            add1,
+            add2,
+            event_startdate,
+            event_enddate
+        from festival
+    </select>
 
-
+    <select id="findByFestivalId" resultMap="festivalResultMap">
+        select
+            festival_title, add1, add2, map_x, map_y,
+            event_startdate, event_enddate, first_image, tel,
+            telname, overview
+        from festival
+        where festival_id=#{festivalId}
+    </select>
 </mapper>

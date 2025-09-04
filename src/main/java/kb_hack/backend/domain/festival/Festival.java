@@ -1,12 +1,18 @@
 package kb_hack.backend.domain.festival;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Festival {
     private Long festivalId;        // festival_id (PK)
     private String festivalTitle;   // festival_title
