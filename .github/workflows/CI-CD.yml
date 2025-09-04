@@ -1,7 +1,7 @@
 name: CI-CD.yml
 on:
   push:
-    branches: ["develop"]
+    branches: ["feature/13"]
 
 jobs:
   build:
