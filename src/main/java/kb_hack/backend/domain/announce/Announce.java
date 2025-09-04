@@ -26,6 +26,8 @@ private String targetName;
 private Integer viewNum;
 private String filePathName;
 private String fileName;
+private String printFilePathName;
+private String printFileName;
 private String howToRegister;
 private String callCompany;
 }

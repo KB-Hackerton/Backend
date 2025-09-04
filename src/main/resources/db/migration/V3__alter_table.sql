@@ -17,6 +17,8 @@ ALTER TABLE announce
     MODIFY COLUMN file_path_name VARCHAR(500),
     MODIFY COLUMN file_name VARCHAR(500),
     MODIFY COLUMN how_to_register TEXT,
-    MODIFY COLUMN call_company VARCHAR(1000);
+    MODIFY COLUMN call_company VARCHAR(1000),
+    ADD COLUMN print_file_path_name VARCHAR(500),
+    ADD COLUMN print_file_name VARCHAR(200);
 
 alter table announce add unique key uk_pblanc_id (link);
