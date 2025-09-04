@@ -5,13 +5,19 @@
 
 <mapper namespace="kb_hack.backend.domain.document.mapper.DocumentMapper">
 
-    <!-- 문서 저장 -->
-    <insert id="insertDocument">
+    <!-- 중복 방지: 같은 공고에서 동일 title 이 이미 있으면 삽입 안 함 -->
+    <insert id="insertDocument" parameterType="kb_hack.backend.domain.document.dto.DocumentRequestDto">
         INSERT INTO document (announce_id, title, description, created_at)
-        VALUES (#{announceId}, #{title}, #{description}, NOW())
+        SELECT #{announceId}, #{title}, #{description}, NOW()
+        FROM DUAL
+        WHERE NOT EXISTS (
+            SELECT 1 FROM document
+            WHERE announce_id = #{announceId}
+              AND title = #{title}
+        )
     </insert>
 
-    <!-- 즐겨찾기한 공고들의 제출서류 조회 -->
+    <!-- 즐겨찾기 전체 -->
     <select id="findDocumentsByMemberId" parameterType="long"
             resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
         SELECT d.document_id   AS documentId,
@@ -26,6 +32,21 @@
                                AND mdc.member_id = #{memberId}
         WHERE mf.member_id = #{memberId}
         ORDER BY d.created_at DESC
+    </select>
+
+    <!-- ✅ 공고별 -->
+    <select id="findDocumentsByMemberAndAnnounce" resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
+        SELECT d.document_id   AS documentId,
+               d.announce_id   AS announceId,
+               d.title,
+               d.description,
+               IF(mdc.status = 1, TRUE, FALSE) AS checked
+        FROM document d
+                 LEFT JOIN member_document_check mdc
+                           ON d.document_id = mdc.document_id
+                               AND mdc.member_id = #{memberId}
+        WHERE d.announce_id = #{announceId}
+        ORDER BY d.created_at ASC
     </select>
 
     <!-- 체크/해제 (UPSERT) -->

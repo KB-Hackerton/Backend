@@ -2,6 +2,7 @@
 package kb_hack.backend.domain.document.service;
 
 import kb_hack.backend.domain.announce.Announce;
+import kb_hack.backend.domain.announce.mapper.AnnounceMapper;
 import kb_hack.backend.domain.favorite.mapper.FavoriteMapper;
 import kb_hack.backend.domain.document.dto.DocumentRequestDto;
 import kb_hack.backend.domain.document.mapper.DocumentMapper;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -23,10 +23,10 @@ public class DocumentService {
 
 	private final FavoriteMapper favoriteMapper;
 	private final DocumentMapper documentMapper;
+	private final AnnounceMapper announceMapper;   // ✅ 단일 공고 조회용
 
 	/**
-	 * 즐겨찾기한 공고의 print_file_path_name(없으면 file_path_name)에서 PDF만 내려받아
-	 * '제출서류' 섹션을 파싱하고 document 테이블에 저장
+	 * 즐겨찾기한 공고들의 첨부(PDF)에서 '제출서류' 섹션을 추출해 저장
 	 */
 	@Transactional
 	public int extractAndSaveDocumentsFromFavorites(Long memberId) {
@@ -34,38 +34,53 @@ public class DocumentService {
 
 		List<Announce> favorites = favoriteMapper.findAnnouncesByMemberId(memberId);
 		for (Announce announce : favorites) {
-			String url = firstNonBlank(announce.getPrintFilePathName(), announce.getFilePathName());
-			if (url == null || url.isBlank()) continue;
-
-			try {
-				HttpFileUtil.Fetched f = HttpFileUtil.fetchToTemp(url);
-
-				// ✅ PDF만 처리
-				boolean isPdf = (f.contentType != null && f.contentType.toLowerCase().contains("pdf"))
-					|| (f.fileName != null && f.fileName.toLowerCase().endsWith(".pdf"));
-				if (!isPdf) {
-					// HWP/HWPX/이미지 등은 스킵
-					continue;
-				}
-
-				String text = PdfTextExtractor.extract(f.file);
-				List<String> docs = parseRequiredDocuments(text);
-
-				for (String title : docs) {
-					DocumentRequestDto dto = DocumentRequestDto.builder()
-						.announceId(announce.getAnnounceId())
-						.title(title)
-						.description(null)
-						.build();
-					documentMapper.insertDocument(dto);
-					savedCount++;
-				}
-			} catch (Exception e) {
-				// 네트워크/파싱 실패는 해당 공고만 건너뜀
-				e.printStackTrace();
-			}
+			savedCount += extractAndSaveInternal(announce);
 		}
 		return savedCount;
+	}
+
+	/**
+	 * ✅ 특정 공고(announceId) 하나에서만 '제출서류' 섹션을 추출해 저장
+	 */
+	@Transactional
+	public int extractAndSaveDocumentsForAnnounce(Long announceId) {
+		Announce announce = announceMapper.findById(announceId);
+		if (announce == null) return 0;
+		return extractAndSaveInternal(announce);
+	}
+
+	/** 공통 로직: 공고 1건에 대해 파일 내려받기 → PDF만 처리 → 텍스트 추출 → 제출서류 파싱 → 저장 */
+	private int extractAndSaveInternal(Announce announce) {
+		String url = firstNonBlank(announce.getPrintFilePathName(), announce.getFilePathName());
+		if (url == null || url.isBlank()) return 0;
+
+		try {
+			HttpFileUtil.Fetched f = HttpFileUtil.fetchToTemp(url);
+
+			// PDF만 처리
+			boolean isPdf = (f.contentType != null && f.contentType.toLowerCase().contains("pdf"))
+				|| (f.fileName != null && f.fileName.toLowerCase().endsWith(".pdf"));
+			if (!isPdf) return 0;
+
+			String text = PdfTextExtractor.extract(f.file);
+			List<String> docs = parseRequiredDocuments(text);
+
+			int saved = 0;
+			for (String title : docs) {
+				DocumentRequestDto dto = DocumentRequestDto.builder()
+					.announceId(announce.getAnnounceId())
+					.title(title)
+					.description(null)
+					.build();
+				documentMapper.insertDocument(dto);
+				saved++;
+			}
+			return saved;
+		} catch (Exception e) {
+			// 실패 시 해당 공고만 스킵
+			e.printStackTrace();
+			return 0;
+		}
 	}
 
 	private String firstNonBlank(String a, String b) {
@@ -75,12 +90,7 @@ public class DocumentService {
 	}
 
 	/**
-	 * 제출서류 섹션 파싱(정확도 강화):
-	 * - 앵커: (제출|신청|구비|첨부|필수)(서류|자료|문서) or 증빙자료
-	 * - 다음 섹션 경계(지원대상/신청방법/평가/문의처 등) 전까지만
-	 * - 불릿/번호 감지 + 줄 병합
-	 * - 화이트/블랙리스트 필터
-	 * - 최소 개수(2개) 미만이면 폐기
+	 * 제출서류 섹션 파싱(정확도 강화)
 	 */
 	private List<String> parseRequiredDocuments(String text) {
 		if (text == null || text.isBlank()) return List.of();
@@ -122,32 +132,24 @@ public class DocumentService {
 		for (String raw : lines) {
 			String s = raw.trim();
 
-			// 무의미 패턴 제거
 			if (s.isBlank()) continue;
-			if (s.matches("^[0-9]+\\s*[-–—]?\\s*$")) continue;      // "7 -" 등
+			if (s.matches("^[0-9]+\\s*[-–—]?\\s*$")) continue; // "7 -" 등
 			if (s.length() <= 2) continue;
 
-			// 블랙리스트 제외
 			boolean hasBlack = black.stream().anyMatch(s::contains);
 			if (hasBlack) continue;
 
-			// 화이트리스트 포함 + 불릿/번호 라인 or 문장형 서류
 			boolean hasWhite = white.stream().anyMatch(s::contains);
 			boolean bulletish = s.matches("^\\s*(?:\\d{1,2}[).]|[①-⑳]|[가-힣A-Za-z]\\)|[-–—•·●○▪◦]).{2,}");
 			if (hasWhite && (bulletish || s.endsWith("서") || s.endsWith("증") || s.endsWith("서류"))) {
-				// 흔한 꼬리표 정리
 				s = s.replaceAll("\\s*\\(사본\\s*\\d+\\s*부\\)\\s*$", "").trim();
 				s = s.replaceAll("\\s{2,}", " ");
 				items.add(s);
 			}
 		}
 
-		// 중복 제거
 		items = items.stream().distinct().toList();
-
-		// 신뢰도: 2개 미만이면 노이즈로 판단
 		if (items.size() < 2) return List.of();
-
 		return items;
 	}
 
@@ -163,18 +165,15 @@ public class DocumentService {
 			String line = ln.replace('\u00A0', ' ').trim();
 
 			if (BULLET.matcher(line).find()) {
-				// 새 불릿 시작: 이전 항목 flush
 				if (cur.length() > 0) {
 					out.add(cur.toString().trim());
 					cur.setLength(0);
 				}
 				cur.append(line);
 			} else {
-				// 이어 붙이기
 				if (cur.length() > 0 && !line.isBlank()) {
 					cur.append(' ').append(line);
 				} else if (!line.isBlank()) {
-					// 섹션 첫 줄이 제목형인 경우 임시 시작
 					cur.append(line);
 				}
 			}
