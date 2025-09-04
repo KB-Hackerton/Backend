@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kb_hack.backend.domain.document.mapper.DocumentMapper">
+
+    <!-- 중복 방지: 같은 공고에서 동일 title 이 이미 있으면 삽입 안 함 -->
+    <insert id="insertDocument" parameterType="kb_hack.backend.domain.document.dto.DocumentRequestDto">
+        INSERT INTO document (announce_id, title, description, created_at)
+        SELECT #{announceId}, #{title}, #{description}, NOW()
+        FROM DUAL
+        WHERE NOT EXISTS (
+            SELECT 1 FROM document
+            WHERE announce_id = #{announceId}
+              AND title = #{title}
+        )
+    </insert>
+
+    <!-- 즐겨찾기 전체 -->
+    <select id="findDocumentsByMemberId" parameterType="long"
+            resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
+        SELECT d.document_id   AS documentId,
+               d.announce_id   AS announceId,
+               d.title,
+               d.description,
+               IF(mdc.status = 1, TRUE, FALSE) AS checked
+        FROM member_favorite mf
+                 JOIN document d ON mf.announce_id = d.announce_id
+                 LEFT JOIN member_document_check mdc
+                           ON d.document_id = mdc.document_id
+                               AND mdc.member_id = #{memberId}
+        WHERE mf.member_id = #{memberId}
+        ORDER BY d.created_at DESC
+    </select>
+
+    <!-- ✅ 공고별 -->
+    <select id="findDocumentsByMemberAndAnnounce" resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
+        SELECT d.document_id   AS documentId,
+               d.announce_id   AS announceId,
+               d.title,
+               d.description,
+               IF(mdc.status = 1, TRUE, FALSE) AS checked
+        FROM document d
+                 LEFT JOIN member_document_check mdc
+                           ON d.document_id = mdc.document_id
+                               AND mdc.member_id = #{memberId}
+        WHERE d.announce_id = #{announceId}
+        ORDER BY d.created_at ASC
+    </select>
+
+    <!-- 체크/해제 (UPSERT) -->
+    <insert id="upsertDocumentCheck">
+        INSERT INTO member_document_check (document_id, member_id, status, checked_at, created_at)
+        VALUES (#{documentId}, #{memberId}, #{status}, NOW(), NOW())
+            ON DUPLICATE KEY UPDATE
+                                 status     = VALUES(status),
+                                 checked_at = NOW()
+    </insert>
+
+</mapper>
