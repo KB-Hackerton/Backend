@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/email")
+@RequestMapping("/email")
 @RequiredArgsConstructor
 @Tag(name = "이메일 인증", description = "이메일 인증번호 발송 및 검증 API")
 public class EmailController {
