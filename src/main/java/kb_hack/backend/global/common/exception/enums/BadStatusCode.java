@@ -12,6 +12,10 @@ public enum BadStatusCode {
     INVALID_ACCESS_TOKEN_EXCEPTION(HttpStatus.BAD_REQUEST,"토큰이 유효하지 않습니다."),
     INVALID_AUTHORIZATION_HEADER_EXCEPTION(HttpStatus.BAD_REQUEST,"인증 헤더가 유효하지 않습니다"),
     INVALID_PARAMETER_EXCEPTION(HttpStatus.BAD_REQUEST,"파라미터를 잘못 입력 하셨습니다."),
+    EMPTY_SIGNUP_INFO_EXCEPTION(HttpStatus.BAD_REQUEST,"회원가입 요청 정보가 비었습니다."),
+    INVALID_MINOR_NAME_EXCEPTION(HttpStatus.BAD_REQUEST,"잘못된 업종 이름 입니다."),
+    FAIL_TO_REGISTER_BUSINESS_EXCEPTION(HttpStatus.BAD_REQUEST,"사업체 등록에 실패했습니다. 요청 데이터를 확인해주세요."),
+    FAIL_TO_REGISTER_MEMBER_EXCEPTION(HttpStatus.BAD_REQUEST, "회원 등록에 실패했습니다. 요청 데이터를 확인해주세요."),
 
 
     //401 UNAUTHORIZED
@@ -30,6 +34,10 @@ public enum BadStatusCode {
 
     // 5xx(Server Error)
     INTERNAL_SERVER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    DATABASE_PROCESSING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "DB 처리 중 오류가 발생했습니다."),
+    PASSWORD_ENCODING_FAIL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호 암호화 처리 중 오류가 발생했습니다."),
+    FAIL_TO_REGISTER_MEMBER_AUTH_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "회원 권한 등록에 실패했습니다."),
+
 
     // 크롤링 관련 5xx
     CRAWL_URL_FAIL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "크롤링 URL 관련 오류"),

@@ -11,7 +11,6 @@
 
     <resultMap id="MemberMap" type="kb_hack.backend.global.security.entity.MemberVO">
         <id     property="memberId"       column="member_id"/>
-        <result property="businessId"     column="business_id"/>
         <result property="profileImageId" column="profile_image_id"/>
         <result property="memberEmail"    column="member_email"/>
         <result property="password"       column="password"/>
@@ -28,7 +27,6 @@
     <select id="getMemberByMemberEmail" parameterType="string" resultMap="MemberMap">
         SELECT
             m.member_id,
-            m.business_id,
             m.profile_image_id,
             m.password,
             m.member_email,

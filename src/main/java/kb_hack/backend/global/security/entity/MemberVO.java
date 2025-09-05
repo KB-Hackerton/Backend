@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 public class MemberVO {
     private Long memberId;
-    private Long businessId;
     private Long profileImageId;
     private String memberEmail;
     private String password;

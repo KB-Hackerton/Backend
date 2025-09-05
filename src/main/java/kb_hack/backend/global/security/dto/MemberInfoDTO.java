@@ -31,7 +31,6 @@ public class MemberInfoDTO {
     public static MemberInfoDTO convertToDTO(MemberVO vo) {
         return MemberInfoDTO.builder()
                 .memberId(vo.getMemberId())
-                .businessId(vo.getBusinessId())
                 .profileImageId(vo.getProfileImageId())
                 .memberEmail(vo.getMemberEmail())
                 .memberName(vo.getMemberName())
