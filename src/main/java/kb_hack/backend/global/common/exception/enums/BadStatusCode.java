@@ -42,6 +42,7 @@ public enum BadStatusCode {
     FAIL_TO_SAVE_VERIFICATION_CODE_REDIS_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"Redis에 인증번호 저장을 실패 했습니다."),
     FAIL_TO_HANDLE_VERIFICATION_CODE_REDIS_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"Redis에서 인증번호 조회/삭제 중 오류 발생 했습니다."),
     FAIL_TO_SEND_MAIL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"메일 서버 오류로 인증 메일 전송을 실패 했습니다."),
+    FAIL_TO_SIGNOUT_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"회원 탈퇴에 실패 했습니다"),
 
 
     // 크롤링 관련 5xx

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kb_hack.backend.domain.member.dto.request.SigunUpRequestDTO;
 import kb_hack.backend.domain.member.service.MemberService;
@@ -12,10 +13,7 @@ import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
 import kb_hack.backend.global.common.response.bad.BadResponse;
 import kb_hack.backend.global.common.response.success.SuccessResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,8 +35,9 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류",
                     content = @Content(schema = @Schema(implementation = BadResponse.class)))
     })
+
     @PostMapping("/member-info")
-    public SuccessResponse<Void> signUpBusiness(
+    public SuccessResponse<Void> signUpMember(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "회원가입 요청 DTO",
                     required = true,
@@ -48,6 +47,25 @@ public class AuthController {
     ) {
         memberService.signup(requestDTO);
         return SuccessResponse.makeResponse(SuccessStatusCode.SIGNUP_SUCCESS);
+    }
+
+    @DeleteMapping("/member-info")
+    @Operation(
+            summary = "회원 탈퇴",
+            description = "현재 로그인한 사용자의 계정을 삭제합니다. "
+                    + "인증된 JWT 토큰이 필요하며, 성공 시 회원 정보가 영구적으로 삭제됩니다.",
+            security = @SecurityRequirement(name = "bearerAuth")
+
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (요청 정보 오류 등)"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 없음/만료)"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    public SuccessResponse<Void> signOutMember(){
+        memberService.delete();
+        return SuccessResponse.makeResponse(SuccessStatusCode.SIGNOUT_SUCCESS);
     }
 }
 

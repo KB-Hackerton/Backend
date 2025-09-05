@@ -9,8 +9,12 @@ import kb_hack.backend.domain.member.mapper.MemberMapper;
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 import kb_hack.backend.global.common.exception.type.BadRequestException;
 import kb_hack.backend.global.common.exception.type.ServerErrorException;
+import kb_hack.backend.global.security.dto.SecurityCustomUser;
+import kb_hack.backend.global.security.entity.MemberVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -68,6 +72,17 @@ public class MemberService {
         MemberDTO dto = signUpInsertMemberInfo(sigunUpRequestDTO);
         businessService.sigunUpInsertBusinessInfo(sigunUpRequestDTO, dto.getMemberId());
 
+    }
+
+    public void delete (){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        SecurityCustomUser securityUser = (SecurityCustomUser) authentication.getPrincipal();
+        MemberVO vo = securityUser.getMemberVO();
+        int i = memberMapper.deleteUser(vo.getMemberId());
+
+        if(i == 0 ) {
+            throw new ServerErrorException(BadStatusCode.FAIL_TO_SIGNOUT_EXCEPTION);
+        }
     }
 
 
