@@ -60,5 +60,12 @@
                  LEFT JOIN business b ON b.member_id = m.member_id
         WHERE m.member_email = #{memberEmail}
     </select>
+    <select id="getMinorNmByBusinessId" resultType="java.lang.String">
+        SELECT bc.minor_name
+        FROM business_class bc
+                 JOIN business b ON bc.business_class_id = b.business_class_id
+        WHERE b.business_id = #{businessId}
+    </select>
+
 
 </mapper>

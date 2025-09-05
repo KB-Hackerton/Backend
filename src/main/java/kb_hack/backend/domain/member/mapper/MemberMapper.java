@@ -11,4 +11,6 @@ public interface MemberMapper {
     int insertAuth(AuthDTO authDTO);
     int deleteUser(Long memberId);
     int updatePasswordByMemberEmail(@Param("memberEmail") String memberEmail, @Param("newPassword")String newPassword);
+    int updateMembernameByMemberId(@Param("memberName") String memberName, @Param("memberId") Long memberId);
+
 }

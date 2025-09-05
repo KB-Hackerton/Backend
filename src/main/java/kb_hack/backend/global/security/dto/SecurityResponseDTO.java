@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class SecurityResponseDTO {
     String accessToken;
     String refreshToken;
-    MemberInfoDTO member;
+    SecurityMemberInfoDTO member;
 
 }

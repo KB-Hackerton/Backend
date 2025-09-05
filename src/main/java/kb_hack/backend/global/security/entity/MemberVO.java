@@ -21,6 +21,7 @@ public class MemberVO {
     private Date createdAt;
     private Integer helpCount;
     private String badge;
+    private String minorNm;
     private BusinessDTO businessDTO;
     private List<MemberAuthVO> authMap;
 }

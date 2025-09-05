@@ -5,5 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface SecurityMemberMapper {
-    public MemberVO getMemberByMemberEmail(String memberEmail);
+     MemberVO getMemberByMemberEmail(String memberEmail);
+     String getMinorNmByBusinessId(Long businessId);
 }
