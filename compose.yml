@@ -8,3 +8,10 @@ services:
       - ./mysql_data:/var/lib/mysql
     ports:
       - "3307:3306"
+  hackerton-redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
