@@ -7,12 +7,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kb_hack.backend.domain.member.dto.request.LoginUpdateNewPassword;
 import kb_hack.backend.domain.member.dto.request.SigunUpRequestDTO;
 import kb_hack.backend.domain.member.service.MemberService;
 import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
 import kb_hack.backend.global.common.response.bad.BadResponse;
 import kb_hack.backend.global.common.response.success.SuccessResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -66,6 +68,27 @@ public class AuthController {
     public SuccessResponse<Void> signOutMember(){
         memberService.delete();
         return SuccessResponse.makeResponse(SuccessStatusCode.SIGNOUT_SUCCESS);
+    }
+
+    @Operation(
+            summary = "비밀번호 변경(로그인 페이지)",
+            description = """
+            회원 이메일을 기반으로 새 비밀번호를 설정합니다.  
+            - 입력받은 비밀번호는 서버에서 BCrypt로 암호화되어 저장됩니다.  
+            """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공",
+                    content = @Content(schema = @Schema(implementation = SuccessResponse.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (이메일 없음, 비밀번호 누락 등)",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PatchMapping("/password")
+    public SuccessResponse<Void> changeNewPassword(@RequestBody LoginUpdateNewPassword loginUpdateNewPassword){
+        memberService.updatePassword(loginUpdateNewPassword.getMemberEmail(),loginUpdateNewPassword.getPassword());
+        return SuccessResponse.makeResponse(SuccessStatusCode.CHANGE_NEW_PASSWORD_SUCCESS);
     }
 }
 

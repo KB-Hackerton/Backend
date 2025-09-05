@@ -74,12 +74,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth)-> auth
                         //스웨거,Welcome page 허용
                         .requestMatchers("/assets/**", "/favicon.ico", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**",
-                                "/webjars/**", "/swagger/**","/", "/index.html","/api-docs/**").permitAll()
+                                "/webjars/**", "/swagger/**","/", "/index.html","/api-docs/**","/images/logo.png").permitAll()
 
                         //실제 permitall 할 ul
-                        .requestMatchers("/auth/login","/auth/refresh","/auth/password","/check","/test/*","/email/**","/images/logo.png").permitAll()
+                        .requestMatchers("/auth/login","/auth/refresh","/auth/password","/check","/test/*","/email/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/member-info").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/member-info").hasRole("Member")
+                        .requestMatchers(HttpMethod.DELETE, "/password").hasRole("Member")
                         .requestMatchers("/crawl/admin").hasRole("Admin")
 
                         .anyRequest().authenticated()

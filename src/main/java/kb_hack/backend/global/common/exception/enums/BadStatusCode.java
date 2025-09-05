@@ -18,6 +18,8 @@ public enum BadStatusCode {
     FAIL_TO_REGISTER_MEMBER_EXCEPTION(HttpStatus.BAD_REQUEST, "회원 등록에 실패했습니다. 요청 데이터를 확인해주세요."),
     INSUFFICIENT_EMAIL_VERIFICATION_CODE(HttpStatus.BAD_REQUEST,"인증번호가 존재하지 않거나 만료되었습니다."),
     INVAID_EMAIL_EXCEPTION(HttpStatus.BAD_REQUEST,"유효하지 않은 이메일 입니다."),
+    ALREADY_REGISTERED_EMAIL_EXCEPTION(HttpStatus.BAD_REQUEST, "이미 가입된 이메일입니다."),
+    INCORRECT_ORIGINAL_PASSWORD_EXCEPTION(HttpStatus.BAD_REQUEST,"기존 비밀번호가 일치 하지 않습니다."),
 
 
     //401 UNAUTHORIZED

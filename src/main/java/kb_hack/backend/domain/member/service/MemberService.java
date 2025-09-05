@@ -75,14 +75,32 @@ public class MemberService {
     }
 
     public void delete (){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        SecurityCustomUser securityUser = (SecurityCustomUser) authentication.getPrincipal();
-        MemberVO vo = securityUser.getMemberVO();
+        MemberVO vo = getMemberVO();
         int i = memberMapper.deleteUser(vo.getMemberId());
 
         if(i == 0 ) {
             throw new ServerErrorException(BadStatusCode.FAIL_TO_SIGNOUT_EXCEPTION);
         }
+    }
+
+
+    public void updatePassword(String memberEmail, String newPassword){
+        if (newPassword == null || newPassword.isBlank() || memberEmail == null || memberEmail.isBlank()) {
+            throw new BadRequestException(BadStatusCode.INVALID_PARAMETER_EXCEPTION);
+        }
+        String encode = bCryptPasswordEncoder.encode(newPassword);
+        int i = memberMapper.updatePasswordByMemberEmail(memberEmail, encode);
+
+        if (i == 0) {
+            throw new ServerErrorException(BadStatusCode.DATABASE_PROCESSING_EXCEPTION);
+        }
+    }
+
+    private static MemberVO getMemberVO() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        SecurityCustomUser securityUser = (SecurityCustomUser) authentication.getPrincipal();
+        MemberVO vo = securityUser.getMemberVO();
+        return vo;
     }
 
 
