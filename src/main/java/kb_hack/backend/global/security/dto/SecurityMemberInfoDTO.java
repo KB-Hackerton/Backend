@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MemberInfoDTO {
+public class SecurityMemberInfoDTO {
     private Long memberId;
     private Long profileImageId;
     private String memberEmail;
@@ -26,11 +25,12 @@ public class MemberInfoDTO {
     private Date createdAt;
     private Integer helpCount;
     private String badge;
+    private String minorNm;
     private BusinessDTO businessDTO;
     private List<MemberAuthVO> authMap;
 
-    public static MemberInfoDTO convertToDTO(MemberVO vo) {
-        return MemberInfoDTO.builder()
+    public static SecurityMemberInfoDTO convertToDTO(MemberVO vo) {
+        return SecurityMemberInfoDTO.builder()
                 .memberId(vo.getMemberId())
                 .profileImageId(vo.getProfileImageId())
                 .memberEmail(vo.getMemberEmail())
