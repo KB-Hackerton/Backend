@@ -85,7 +85,7 @@ public class MemberService {
 
 
     public void updatePassword(String memberEmail, String newPassword){
-        if (newPassword == null || newPassword.isBlank()) {
+        if (newPassword == null || newPassword.isBlank() || memberEmail == null || memberEmail.isBlank()) {
             throw new BadRequestException(BadStatusCode.INVALID_PARAMETER_EXCEPTION);
         }
         String encode = bCryptPasswordEncoder.encode(newPassword);
