@@ -71,7 +71,7 @@ public class AuthController {
     }
 
     @Operation(
-            summary = "비밀번호 변경",
+            summary = "비밀번호 변경(로그인 페이지)",
             description = """
             회원 이메일을 기반으로 새 비밀번호를 설정합니다.  
             - 입력받은 비밀번호는 서버에서 BCrypt로 암호화되어 저장됩니다.  
