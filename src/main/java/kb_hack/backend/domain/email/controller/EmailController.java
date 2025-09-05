@@ -19,8 +19,9 @@ public class EmailController {
     private final EmailService emailService;
 
     @GetMapping("")
-    public SuccessResponse<Void>sendEmail(){
-        emailService.sendVerificationCode();
+    public SuccessResponse<Void>sendEmail(@RequestBody MailDTO mailDTO){
+        System.out.println("✨✨✨✨✨✨✨✨✨✨mailDTO.getEmail() = " + mailDTO.getEmail());
+        emailService.sendVerificationCode(mailDTO.getEmail());
         return SuccessResponse.makeResponse(SuccessStatusCode.EMAIL_SEND_SUCCESS);
     }
 }

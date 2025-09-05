@@ -22,20 +22,14 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private final TemplateEngine templateEngine;
 
-    public void sendVerificationCode() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        SecurityCustomUser customUser = (SecurityCustomUser) authentication.getPrincipal();
-        MemberVO vo = customUser.getMemberVO();
-        System.out.println("✨✨✨✨✨✨✨✨✨vo = " + vo);
+    public void sendVerificationCode(String email) {
 
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(new InternetAddress("zibi_official@naver.com", "경상났네 운영팀"));
-            System.out.println("✨✨✨✨✨✨✨✨✨vo.getMemberEmail() = " + vo.getMemberEmail());
-            helper.setTo(vo.getMemberEmail());
+            helper.setTo(email);
             helper.setSubject("[경상났네] 이메일 인증번호 안내");
 
             Context context = new Context();
