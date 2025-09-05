@@ -1,6 +1,7 @@
 package kb_hack.backend.domain.business.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kb_hack.backend.domain.member.dto.request.SigunUpRequestDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import java.util.Date;
 @Data
 public class BusinessDTO {
     private Long businessId;// AUTO_INCREMENT PK
+    @JsonIgnore
     private Long memberId;
     private Long businessClassId;
     private String businessNm;

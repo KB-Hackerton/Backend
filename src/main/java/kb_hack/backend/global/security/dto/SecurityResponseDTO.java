@@ -14,4 +14,5 @@ public class SecurityResponseDTO {
     String accessToken;
     String refreshToken;
     MemberInfoDTO member;
+
 }
