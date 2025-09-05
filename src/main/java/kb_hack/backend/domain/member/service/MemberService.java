@@ -26,19 +26,19 @@ public class MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public MemberDTO signUpInsertMemberInfo(SigunUpRequestDTO sigunUpRequestDTO) {
-        System.out.println("🔥🔥🔥🔥🔥🔥🔥sigunUpRequestDTO = " + sigunUpRequestDTO);
+
         if (sigunUpRequestDTO == null) {
             throw new BadRequestException(BadStatusCode.EMPTY_SIGNUP_INFO_EXCEPTION);
         }
         try {
             MemberDTO dto = MemberDTO.convertToMemberDTO(sigunUpRequestDTO);
-            System.out.println("🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥dto = " + dto);
+
             try {
                 dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
             } catch (Exception e) {
                 throw new ServerErrorException(BadStatusCode.PASSWORD_ENCODING_FAIL_EXCEPTION);
             }
-            System.out.println("🔥🔥🔥🔥🔥🔥🔥insert 직전🔥🔥🔥🔥🔥🔥🔥dto = " + dto);
+
 
             int i = memberMapper.insertMember(dto);
             if (i == 0) {

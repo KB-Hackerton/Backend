@@ -24,9 +24,7 @@ public class BusinessDTO {
     private String businessAddrDetail;
     private String businessCode;
     private Date businessOpenDate;
-    private String si;
-    private String sigungu;
-    private String eupmyeonDong;
+
 
     public static BusinessDTO makeBusniessDTO(SigunUpRequestDTO dto){
         return BusinessDTO.builder()

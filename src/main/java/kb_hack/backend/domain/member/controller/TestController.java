@@ -1,5 +1,6 @@
 package kb_hack.backend.domain.member.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kb_hack.backend.domain.business.dto.BusinessDTO;
 import kb_hack.backend.domain.business.service.BusinessService;
 import kb_hack.backend.domain.member.dto.request.SigunUpRequestDTO;
@@ -16,18 +17,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/test")
 @RequiredArgsConstructor
+@Tag(name = "Checklist", description = "api 테스트용 컨트롤러")
 public class TestController {
-    private  final MemberService memberService;
-
 
     @GetMapping("")
     public String test() { return "ok"; }
-
-    @PostMapping("/signup")
-    public SuccessResponse<Void> signUpBusiness(@RequestBody SigunUpRequestDTO requestDTO) {
-         memberService.signup(requestDTO);
-         return SuccessResponse.makeResponse(SuccessStatusCode.SIGNUP_SUCCESS);
-    }
 
     @GetMapping("/400")
     public String test400(@RequestParam(required = false) String name) {
@@ -42,10 +36,4 @@ public class TestController {
         int error = 1 / 0;
         return "ok";
     }
-
-    @GetMapping("/missing-param")
-    public String testMissing(@RequestParam String name) {
-        return "hello " + name;
-    }
-
 }
