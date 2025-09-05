@@ -14,5 +14,11 @@
         INSERT INTO auth (member_id,auth)
         VALUES (#{memberId},#{auth})
     </insert>
+    <delete id="deleteUser" parameterType="long">
+        delete from member
+        where member_id = #{memberId}
+    </delete>
+
+
 
 </mapper>

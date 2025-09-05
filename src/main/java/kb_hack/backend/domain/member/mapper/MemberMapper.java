@@ -8,5 +8,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface MemberMapper {
     int insertMember(MemberDTO memberDTO);
     int insertAuth(AuthDTO authDTO);
-
+    int deleteUser(Long memberId);
 }
