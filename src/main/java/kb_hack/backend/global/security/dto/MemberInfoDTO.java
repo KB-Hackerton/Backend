@@ -1,6 +1,7 @@
 package kb_hack.backend.global.security.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import kb_hack.backend.domain.business.dto.BusinessDTO;
 import kb_hack.backend.global.security.entity.MemberAuthVO;
 import kb_hack.backend.global.security.entity.MemberVO;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,6 @@ import java.util.List;
 @Builder
 public class MemberInfoDTO {
     private Long memberId;
-    private Long businessId;
     private Long profileImageId;
     private String memberEmail;
     private String memberName;
@@ -26,18 +26,19 @@ public class MemberInfoDTO {
     private Date createdAt;
     private Integer helpCount;
     private String badge;
+    private BusinessDTO businessDTO;
     private List<MemberAuthVO> authMap;
 
     public static MemberInfoDTO convertToDTO(MemberVO vo) {
         return MemberInfoDTO.builder()
                 .memberId(vo.getMemberId())
-                .businessId(vo.getBusinessId())
                 .profileImageId(vo.getProfileImageId())
                 .memberEmail(vo.getMemberEmail())
                 .memberName(vo.getMemberName())
                 .createdAt(vo.getCreatedAt())
                 .helpCount(vo.getHelpCount())
                 .badge(vo.getBadge())
+                .businessDTO(vo.getBusinessDTO())
                 .authMap(vo.getAuthMap())
                 .build();
     }

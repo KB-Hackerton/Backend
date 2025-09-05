@@ -9,9 +9,19 @@
         <result property="auth" column="auth"/>
     </resultMap>
 
+    <resultMap id="BusinessMap" type="kb_hack.backend.domain.business.dto.BusinessDTO">
+        <id property="businessId" column="business_id"/>
+        <result property="businessClassId" column="business_class_id"/>
+        <result property="businessNm" column="business_nm"/>
+        <result property="businessAddr" column="business_addr"/>
+        <result property="businessAddrDetail" column="business_addr_detail"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="businessOpenDate" column="business_open_date"/>
+    </resultMap>
+
+
     <resultMap id="MemberMap" type="kb_hack.backend.global.security.entity.MemberVO">
         <id     property="memberId"       column="member_id"/>
-        <result property="businessId"     column="business_id"/>
         <result property="profileImageId" column="profile_image_id"/>
         <result property="memberEmail"    column="member_email"/>
         <result property="password"       column="password"/>
@@ -19,8 +29,10 @@
         <result property="createdAt"      column="created_at"/>
         <result property="helpCount"      column="help_count"/>
         <result property="badge"          column="badge"/>
+        <association property="businessDTO" resultMap="BusinessMap"/>
         <collection property="authMap" resultMap="authMap"/>
     </resultMap>
+
 
 
 
@@ -28,21 +40,25 @@
     <select id="getMemberByMemberEmail" parameterType="string" resultMap="MemberMap">
         SELECT
             m.member_id,
-            m.business_id,
             m.profile_image_id,
-            m.password,
             m.member_email,
             m.password,
             m.member_name,
             m.created_at,
             m.help_count,
             m.badge,
-            a.auth
-
+            a.auth,
+            b.business_id,
+            b.business_class_id,
+            b.business_nm,
+            b.business_addr,
+            b.business_addr_detail,
+            b.business_code,
+            b.business_open_date
         FROM member m
-                 LEFT JOIN auth a
-                           ON a.member_id = m.member_id
+                 LEFT JOIN auth a ON a.member_id = m.member_id
+                 LEFT JOIN business b ON b.member_id = m.member_id
         WHERE m.member_email = #{memberEmail}
-
     </select>
+
 </mapper>
