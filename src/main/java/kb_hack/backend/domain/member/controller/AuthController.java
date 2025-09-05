@@ -8,7 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kb_hack.backend.domain.member.dto.request.LoginUpdateNewPassword;
+import kb_hack.backend.domain.member.dto.request.MemberInfoRequestDTO;
 import kb_hack.backend.domain.member.dto.request.SigunUpRequestDTO;
+import kb_hack.backend.domain.member.service.MemberInfoService;
 import kb_hack.backend.domain.member.service.MemberService;
 import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
 import kb_hack.backend.global.common.response.bad.BadResponse;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final MemberService memberService;
+    private final MemberInfoService memberInfoService;
 
     @Operation(
             summary = "회원가입 API",
@@ -89,6 +92,33 @@ public class AuthController {
     public SuccessResponse<Void> changeNewPassword(@RequestBody LoginUpdateNewPassword loginUpdateNewPassword){
         memberService.updatePassword(loginUpdateNewPassword.getMemberEmail(),loginUpdateNewPassword.getPassword());
         return SuccessResponse.makeResponse(SuccessStatusCode.CHANGE_NEW_PASSWORD_SUCCESS);
+    }
+
+    @PatchMapping("/member-info")
+    @Operation(
+            summary = "회원/사업체 정보 수정",
+            security = @SecurityRequirement(name = "bearerAuth"),
+            description = """
+            로그인된 회원의 사업체 정보와 회원 이름을 수정합니다.  
+            - `minor_name` 값으로 업종 분류 ID를 조회하여 업데이트합니다.  
+            - 사업체 정보와 회원 이름이 모두 정상적으로 업데이트되지 않으면 실패합니다.
+            """
+    )
+    @ApiResponse(responseCode = "200", description = "회원 정보 수정 성공",
+            content = @Content(schema = @Schema(implementation = SuccessResponse.class)))
+    @ApiResponse(responseCode = "400", description = "잘못된 요청 (예: 잘못된 minor_name 입력, 파라미터 오류)")
+    @ApiResponse(responseCode = "404", description = "존재하지 않는 회원")
+    @ApiResponse(responseCode = "500", description = "서버 내부 오류 (DB 처리 실패 등)")
+    public SuccessResponse<Void> updateUserInfo(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "수정할 회원/사업체 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = MemberInfoRequestDTO.class))
+            )
+            @RequestBody MemberInfoRequestDTO memberInfoRequestDTO
+    ) {
+        memberInfoService.updateMemberInfo(memberInfoRequestDTO);
+        return SuccessResponse.makeResponse(SuccessStatusCode.CHANGE_MEMBER_INFO_SUCCESS);
     }
 }
 

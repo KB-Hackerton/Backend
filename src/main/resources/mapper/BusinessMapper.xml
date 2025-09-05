@@ -15,4 +15,15 @@
     </select>
 
 
+    <update id="updateBusiness">
+        UPDATE business
+        SET business_code = #{dto.businessCode},
+            business_nm = #{dto.businessNm},
+            business_open_date = #{dto.businessOpenDate},
+            business_addr = #{dto.businessAddr},
+            business_addr_detail = #{dto.businessAddrDetail},
+            business_class_id = #{dto.businessClassId}
+        WHERE business_id = #{businessId}
+    </update>
+
 </mapper>

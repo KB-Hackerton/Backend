@@ -25,7 +25,11 @@
         WHERE member_email =#{memberEmail}
 
     </update>
-
+    <update id="updateMembernameByMemberId">
+        UPDATE member
+        SET member_name = #{memberName}
+        WHERE member_id = #{memberId}
+    </update>
 
 
 </mapper>

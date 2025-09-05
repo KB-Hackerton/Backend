@@ -19,7 +19,8 @@ public enum SuccessStatusCode {
     ANNOUNCE_GET_SUCCESS(HttpStatus.OK,"공고 리스트 불러오기 성공!"),
     FESTIVAL_GET_SUCCESS(HttpStatus.OK,"축제 리스트 불러오기 성공!"),
     SIGNOUT_SUCCESS(HttpStatus.OK,"회원 탈퇴 성공!"),
-    CHANGE_NEW_PASSWORD_SUCCESS(HttpStatus.OK,"비밀번호 변경 성공!");
+    CHANGE_NEW_PASSWORD_SUCCESS(HttpStatus.OK,"비밀번호 변경 성공!"),
+    CHANGE_MEMBER_INFO_SUCCESS(HttpStatus.OK,"회원 정보 업데이트 완료!");
     private final HttpStatus httpStatus;
     private final String message;
 
