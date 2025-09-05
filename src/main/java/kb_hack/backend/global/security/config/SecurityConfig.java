@@ -77,7 +77,7 @@ public class SecurityConfig {
                                 "/webjars/**", "/swagger/**","/", "/index.html","/api-docs/**").permitAll()
 
                         //실제 permitall 할 ul
-                        .requestMatchers("/auth/login","/auth/refresh","/auth/password","/check","/test/*").permitAll()
+                        .requestMatchers("/auth/login","/auth/refresh","/auth/password","/check","/test/*","/email/**","/images/logo.png").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/member-info").permitAll()
                         .requestMatchers("/crawl/admin").hasRole("Admin")
 

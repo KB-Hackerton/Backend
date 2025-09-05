@@ -16,6 +16,8 @@ public enum BadStatusCode {
     INVALID_MINOR_NAME_EXCEPTION(HttpStatus.BAD_REQUEST,"잘못된 업종 이름 입니다."),
     FAIL_TO_REGISTER_BUSINESS_EXCEPTION(HttpStatus.BAD_REQUEST,"사업체 등록에 실패했습니다. 요청 데이터를 확인해주세요."),
     FAIL_TO_REGISTER_MEMBER_EXCEPTION(HttpStatus.BAD_REQUEST, "회원 등록에 실패했습니다. 요청 데이터를 확인해주세요."),
+    INSUFFICIENT_EMAIL_VERIFICATION_CODE(HttpStatus.BAD_REQUEST,"인증번호가 존재하지 않거나 만료되었습니다."),
+    INVAID_EMAIL_EXCEPTION(HttpStatus.BAD_REQUEST,"유효하지 않은 이메일 입니다."),
 
 
     //401 UNAUTHORIZED
@@ -37,6 +39,9 @@ public enum BadStatusCode {
     DATABASE_PROCESSING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "DB 처리 중 오류가 발생했습니다."),
     PASSWORD_ENCODING_FAIL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호 암호화 처리 중 오류가 발생했습니다."),
     FAIL_TO_REGISTER_MEMBER_AUTH_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "회원 권한 등록에 실패했습니다."),
+    FAIL_TO_SAVE_VERIFICATION_CODE_REDIS_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"Redis에 인증번호 저장을 실패 했습니다."),
+    FAIL_TO_HANDLE_VERIFICATION_CODE_REDIS_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"Redis에서 인증번호 조회/삭제 중 오류 발생 했습니다."),
+    FAIL_TO_SEND_MAIL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"메일 서버 오류로 인증 메일 전송을 실패 했습니다."),
 
 
     // 크롤링 관련 5xx
