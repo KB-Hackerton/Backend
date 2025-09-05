@@ -2,6 +2,7 @@ package kb_hack.backend.domain.email.service;
 
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import kb_hack.backend.domain.email.mapper.EmailMapper;
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 import kb_hack.backend.global.common.exception.type.BadRequestException;
 import kb_hack.backend.global.common.exception.type.ServerErrorException;
@@ -25,8 +26,13 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private final TemplateEngine templateEngine;
     private final StringRedisTemplate redisTemplate;
+    private final EmailMapper emailMapper;
 
     public void sendVerificationCode(String email) {
+        if (emailMapper.findMemberIDByEmail(email) != 0) {
+            throw new BadRequestException(BadStatusCode.ALREADY_REGISTERED_EMAIL_EXCEPTION);
+        }
+
         String verificationCode = generateCode();
         String key = email + ":email-verification";
 

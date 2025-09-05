@@ -19,6 +19,13 @@
         where member_id = #{memberId}
     </delete>
 
+    <update id="updatePasswordByMemberEmail">
+        UPDATE member
+        SET password = #{newPassword}
+        WHERE member_email =#{memberEmail}
+
+    </update>
+
 
 
 </mapper>

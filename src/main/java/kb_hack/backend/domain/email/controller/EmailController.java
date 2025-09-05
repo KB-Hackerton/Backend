@@ -27,7 +27,7 @@ public class EmailController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "이메일 발송 성공",
                             content = @Content(schema = @Schema(implementation = SuccessResponse.class))),
-                    @ApiResponse(responseCode = "500", description = "메일 서버 오류 / Redis 저장 오류")
+                    @ApiResponse(responseCode = "400", description = "이미 가입한 이메일 입니다 or 이메일 발송 실패 ")
             }
     )
     public SuccessResponse<Void>sendEmail(@RequestBody MailDTO mailDTO){

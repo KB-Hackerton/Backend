@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kb_hack.backend.domain.member.dto.request.LoginUpdateNewPassword;
 import kb_hack.backend.domain.member.dto.request.SigunUpRequestDTO;
 import kb_hack.backend.domain.member.service.MemberService;
 import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
@@ -66,6 +67,12 @@ public class AuthController {
     public SuccessResponse<Void> signOutMember(){
         memberService.delete();
         return SuccessResponse.makeResponse(SuccessStatusCode.SIGNOUT_SUCCESS);
+    }
+
+    @PatchMapping("/password")
+    public SuccessResponse<Void> changeNewPassword(@RequestBody LoginUpdateNewPassword loginUpdateNewPassword){
+        memberService.updatePassword(loginUpdateNewPassword.getMemberEmail(),loginUpdateNewPassword.getPassword());
+        return SuccessResponse.makeResponse(SuccessStatusCode.CHANGE_NEW_PASSWORD_SUCCESS);
     }
 }
 

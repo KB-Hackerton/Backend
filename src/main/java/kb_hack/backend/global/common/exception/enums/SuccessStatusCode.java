@@ -18,7 +18,8 @@ public enum SuccessStatusCode {
     EMAIL_VERIFY_CODE_SUCCESS(HttpStatus.OK,"인증 코드 검증 성공!"),
     ANNOUNCE_GET_SUCCESS(HttpStatus.OK,"공고 리스트 불러오기 성공!"),
     FESTIVAL_GET_SUCCESS(HttpStatus.OK,"축제 리스트 불러오기 성공!"),
-    SIGNOUT_SUCCESS(HttpStatus.OK,"회원 탈퇴 성공!");
+    SIGNOUT_SUCCESS(HttpStatus.OK,"회원 탈퇴 성공!"),
+    CHANGE_NEW_PASSWORD_SUCCESS(HttpStatus.OK,"비밀번호 변경 성공!");
     private final HttpStatus httpStatus;
     private final String message;
 
