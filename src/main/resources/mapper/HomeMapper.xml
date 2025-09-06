@@ -4,25 +4,26 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kb_hack.backend.domain.home.mapper.HomeMapper">
 
-    <select id="getRecentAnnounce" resultType="map">
-        SELECT request_end_date, announce_title, announce_id
+    <select id="getRecentAnnounce" resultType="kb_hack.backend.domain.home.dto.request.RecentAnnounceDTO">
+        SELECT reqst_end_date, announce_title, announce_id
         FROM announce
         ORDER BY created_at DESC
-            LIMIT 3;
+            LIMIT 3
     </select>
 
-    <select id="getRecentFestival" resultType="map">
+    <select id="getRecentFestival" resultType="kb_hack.backend.domain.home.dto.request.RecentFestivalDTO">
         SELECT festival_title, festival_id
         FROM festival
         ORDER BY created_at DESC
-            LIMIT 3;
+            LIMIT 3
     </select>
 
-    <select id="getRecentArticle" resultType="map">
+    <select id="getRecentArticle" resultType="kb_hack.backend.domain.home.dto.request.RecentArticleDTO">
         SELECT title, article_id
-        FROM article
+        FROM articles
         ORDER BY created_at DESC
-            LIMIT 3;
+            LIMIT 3
     </select>
+
 
 </mapper>
