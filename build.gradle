@@ -68,6 +68,18 @@ dependencies {
 
 	// mac M1 칩에서 Redis 사용 시 필요할 수 있는 네티 의존성 (운영 환경에서는 제외 가능)
 	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
+
+	implementation 'org.jsoup:jsoup:1.17.2'
+	implementation 'org.apache.pdfbox:pdfbox:2.0.30'
+
+	//13.이메일
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//14.타임리프
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
 }
 
 tasks.named('test') {

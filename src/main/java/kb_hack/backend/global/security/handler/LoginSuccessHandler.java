@@ -6,10 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
 import kb_hack.backend.global.common.response.success.SuccessResponse;
-import kb_hack.backend.global.security.dto.MemberInfoDTO;
+import kb_hack.backend.global.security.dto.SecurityMemberInfoDTO;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import kb_hack.backend.global.security.dto.SecurityResponseDTO;
 import kb_hack.backend.global.security.entity.MemberVO;
+import kb_hack.backend.global.security.mapper.SecurityMemberMapper;
 import kb_hack.backend.global.util.JwtProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,7 @@ import java.io.IOException;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtProcessor jwtProcessor;
     private final ObjectMapper objectMapper;
+    private final SecurityMemberMapper securityMemberMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -33,7 +35,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtProcessor.generateAccessToken(email);
         String refreshToken = jwtProcessor.generateRefreshToken(email);
 
-        MemberInfoDTO dto = MemberInfoDTO.convertToDTO(vo);
+        SecurityMemberInfoDTO dto = SecurityMemberInfoDTO.convertToDTO(vo);
+        dto.setMinorNm(securityMemberMapper.getMinorNmByBusinessId(dto.getBusinessDTO().getBusinessId()));
         SecurityResponseDTO result = new SecurityResponseDTO(accessToken, refreshToken, dto);
 
         SuccessResponse<SecurityResponseDTO> body =

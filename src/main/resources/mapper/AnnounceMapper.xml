@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kb_hack.backend.domain.announce.mapper.AnnounceMapper">
+
+    <resultMap id="announceResultMap" type="kb_hack.backend.domain.announce.Announce">
+        <result property="announceId" column="announce_id"/>
+        <result property="announceTitle" column="announce_title"/>
+        <result property="link" column="link"/>
+        <result property="author" column="author"/>
+        <result property="excInsttNm" column="exc_insttNm"/>
+        <result property="description" column="description"/>
+        <result property="lcategory" column="lcategory"/>
+        <result property="pubDate" column="pub_date"/>
+        <result property="startDate" column="reqst_start_date"/>
+        <result property="endDate" column="reqst_end_date"/>
+        <result property="targetName" column="taget_name"/>
+        <result property="viewNum" column="view_num"/>
+        <result property="filePathName" column="file_path_name"/>
+        <result property="fileName" column="file_name"/>
+        <result property="howToRegister" column="how_to_register"/>
+        <result property="callCompany" column="call_company"/>
+        <result property="printFileName" column="print_file_name"/>
+        <result property="printFilePathName" column="print_file_path_name"/>
+    </resultMap>
+
+
+    <insert id="insertAnnounce" parameterType="kb_hack.backend.domain.announce.Announce">
+        insert into announce
+        (  announce_title, link, author, exc_insttNm, description,
+           lcategory, pub_date, reqst_start_date, reqst_end_date,
+           taget_name, view_num, file_path_name, file_name,
+        how_to_register, call_company ,print_file_name , print_file_path_name)
+        values (
+                   #{announceTitle}, #{link}, #{author}, #{excInsttNm}, #{description},
+                   #{lcategory}, #{pubDate}, #{startDate}, #{endDate},
+                   #{targetName}, #{viewNum}, #{filePathName}, #{fileName},
+                   #{howToRegister}, #{callCompany} ,#{printFileName} ,#{printFilePathName}
+               )
+    </insert>
+
+    <select id="findAll" resultMap="announceResultMap">
+        select
+            announce_id,
+            announce_title,
+            exc_insttNm,
+            reqst_start_date,
+            reqst_end_date
+        from announce
+    </select>
+
+    <select id="findById" resultMap="announceResultMap">
+        select announce_title, link, author, exc_insttNm, description,
+               lcategory, pub_date, reqst_start_date, reqst_end_date,
+               taget_name, view_num, file_path_name, file_name,
+               how_to_register, call_company ,print_file_name , print_file_path_name
+        from announce
+        where announce_id=#{announceId}
+    </select>
+</mapper>

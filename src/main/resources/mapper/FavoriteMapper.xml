@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kb_hack.backend.domain.favorite.mapper.FavoriteMapper">
+
+    <insert id="insertFavorite">
+        INSERT INTO member_favorite (announce_id, member_id, created_at)
+        VALUES (#{announceId}, #{memberId}, NOW())
+    </insert>
+
+    <delete id="deleteFavorite">
+        DELETE FROM member_favorite
+        WHERE announce_id = #{announceId}
+          AND member_id = #{memberId}
+    </delete>
+    <select id="findFavoritesByMemberId" parameterType="long" resultType="kb_hack.backend.domain.favorite.dto.FavoriteResponseDto">
+        SELECT a.announce_id    AS announceId,
+               a.announce_title AS announceTitle,
+               a.link           AS link
+        FROM member_favorite mf
+                 JOIN announce a ON mf.announce_id = a.announce_id
+        WHERE mf.member_id = #{memberId}
+        ORDER BY mf.created_at DESC
+    </select>
+
+    <select id="findAnnouncesByMemberId" parameterType="long"
+            resultType="kb_hack.backend.domain.announce.Announce">
+        SELECT a.*
+        FROM member_favorite mf
+                 JOIN announce a ON mf.announce_id = a.announce_id
+        WHERE mf.member_id = #{memberId}
+    </select>
+
+</mapper>

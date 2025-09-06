@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kb_hack.backend.domain.business.mapper.BusinessMapper">
+
+    <insert id="insertBusiness" parameterType="kb_hack.backend.domain.business.dto.BusinessDTO"
+            useGeneratedKeys="true" keyProperty="businessId">
+        INSERT INTO business (business_class_id,business_nm,business_addr,business_addr_detail,business_code,business_open_date,member_id)
+        VALUES (#{businessClassId},#{businessNm},#{businessAddr},#{businessAddrDetail},#{businessCode},#{businessOpenDate},#{memberId})
+    </insert>
+
+    <select id="findBusinessClassIdByMinorname" parameterType="string" resultType="long">
+        SELECT business_class_id
+        FROM business_class
+        WHERE minor_name = #{minorName}
+    </select>
+
+
+    <update id="updateBusiness">
+        UPDATE business
+        SET business_code = #{dto.businessCode},
+            business_nm = #{dto.businessNm},
+            business_open_date = #{dto.businessOpenDate},
+            business_addr = #{dto.businessAddr},
+            business_addr_detail = #{dto.businessAddrDetail},
+            business_class_id = #{dto.businessClassId}
+        WHERE business_id = #{businessId}
+    </update>
+
+</mapper>
