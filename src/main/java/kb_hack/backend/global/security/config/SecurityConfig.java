@@ -82,10 +82,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/auth/member-info").hasRole("Member")
                         .requestMatchers(HttpMethod.PATCH,"/auth/member-info").hasRole("Member")
                         .requestMatchers(HttpMethod.DELETE, "/password").hasRole("Member")
+                        .requestMatchers(HttpMethod.DELETE, "/announce/**").hasRole("Member")
                     .requestMatchers(HttpMethod.POST, "/api/sos").permitAll()   // ✅ 추가
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()     // ✅ CORS preflight 허용
                         .requestMatchers("/test").hasRole("Member")
                         .requestMatchers("/crawl/admin").hasRole("Admin")
+                        .requestMatchers("/admin/ingest/gyeongsang").hasRole("Admin")
                         .requestMatchers("/api/bizinfo").hasRole("Member")
                         .requestMatchers("/favorites/**").hasRole("Member")
                         .requestMatchers("/sos/**").hasRole("Member")

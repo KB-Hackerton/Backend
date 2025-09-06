@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class announceService {
     private final AnnounceMapper announceMapper;
     private final FavoriteService favoriteService;
+    private final RecentAnnounceService recentAnnounceService;
 
     public List<announceDto> getAnnounceList(){
         List<Announce> announces= announceMapper.findAll();
@@ -36,9 +37,11 @@ public class announceService {
 
     public announceDetailDto getAnnounceDetail(@Param("announceId") Long announceId) {
         Announce announce = announceMapper.findById(announceId);
+        recentAnnounceService.addRecentAnnounce(announceId);
         if(announce==null){
             return null;
         }
+
         return announceDetailDto.from(announce);
     }
 }
