@@ -28,7 +28,7 @@ public class FavoriteController {
 	@PostMapping
 	public ResponseEntity<String> addFavorite(@RequestBody FavoriteRequestDto dto) {
 		favoriteService.addFavorite(dto);
-		return ResponseEntity.ok("즐겨찾기에 등록되었습니다. (memberId=1)");
+		return ResponseEntity.ok("즐겨찾기에 등록되었습니다.");
 	}
 
 	@Operation(
@@ -39,7 +39,7 @@ public class FavoriteController {
 	@DeleteMapping("/{announceId}")
 	public ResponseEntity<String> removeFavorite(@PathVariable Long announceId) {
 		favoriteService.removeFavorite(announceId);
-		return ResponseEntity.ok("즐겨찾기에서 삭제되었습니다. (memberId=1)");
+		return ResponseEntity.ok("즐겨찾기에서 삭제되었습니다.");
 	}
 
 	@Operation(

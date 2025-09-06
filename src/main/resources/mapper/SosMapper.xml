@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kb_hack.backend.domain.sos.mapper.SosMapper">
+
+    <insert id="insert" parameterType="kb_hack.backend.domain.sos.entity.Sos" useGeneratedKeys="true" keyProperty="sosId" keyColumn="sos_id">
+        INSERT INTO sos
+        (member_id, sos_title, sos_type, sos_content, expires_at, is_complete)
+        VALUES
+            (#{memberId}, #{sosTitle}, #{sosType}, #{sosContent}, #{expiresAt}, #{isComplete})
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="kb_hack.backend.domain.sos.entity.Sos">
+        UPDATE sos
+        SET sos_title   = #{sosTitle},
+            sos_type    = #{sosType},
+            sos_content = #{sosContent},
+            expires_at  = #{expiresAt}
+        WHERE sos_id = #{sosId}
+    </update>
+
+    <!-- 하드 삭제 -->
+    <delete id="hardDelete" parameterType="long">
+        DELETE FROM sos
+        WHERE sos_id = #{sosId}
+    </delete>
+
+</mapper>

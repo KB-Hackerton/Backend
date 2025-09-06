@@ -39,5 +39,6 @@ out/
 ## application.properties ##
 /src/main/resources/application.properties
 /mysql_data
+src/main/resources/application-local.properties
 /redis_data
 
