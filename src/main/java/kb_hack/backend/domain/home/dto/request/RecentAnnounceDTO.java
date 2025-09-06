@@ -1,4 +1,4 @@
-package kb_hack.backend.domain.home.dto;
+package kb_hack.backend.domain.home.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 public class RecentAnnounceDTO {
 
-    private Date requestEndDate;
+    private Date reqstEndDate;
     private String announceTitle;
     private Long announceId;
 }

@@ -82,6 +82,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/auth/member-info").hasRole("Member")
                         .requestMatchers(HttpMethod.PATCH,"/auth/member-info").hasRole("Member")
                         .requestMatchers(HttpMethod.DELETE, "/password").hasRole("Member")
+                        .requestMatchers(HttpMethod.DELETE, "/home").hasRole("Member")
                         .requestMatchers(HttpMethod.DELETE, "/announce/**").hasRole("Member")
                         .requestMatchers("/crawl/admin").hasRole("Admin")
                         .requestMatchers("/admin/ingest/gyeongsang").hasRole("Admin")
