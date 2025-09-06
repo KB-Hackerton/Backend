@@ -1,10 +1,14 @@
 package kb_hack.backend.domain.favorite.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+
 public class FavoriteResponseDto {
 	private Long announceId;
 	private String announceTitle;

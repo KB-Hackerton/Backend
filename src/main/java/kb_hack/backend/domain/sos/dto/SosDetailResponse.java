@@ -1,5 +1,7 @@
 package kb_hack.backend.domain.sos.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kb_hack.backend.domain.sos.entity.SosType;
 import lombok.*;
@@ -11,6 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
 public class SosDetailResponse {
 

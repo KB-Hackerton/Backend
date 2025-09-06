@@ -2,6 +2,8 @@ package kb_hack.backend.domain.sos.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import kb_hack.backend.global.common.response.success.SuccessResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -45,15 +47,16 @@ public class SosController {
 
 	private final SosService sosService;
 
-	@Operation(summary = "SOS 생성", description = "새로운 SOS 요청을 생성합니다.")
+	@Operation(summary = "SOS 생성", description = "새로운 SOS 요청을 생성합니다.",security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "SOS 생성 성공",
 			content = @Content(schema = @Schema(implementation = SosCreateResponse.class))),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 		@ApiResponse(responseCode = "500", description = "서버 에러")
+
 	})
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<SosCreateResponse> createSos(
+	public SuccessResponse<SosCreateResponse> createSos(
 		@Parameter(description = "SOS 제목") @RequestParam(required = false) String sosTitle,
 		@Parameter(description = "SOS 유형") @RequestParam SosType sosType,
 		@Parameter(description = "SOS 내용") @RequestParam String sosContent,
@@ -72,19 +75,17 @@ public class SosController {
 			.build();
 
 		SosCreateResponse response = sosService.create(req);
-		return ResponseEntity
-			.status(SuccessStatusCode.SOS_CREATE_SUCCESS.getHttpStatus()) // 201 Created
-			.body(response);
+		return SuccessResponse.makeResponse(SuccessStatusCode.SOS_CREATE_SUCCESS,response);
 	}
 
-	@Operation(summary = "SOS 수정", description = "기존 SOS 요청을 수정합니다.")
+	@Operation(summary = "SOS 수정", description = "기존 SOS 요청을 수정합니다.",security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "SOS 수정 성공"),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 SOS")
 	})
 	@PutMapping("/{sosId}")
-	public ResponseEntity<String> updateSos(
+	public SuccessResponse<Void> updateSos(
 		@PathVariable Long sosId,
 		@RequestParam(required = false) String sosTitle,
 		@RequestParam SosType sosType,
@@ -100,25 +101,21 @@ public class SosController {
 			.expiresAt(expiresAt)
 			.build();
 		sosService.update(sosId, req);
-		return ResponseEntity
-			.status(SuccessStatusCode.SOS_UPDATE_SUCCESS.getHttpStatus())
-			.body(SuccessStatusCode.SOS_UPDATE_SUCCESS.getMessage());
+		return SuccessResponse.makeResponse(SuccessStatusCode.SOS_UPDATE_SUCCESS);
 	}
 
-	@Operation(summary = "SOS 삭제", description = "SOS 요청을 완전히 삭제합니다 (하드 딜리트).")
+	@Operation(summary = "SOS 삭제", description = "SOS 요청을 완전히 삭제합니다 (하드 딜리트).",security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "SOS 삭제 성공"),
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 SOS")
 	})
 	@DeleteMapping("/{sosId}")
-	public ResponseEntity<String> hardDeleteSos(@PathVariable Long sosId) {
+	public SuccessResponse<Void> hardDeleteSos(@PathVariable Long sosId) {
 		sosService.hardDelete(sosId);
-		return ResponseEntity
-			.status(SuccessStatusCode.SOS_DELETE_SUCCESS.getHttpStatus())
-			.body(SuccessStatusCode.SOS_DELETE_SUCCESS.getMessage());
+		return SuccessResponse.makeResponse(SuccessStatusCode.SOS_DELETE_SUCCESS);
 	}
 
-	// ✅ 공통 메서드
+
 	private Long getLoginMemberId() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		SecurityCustomUser securityUser = (SecurityCustomUser) authentication.getPrincipal();
@@ -126,16 +123,16 @@ public class SosController {
 		return vo.getMemberId();
 	}
 
-	@Operation(summary = "SOS 목록 조회", description = "등록된 SOS 목록을 조회합니다.")
+	@Operation(summary = "SOS 목록 조회", description = "등록된 SOS 목록을 조회합니다.",security = @SecurityRequirement(name = "bearerAuth"))
 	@GetMapping
 	public ResponseEntity<List<SosListResponse>> getSosList() {
 		return ResponseEntity.ok(sosService.getSosList());
 	}
 
-	@Operation(summary = "SOS 상세 조회", description = "특정 SOS 요청의 상세 정보를 조회합니다.")
+	@Operation(summary = "SOS 상세 조회", description = "특정 SOS 요청의 상세 정보를 조회합니다.",security = @SecurityRequirement(name = "bearerAuth"))
 	@GetMapping("/{sosId}")
-	public ResponseEntity<SosDetailResponse> getSosDetail(@PathVariable Long sosId) {
-		return ResponseEntity.ok(sosService.getSosDetail(sosId));
+	public SuccessResponse<SosDetailResponse> getSosDetail(@PathVariable Long sosId) {
+		return SuccessResponse.makeResponse(SuccessStatusCode.SOS_GET_SUCCESS,sosService.getSosDetail(sosId));
 	}
 
 }
