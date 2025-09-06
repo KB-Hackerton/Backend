@@ -1,6 +1,8 @@
 package kb_hack.backend.domain.sos.dto;
 
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SosCreateResponse {
 
 	@Schema(description = "생성된 SOS 요청 ID", example = "101")

@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kb_hack.backend.domain.favorite.dto.FavoriteRequestDto;
 import kb_hack.backend.domain.favorite.dto.FavoriteResponseDto;
 import kb_hack.backend.domain.favorite.service.FavoriteService;
+import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
+import kb_hack.backend.global.common.response.success.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +28,9 @@ public class FavoriteController {
 			security = @SecurityRequirement(name = "bearerAuth")
 	)
 	@PostMapping
-	public ResponseEntity<String> addFavorite(@RequestBody FavoriteRequestDto dto) {
+	public SuccessResponse<Void> addFavorite(@RequestBody FavoriteRequestDto dto) {
 		favoriteService.addFavorite(dto);
-		return ResponseEntity.ok("즐겨찾기에 등록되었습니다.");
+		return SuccessResponse.makeResponse(SuccessStatusCode.SUCCESS_ADD_FAVORITE);
 	}
 
 	@Operation(
@@ -37,9 +39,9 @@ public class FavoriteController {
 			security = @SecurityRequirement(name = "bearerAuth")
 	)
 	@DeleteMapping("/{announceId}")
-	public ResponseEntity<String> removeFavorite(@PathVariable Long announceId) {
+	public SuccessResponse<Void> removeFavorite(@PathVariable Long announceId) {
 		favoriteService.removeFavorite(announceId);
-		return ResponseEntity.ok("즐겨찾기에서 삭제되었습니다.");
+		return SuccessResponse.makeResponse(SuccessStatusCode.SUCCESS_DELETE_FAVORITE);
 	}
 
 	@Operation(
@@ -48,7 +50,7 @@ public class FavoriteController {
 			security = @SecurityRequirement(name = "bearerAuth")
 	)
 	@GetMapping
-	public ResponseEntity<List<FavoriteResponseDto>> getFavorites() {
-		return ResponseEntity.ok(favoriteService.getFavorites());
+	public SuccessResponse<List<FavoriteResponseDto>> getFavorites() {
+		return SuccessResponse.makeResponse(SuccessStatusCode.SUCCESS_GET_FAVORITE,favoriteService.getFavorites());
 	}
 }

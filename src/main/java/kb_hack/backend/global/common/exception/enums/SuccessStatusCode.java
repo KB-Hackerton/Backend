@@ -24,6 +24,10 @@ public enum SuccessStatusCode {
     SOS_CREATE_SUCCESS(HttpStatus.OK, "SOS 생성 성공!"),
     SOS_UPDATE_SUCCESS(HttpStatus.OK, "SOS 수정 성공!"),
     SOS_DELETE_SUCCESS(HttpStatus.OK, "SOS 삭제 성공!"),
+    SUCCESS_ADD_FAVORITE(HttpStatus.OK, "즐겨찾기 등록 성공!"),
+    SUCCESS_DELETE_FAVORITE(HttpStatus.OK, "즐겨찾기 삭제 성공!"),
+    SUCCESS_GET_FAVORITE(HttpStatus.OK, "즐겨찾기 불러오기 성공!"),
+    SOS_GET_SUCCESS(HttpStatus.OK, "SOS 상세 불러오기 성공!"),
 
     HOME_DATA_LOAD_SUCCESS(HttpStatus.OK,"홈 뷰 데이터 불러오기 성공!");
     private final HttpStatus httpStatus;

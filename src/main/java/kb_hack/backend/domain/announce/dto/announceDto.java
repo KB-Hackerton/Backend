@@ -1,6 +1,8 @@
 package kb_hack.backend.domain.announce.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import kb_hack.backend.domain.announce.Announce;
 import lombok.*;
 
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class announceDto {
     private Long announceId;
     private String title;
