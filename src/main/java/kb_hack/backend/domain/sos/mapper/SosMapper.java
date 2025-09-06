@@ -12,4 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface SosMapper {
 	int insert(Sos sos);
+	int update(Sos sos);
+
+	int hardDelete(Long sosId);
 }

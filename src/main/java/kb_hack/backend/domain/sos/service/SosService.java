@@ -5,4 +5,7 @@ import kb_hack.backend.domain.sos.dto.SosCreateResponse;
 
 public interface SosService {
 	SosCreateResponse create(SosCreateRequest req);
+	void update(Long sosId, SosCreateRequest req);
+
+	void hardDelete(Long sosId);
 }

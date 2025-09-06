@@ -82,4 +82,34 @@ public class SosServiceImpl implements SosService {
 			.imageKeys(keys)
 			.build();
 	}
+
+	@Override
+	@Transactional
+	public void update(Long sosId, SosCreateRequest req) {
+		// 만료일 파싱
+		LocalDateTime expiresAt = parseExpiresAt(req.getExpiresAt());
+
+		Sos sos = Sos.builder()
+			.sosId(sosId)
+			.sosTitle(req.getSosTitle())
+			.sosType(req.getSosType())
+			.sosContent(req.getSosContent())
+			.expiresAt(expiresAt)
+			.build();
+
+		int updated = sosMapper.update(sos);
+		if (updated == 0) {
+			throw new IllegalArgumentException("해당 SOS가 존재하지 않거나 삭제된 상태입니다.");
+		}
+	}
+	@Override
+	@Transactional
+	public void hardDelete(Long sosId) {
+		int deleted = sosMapper.hardDelete(sosId);
+		if (deleted == 0) {
+			throw new IllegalArgumentException("존재하지 않는 SOS ID: " + sosId);
+		}
+	}
+
+
 }

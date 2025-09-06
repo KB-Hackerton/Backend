@@ -88,7 +88,7 @@ public class SecurityConfig {
                         .requestMatchers("/crawl/admin").hasRole("Admin")
                         .requestMatchers("/api/bizinfo").hasRole("Member")
                         .requestMatchers("/favorites/**").hasRole("Member")
-                        .requestMatchers("/sos").hasRole("Member")
+                        .requestMatchers("/sos/**").hasRole("Member")
 
                     .anyRequest().authenticated()
                 );

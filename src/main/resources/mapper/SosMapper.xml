@@ -12,4 +12,21 @@
             (#{memberId}, #{sosTitle}, #{sosType}, #{sosContent}, #{expiresAt}, #{isComplete}, #{isDeleted})
     </insert>
 
+    <!-- UPDATE -->
+    <update id="update" parameterType="kb_hack.backend.domain.sos.entity.Sos">
+        UPDATE sos
+        SET sos_title   = #{sosTitle},
+            sos_type    = #{sosType},
+            sos_content = #{sosContent},
+            expires_at  = #{expiresAt}
+        WHERE sos_id = #{sosId}
+          AND is_deleted = false
+    </update>
+
+    <!-- 하드 삭제 -->
+    <delete id="hardDelete" parameterType="long">
+        DELETE FROM sos
+        WHERE sos_id = #{sosId}
+    </delete>
+
 </mapper>

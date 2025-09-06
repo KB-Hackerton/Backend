@@ -8,6 +8,7 @@ import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import kb_hack.backend.global.security.entity.MemberVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,5 +55,33 @@ public class SosController {
 		MemberVO vo = securityUser.getMemberVO();
 		return vo.getMemberId();
 	}
+
+	// ✅ 수정 API
+	@PutMapping("/{sosId}")
+	public void updateSos(
+		@PathVariable Long sosId,
+		@RequestParam(required = false) String sosTitle,
+		@RequestParam SosType sosType,
+		@RequestParam String sosContent,
+		@RequestParam String expiresAt
+	) {
+		Long memberId = getLoginMemberId();
+		SosCreateRequest req = SosCreateRequest.builder()
+			.memberId(memberId)
+			.sosTitle(sosTitle)
+			.sosType(sosType)
+			.sosContent(sosContent)
+			.expiresAt(expiresAt)
+			.build();
+		sosService.update(sosId, req);
+	}
+
+	@DeleteMapping("/{sosId}/hard")
+	public ResponseEntity<Void> hardDeleteSos(@PathVariable Long sosId) {
+		sosService.hardDelete(sosId);
+		return ResponseEntity.ok().build();
+	}
+
+
 
 }
