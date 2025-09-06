@@ -88,8 +88,9 @@ public class SecurityConfig {
                         .requestMatchers("/crawl/admin").hasRole("Admin")
                         .requestMatchers("/api/bizinfo").hasRole("Member")
                         .requestMatchers("/favorites/**").hasRole("Member")
+                        .requestMatchers("/api/sos").hasRole("Member")
 
-                        .anyRequest().authenticated()
+                    .anyRequest().authenticated()
                 );
 
         http

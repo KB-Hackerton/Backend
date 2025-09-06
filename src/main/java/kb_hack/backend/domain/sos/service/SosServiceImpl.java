@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -30,15 +32,17 @@ public class SosServiceImpl implements SosService {
 	);
 
 	private LocalDateTime parseExpiresAt(String input) {
-		for (DateTimeFormatter formatter : EXPIRES_FORMATS) {
-			try {
-				return LocalDateTime.parse(input, formatter);
-			} catch (Exception ignored) {}
+		try {
+			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+			return LocalDateTime.of(
+				LocalDate.now(),                // 오늘 날짜
+				LocalTime.parse(input, timeFormatter) // 입력 시간
+			);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("expires_at 형식이 올바르지 않습니다. 예) 23:59");
 		}
-		throw new IllegalArgumentException(
-			"expires_at 형식이 올바르지 않습니다. 예) 2025-09-01T23:59:00"
-		);
 	}
+
 
 	@Override
 	@Transactional
