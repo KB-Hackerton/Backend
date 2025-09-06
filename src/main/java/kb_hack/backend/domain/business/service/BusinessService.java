@@ -7,15 +7,18 @@ import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 import kb_hack.backend.global.common.exception.type.BadRequestException;
 import kb_hack.backend.global.common.exception.type.ServerErrorException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class BusinessService {
     private final BusinessMapper businessMapper;
 
     public void sigunUpInsertBusinessInfo(SigunUpRequestDTO sigunUpRequestDTO,Long memberId ){
+
         if(sigunUpRequestDTO == null){
             throw new BadRequestException(BadStatusCode.EMPTY_SIGNUP_INFO_EXCEPTION);
         }
@@ -29,6 +32,7 @@ public class BusinessService {
 
             dto.setBusinessClassId(businessClassId);
             dto.setMemberId(memberId);
+
             int i = businessMapper.insertBusiness(dto);
 
             if(i == 0){
@@ -37,6 +41,7 @@ public class BusinessService {
 
 
         }catch (DataAccessException e){
+            log.info(e.getMessage());
             throw new ServerErrorException(BadStatusCode.DATABASE_PROCESSING_EXCEPTION);
         }catch(Exception e){
             throw new ServerErrorException(BadStatusCode.INTERNAL_SERVER_EXCEPTION);
