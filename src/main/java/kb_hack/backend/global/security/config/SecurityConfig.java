@@ -83,6 +83,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH,"/auth/member-info").hasRole("Member")
                         .requestMatchers(HttpMethod.DELETE, "/password").hasRole("Member")
                         .requestMatchers("/crawl/admin").hasRole("Admin")
+                        .requestMatchers("/api/bizinfo").hasRole("Member")
+                        .requestMatchers("/favorites/**").hasRole("Member")
 
                         .anyRequest().authenticated()
                 );

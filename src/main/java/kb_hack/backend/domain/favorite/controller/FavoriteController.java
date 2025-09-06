@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Favorite", description = "즐겨찾기 API ")
-@RequestMapping("/api/favorites")
+@RequestMapping("/favorites")
 @RequiredArgsConstructor
 public class FavoriteController {
 
