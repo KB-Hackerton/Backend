@@ -1,11 +1,21 @@
 package kb_hack.backend.domain.sos.dto;
 
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.List;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SosCreateResponse {
+
+	@Schema(description = "생성된 SOS 요청 ID", example = "101")
 	private Long sosId;
-	private List<String> imageKeys; // 저장된 storage_key 리스트
+
+	@Schema(description = "저장된 이미지의 스토리지 키 리스트",
+		example = "[\"sos/2025/09/01/uuid1.jpg\", \"sos/2025/09/01/uuid2.png\"]")
+	private List<String> imageKeys;
 }

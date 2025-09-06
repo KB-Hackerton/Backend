@@ -1,4 +1,6 @@
 package kb_hack.backend.domain.sos.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import kb_hack.backend.domain.sos.entity.SosType;
 import lombok.*;
 
@@ -10,9 +12,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class SosListResponse {
+
+	@Schema(description = "SOS ID", example = "101")
 	private Long sosId;
+
+	@Schema(description = "가게 이름", example = "동욱타이어")
 	private String businessName;    // business.business_nm
+
+	@Schema(description = "SOS 요청 제목", example = "긴급 타이어 지원 요청")
 	private String sosTitle;        // sos.sos_title
+
+	@Schema(description = "SOS 요청 카테고리", example = "stock")
 	private SosType sosType;        // sos.sos_type
-	private LocalDateTime expiresAt;// sos.expires_at
+
+	@Schema(description = "SOS 종료 시각", example = "2025-09-07T18:00:00")
+	private LocalDateTime expiresAt; // sos.expires_at
 }
