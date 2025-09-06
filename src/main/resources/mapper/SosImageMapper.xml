@@ -7,9 +7,9 @@
 
     <insert id="insert" parameterType="kb_hack.backend.domain.sos.entity.SosImage" useGeneratedKeys="true" keyProperty="sosImageId" keyColumn="sos_image_id">
         INSERT INTO sos_image
-            (sos_id, storage_key, is_deleted)
+            (sos_id, storage_key)
         VALUES
-            (#{sosId}, #{storageKey}, #{isDeleted})
+            (#{sosId}, #{storageKey})
     </insert>
 
 </mapper>
