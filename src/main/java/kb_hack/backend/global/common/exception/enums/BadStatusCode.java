@@ -45,6 +45,13 @@ public enum BadStatusCode {
     FAIL_TO_HANDLE_VERIFICATION_CODE_REDIS_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"Redis에서 인증번호 조회/삭제 중 오류 발생 했습니다."),
     FAIL_TO_SEND_MAIL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"메일 서버 오류로 인증 메일 전송을 실패 했습니다."),
     FAIL_TO_SIGNOUT_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"회원 탈퇴에 실패 했습니다"),
+    FAIL_TO_SAVE_RECENT_ANNOUNCE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"Redis에 최근 공고 저장 중 오류가 발생 했습니다."),
+    REDIS_FAIL_TO_GET_RECENT_ANNOUNCE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"Redis에 최근 공고 불러오기 중 오류가 발생 했습니다."),
+    REDIS_INVALID_DATA_FORMAT_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"Redis 데이터 형식 오류가 발생 했습니다."),
+    FAIL_TO_GET_RECENT_ANNOUNCE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"최근 공고 불러오기에 실패 했습니다."),
+    FAIL_TO_GET_RECENT_FESTIVAL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"최근 축제 불러오기에 실패 했습니다."),
+    FAIL_TO_GET_RECENT_ARTICLE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"최근 본 공고 불러오기에 실패 했습니다."),
+
 
 
     // 크롤링 관련 5xx

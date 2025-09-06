@@ -1,4 +1,4 @@
-package kb_hack.backend.domain.home.dto;
+package kb_hack.backend.domain.home.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

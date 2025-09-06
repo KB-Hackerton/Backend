@@ -37,7 +37,7 @@ public class announceService {
 
     public announceDetailDto getAnnounceDetail(@Param("announceId") Long announceId) {
         Announce announce = announceMapper.findById(announceId);
-        recentAnnounceService.addRecentAnnounce(announceId);
+        recentAnnounceService.addRecentAnnounce(String.valueOf(announceId),announce.getAnnounceTitle());
         if(announce==null){
             return null;
         }
