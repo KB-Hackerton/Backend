@@ -28,4 +28,37 @@
         WHERE sos_id = #{sosId}
     </delete>
 
+    <select id="findAll" resultType="kb_hack.backend.domain.sos.dto.SosListResponse">
+        SELECT
+            s.sos_id       AS sosId,
+            b.business_nm  AS businessName,
+            s.sos_title    AS sosTitle,
+            s.sos_type     AS sosType,
+            s.expires_at   AS expiresAt
+        FROM sos s
+                 JOIN member m ON s.member_id = m.member_id
+                 JOIN business b ON b.member_id = m.member_id
+        ORDER BY s.created_at DESC
+    </select>
+
+    <select id="findDetail" parameterType="long"
+            resultType="kb_hack.backend.domain.sos.dto.SosDetailRow">
+        SELECT
+            s.sos_id         AS sosId,
+            b.business_nm    AS businessName,
+            m.badge          AS badge,
+            b.business_addr  AS businessAddr,
+            b.business_addr_detail AS businessAddrDetail,
+            s.sos_title      AS sosTitle,
+            s.sos_type       AS sosType,
+            s.sos_content    AS sosContent,
+            s.expires_at     AS expiresAt,
+            si.storage_key   AS imageKey
+        FROM sos s
+                 JOIN member m ON s.member_id = m.member_id
+                 JOIN business b ON b.member_id = m.member_id
+                 LEFT JOIN sos_image si ON si.sos_id = s.sos_id
+        WHERE s.sos_id = #{sosId}
+    </select>
+
 </mapper>
