@@ -76,7 +76,7 @@ public class SosController {
 		sosService.update(sosId, req);
 	}
 
-	@DeleteMapping("/{sosId}/hard")
+	@DeleteMapping("/{sosId}")
 	public ResponseEntity<Void> hardDeleteSos(@PathVariable Long sosId) {
 		sosService.hardDelete(sosId);
 		return ResponseEntity.ok().build();
