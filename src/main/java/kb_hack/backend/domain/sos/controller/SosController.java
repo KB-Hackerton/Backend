@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import kb_hack.backend.domain.sos.dto.SosCreateRequest;
 import kb_hack.backend.domain.sos.dto.SosCreateResponse;
 import kb_hack.backend.domain.sos.entity.SosType;
@@ -33,6 +34,7 @@ import kb_hack.backend.global.security.entity.MemberVO;
 import lombok.RequiredArgsConstructor;
 
 @RestController
+@Tag(name = "Sos", description = "SOS API ")
 @RequestMapping("/sos")
 @RequiredArgsConstructor
 @Validated
