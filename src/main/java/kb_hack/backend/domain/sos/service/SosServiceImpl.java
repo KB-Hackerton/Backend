@@ -2,8 +2,12 @@ package kb_hack.backend.domain.sos.service;
 
 import kb_hack.backend.domain.sos.dto.SosCreateRequest;
 import kb_hack.backend.domain.sos.dto.SosCreateResponse;
+import kb_hack.backend.domain.sos.dto.SosDetailResponse;
+import kb_hack.backend.domain.sos.dto.SosDetailRow;
+import kb_hack.backend.domain.sos.dto.SosListResponse;
 import kb_hack.backend.domain.sos.entity.Sos;
 import kb_hack.backend.domain.sos.entity.SosImage;
+import kb_hack.backend.domain.sos.entity.SosType;
 import kb_hack.backend.domain.sos.mapper.SosImageMapper;
 import kb_hack.backend.domain.sos.mapper.SosMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +20,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import kb_hack.backend.domain.sos.dto.SosDetailRow;
+
 
 @Service
 @RequiredArgsConstructor
@@ -110,6 +117,41 @@ public class SosServiceImpl implements SosService {
 			throw new IllegalArgumentException("존재하지 않는 SOS ID: " + sosId);
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<SosListResponse> getSosList() {
+		return sosMapper.findAll();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public SosDetailResponse getSosDetail(Long sosId) {
+		List<SosDetailRow> rows = sosMapper.findDetail(sosId);
+		if (rows.isEmpty()) {
+			throw new IllegalArgumentException("존재하지 않는 SOS ID: " + sosId);
+		}
+
+		SosDetailRow first = rows.get(0);
+		List<String> imageKeys = rows.stream()
+			.map(SosDetailRow::getImageKey)
+			.filter(k -> k != null)
+			.toList();
+
+		return SosDetailResponse.builder()
+			.sosId(first.getSosId())
+			.businessName(first.getBusinessName())
+			.badge(first.getBadge())
+			.businessAddr(first.getBusinessAddr())
+			.businessAddrDetail(first.getBusinessAddrDetail())
+			.sosTitle(first.getSosTitle())
+			.sosType(first.getSosType())
+			.sosContent(first.getSosContent())
+			.expiresAt(first.getExpiresAt())
+			.imageKeys(imageKeys)
+			.build();
+	}
+
 
 
 }

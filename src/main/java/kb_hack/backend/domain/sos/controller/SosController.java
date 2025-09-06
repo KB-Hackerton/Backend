@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +27,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kb_hack.backend.domain.sos.dto.SosCreateRequest;
 import kb_hack.backend.domain.sos.dto.SosCreateResponse;
+import kb_hack.backend.domain.sos.dto.SosDetailResponse;
+import kb_hack.backend.domain.sos.dto.SosListResponse;
 import kb_hack.backend.domain.sos.entity.SosType;
 import kb_hack.backend.domain.sos.service.SosService;
 import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
@@ -122,5 +125,18 @@ public class SosController {
 		MemberVO vo = securityUser.getMemberVO();
 		return vo.getMemberId();
 	}
+
+	@Operation(summary = "SOS 목록 조회", description = "등록된 SOS 목록을 조회합니다.")
+	@GetMapping
+	public ResponseEntity<List<SosListResponse>> getSosList() {
+		return ResponseEntity.ok(sosService.getSosList());
+	}
+
+	@Operation(summary = "SOS 상세 조회", description = "특정 SOS 요청의 상세 정보를 조회합니다.")
+	@GetMapping("/{sosId}")
+	public ResponseEntity<SosDetailResponse> getSosDetail(@PathVariable Long sosId) {
+		return ResponseEntity.ok(sosService.getSosDetail(sosId));
+	}
+
 }
 
