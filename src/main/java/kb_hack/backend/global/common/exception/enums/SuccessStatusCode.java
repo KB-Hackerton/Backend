@@ -25,8 +25,7 @@ public enum SuccessStatusCode {
     SOS_UPDATE_SUCCESS(HttpStatus.OK, "SOS 수정 성공!"),
     SOS_DELETE_SUCCESS(HttpStatus.OK, "SOS 삭제 성공!"),
 
-    HOME_DATA_LOAD_SUCCESS(HttpStatus.OK,"홈 뷰 데이터 불러오기 성공!"),
-    CHANGE_MEMBER_INFO_SUCCESS(HttpStatus.OK,"회원 정보 업데이트 완료!");
+    HOME_DATA_LOAD_SUCCESS(HttpStatus.OK,"홈 뷰 데이터 불러오기 성공!");
     private final HttpStatus httpStatus;
     private final String message;
 
