@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -38,6 +39,10 @@ public class MemberService {
             MemberDTO dto = MemberDTO.convertToMemberDTO(sigunUpRequestDTO);
 
             try {
+                if (dto.getPassword() == null || dto.getPassword().isEmpty()) {
+                    String randomPassword = UUID.randomUUID().toString().substring(0, 4);
+                    dto.setPassword(randomPassword);
+                }
                 dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
             } catch (Exception e) {
                 throw new ServerErrorException(BadStatusCode.PASSWORD_ENCODING_FAIL_EXCEPTION);
