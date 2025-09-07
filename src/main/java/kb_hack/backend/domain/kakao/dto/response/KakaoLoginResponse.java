@@ -1,4 +1,4 @@
-package kb_hack.backend.domain.home.dto.request;
+package kb_hack.backend.domain.kakao.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -7,13 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-
-public class RecentArticleDTO {
-    private String title;
-    private Long articleId;
+public class KakaoLoginResponse {
+    private String flag;
+    private Long kakaoId;
+    private String memberEmail;
 }
