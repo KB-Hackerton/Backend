@@ -29,7 +29,8 @@ public class EmailService {
     private final EmailMapper emailMapper;
 
     public void sendVerificationCode(String email) {
-        if (emailMapper.findMemberIDByEmail(email) != 0) {
+        Long memberId = emailMapper.findMemberIDByEmail(email);
+        if (memberId != null) {
             throw new BadRequestException(BadStatusCode.ALREADY_REGISTERED_EMAIL_EXCEPTION);
         }
 
