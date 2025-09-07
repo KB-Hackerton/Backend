@@ -1,9 +1,11 @@
 package kb_hack.backend.global.webclient;
 
+import com.google.common.net.HttpHeaders;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -54,5 +56,28 @@ public class WebClientConfig {
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
+
+    @Bean
+    @Qualifier("kakaoAuthWebClient")
+    public WebClient kakaoAuthWebClient(){
+        return WebClient.builder()
+                .baseUrl("https://kauth.kakao.com")
+                .defaultHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+                .build();
+    }
+
+
+    @Bean
+    @Qualifier("kakaoApiWebClient")
+    public WebClient kakaoApiWebClient() {
+        return WebClient.builder()
+                .baseUrl("https://kapi.kakao.com")
+                .defaultHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+                .build();
+    }
+
+
+
+
 
 }

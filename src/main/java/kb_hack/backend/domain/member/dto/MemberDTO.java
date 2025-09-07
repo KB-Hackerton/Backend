@@ -28,6 +28,7 @@ public class MemberDTO {
                 .memberEmail(dto.getMemberEmail())
                 .password(dto.getPassword())
                 .memberName(dto.getMemberName())
+                .kakaoId(dto.getKakaoId())
                 .status("active")
                 .helpCount(0)
                 .badge("도움 일꾼")

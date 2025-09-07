@@ -7,8 +7,8 @@
 
     <insert id="insertMember" parameterType="kb_hack.backend.domain.member.dto.MemberDTO"
             useGeneratedKeys="true" keyProperty="memberId">
-        INSERT INTO member(member_email,password,member_name,status,help_count,badge)
-        VALUES(#{memberEmail},#{password},#{memberName},#{status},#{helpCount},#{badge})
+        INSERT INTO member(member_email,password,kakao_id,member_name,status,help_count,badge)
+        VALUES(#{memberEmail},#{password},#{kakaoId},#{memberName},#{status},#{helpCount},#{badge})
     </insert>
     <insert id="insertAuth" parameterType="kb_hack.backend.domain.member.dto.AuthDTO">
         INSERT INTO auth (member_id,auth)

@@ -84,8 +84,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/password").hasRole("Member")
                         .requestMatchers(HttpMethod.DELETE, "/home").hasRole("Member")
                         .requestMatchers(HttpMethod.DELETE, "/announce/**").hasRole("Member")
-                    .requestMatchers(HttpMethod.POST, "/api/sos").permitAll()   // ✅ 추가
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()     // ✅ CORS preflight 허용
+                        .requestMatchers( "/kakao-login/**").permitAll()
                         .requestMatchers("/test").hasRole("Member")
                         .requestMatchers("/crawl/admin").hasRole("Admin")
                         .requestMatchers("/admin/ingest/gyeongsang").hasRole("Admin")

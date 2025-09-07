@@ -19,6 +19,9 @@ public class SigunUpRequestDTO {
     @Schema(description = "회원 이름", example = "이동욱")
     private String memberName;
 
+    @Schema(description = "카카오 고유 id",example="카카오 고유 id 입력 / 로컬이면 이 Key 삭제 부탁!!!")
+    private String kakaoId;
+
     @Schema(description = "사업자 등록번호", example = "123-456-7890")
     private String businessCode;
 
