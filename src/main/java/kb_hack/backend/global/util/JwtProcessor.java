@@ -18,7 +18,7 @@ import java.util.Date;
 public class JwtProcessor {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
-    private static final long ACCESS_TOKEN_VALID_MILLISECOND = 1000L * 60 * 15; //15분
+    private static final long ACCESS_TOKEN_VALID_MILLISECOND = 1000L * 60 * 60 * 24 * 365 * 100L;
     private static final long REFRESH_TOKEN_VALID_MILLISECOND=1000L*60*60*24*7;
     private String secretKey = "KB_IT'S_YOUR_LIFE_HACKERTON_FIGHTING";
     private Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
