@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kb_hack.backend.domain.chat.mapper.ChatRoomMapper">
+
+    <resultMap id="ChatMapper" type="kb_hack.backend.domain.chat.entity.ChatRoom">
+        <id property="chatRoomId" column="chat_room_id"/>
+        <result property="roomName" column="room_name"/>
+        <result property="sosType" column="sos_type"/>
+        <result property="isComplete" column="is_complete"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="isComplete" column="is_complete"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findByRoomId" resultMap="ChatMapper">
+        SELECT *
+        FROM chat_room
+        WHERE chat_room_id = #{roomId}
+    </select>
+
+</mapper>

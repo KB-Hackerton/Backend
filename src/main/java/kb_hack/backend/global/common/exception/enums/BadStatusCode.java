@@ -71,7 +71,15 @@ public enum BadStatusCode {
     CRAW_IO_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "크롤링 IO 오류"),
     CRAWL_FAIL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "공고 크롤링 실패"),
 
-    ANNOUNCE_DETAIL_GET_FAIL(HttpStatus.NOT_FOUND,"상세 공고 불러오기 실패");
+    ANNOUNCE_DETAIL_GET_FAIL(HttpStatus.NOT_FOUND,"상세 공고 불러오기 실패"),
+
+    // 채팅 관련 오류
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방"),
+    CHAT_SOS_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 SOS"),
+    CHAT_ROOM_CREATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "채팅방 생성 실패"),
+    CHAT_MESSAGE_SAVE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메시지 저장 실패"),
+    ;
+
     private final HttpStatus httpStatus;
     private final String message;
 }

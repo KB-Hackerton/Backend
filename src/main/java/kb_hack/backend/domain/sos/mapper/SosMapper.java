@@ -26,4 +26,5 @@ public interface SosMapper {
 	List<SosListResponse> findAll();
 	List<SosDetailRow> findDetail(Long sosId);
 
+	Sos findById(Long sosId);
 }
