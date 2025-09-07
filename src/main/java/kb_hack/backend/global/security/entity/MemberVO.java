@@ -12,6 +12,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberVO {
     private Long memberId;
     private Long profileImageId;

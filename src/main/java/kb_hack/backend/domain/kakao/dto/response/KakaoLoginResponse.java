@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class KakaoLoginResponse {
+    private String flag;
     private Long kakaoId;
     private String memberEmail;
 }

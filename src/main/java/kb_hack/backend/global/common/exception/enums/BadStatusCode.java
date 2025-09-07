@@ -51,6 +51,13 @@ public enum BadStatusCode {
     FAIL_TO_GET_RECENT_ANNOUNCE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"최근 공고 불러오기에 실패 했습니다."),
     FAIL_TO_GET_RECENT_FESTIVAL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"최근 축제 불러오기에 실패 했습니다."),
     FAIL_TO_GET_RECENT_ARTICLE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"최근 본 공고 불러오기에 실패 했습니다."),
+    KAKAO_TOKEN_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR,"카카오 토큰 응답이 비어있습니다."),
+    KAKAO_TOKEN_REQUEST_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 토큰 요청 중 오류가 발생 했습니다"),
+    KAKAO_USERINFO_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 사용자 정보 응답이 비어있습니다."),
+    KAKAO_USERINFO_REQUEST_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 사용자 정보 요청 중 오류가 발생 했습니다."),
+    FAIL_TO_COMMUNICATE_KAKAO_OAUTH_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"카카오 OAuth 통신 오류가 발생 했습니다"),
+    FAIL_TO_PROCESSING_KAKAO_OAUTH_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"카카오 OAuth 로그인 과정 중 오류가 발생 했습니다"),
+
 
 
 

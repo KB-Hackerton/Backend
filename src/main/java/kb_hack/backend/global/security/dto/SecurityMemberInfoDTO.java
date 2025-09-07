@@ -1,6 +1,8 @@
 package kb_hack.backend.global.security.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import kb_hack.backend.domain.business.dto.BusinessDTO;
 import kb_hack.backend.global.security.entity.MemberAuthVO;
 import kb_hack.backend.global.security.entity.MemberVO;
@@ -16,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SecurityMemberInfoDTO {
     private Long memberId;
     private Long profileImageId;

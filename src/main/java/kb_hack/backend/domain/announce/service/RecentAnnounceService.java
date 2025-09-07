@@ -45,9 +45,6 @@ public class RecentAnnounceService {
 
         List<String> values = stringRedisTemplate.opsForList().range(key, 0, -1);
 
-        if (values == null || values.isEmpty()) {
-            throw new ServerErrorException(BadStatusCode.REDIS_FAIL_TO_GET_RECENT_ANNOUNCE_EXCEPTION);
-        }
 
         try {
             return values.stream()
