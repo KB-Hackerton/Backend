@@ -101,9 +101,7 @@ public class KakaoService {
             Long kakaoId = userInfo.getId();
 
             boolean kakaoExists = kakaoMapper.existsByKakaoId(kakaoId) == 1;
-            System.out.println("✨✨✨✨✨✨✨✨✨kakaoExists = " + kakaoExists);
             boolean emailExists = kakaoMapper.existByMemberEmail(email) == 1;
-            System.out.println("System.out.println(\"✨✨✨✨✨✨✨✨✨kakaoExists = \" + kakaoExists);emailExists = " + emailExists);
 
 
             if (kakaoExists) {
@@ -114,7 +112,6 @@ public class KakaoService {
                 return buildLoginResponse(vo);
 
             } else if (emailExists) {
-                System.out.println("여기로 와야해 ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨");
                 kakaoMapper.updateKakaoIdByEmail(email, kakaoId);
                 MemberVO vo = securityMemberMapper.getMemberByMemberEmail(email);
                 if (vo == null) {
