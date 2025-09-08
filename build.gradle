@@ -78,6 +78,9 @@ dependencies {
 	//14.타임리프
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.17.1'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.1'
 
 }
 

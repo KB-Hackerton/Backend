@@ -50,7 +50,7 @@
     </select>
 
     <select id="findById" resultMap="announceResultMap">
-        select announce_title, link, author, exc_insttNm, description,
+        select announce_id,announce_title, link, author, exc_insttNm, description,
                lcategory, pub_date, reqst_start_date, reqst_end_date,
                taget_name, view_num, file_path_name, file_name,
                how_to_register, call_company ,print_file_name , print_file_path_name
