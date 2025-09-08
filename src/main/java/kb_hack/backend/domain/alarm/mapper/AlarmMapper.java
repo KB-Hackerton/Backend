@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface AlarmMapper {
     AlarmPreference findById(@Param("memberId") Long memberId);
-    int upsert(@Param("p") AlarmPreference p);
+    int updateSelective(@Param("p") AlarmPreference p);
 
 }

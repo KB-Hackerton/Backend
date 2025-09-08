@@ -44,6 +44,6 @@ public class AlarmController {
     @PatchMapping("/preference")
     public void update(@AuthenticationPrincipal SecurityCustomUser user,
                        @Valid @RequestBody AlarmPreferenceReq req) {
-        alarmPreferenceService.save(user.getMemberVO().getMemberId(), req);
+        alarmPreferenceService.partialUpdate(user.getMemberVO().getMemberId(), req);
     }
 }

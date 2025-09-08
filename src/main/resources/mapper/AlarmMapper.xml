@@ -17,15 +17,15 @@
         WHERE member_id = #{memberId}
     </select>
 
-    <insert id="upsert">
-        insert into alarm_preference
-        (member_id, sos_preference, announce_preference, alarm_start_time, alarm_end_time, is_alarm)
-         values  (#{p.memberId}, #{p.sosPreference}, #{p.announcePreference}, #{p.alarmStartTime}, #{p.alarmEndTime}, #{p.isAlarm})
-             ON DUPLICATE KEY UPDATE
-                                  sos_preference      = VALUES(sos_preference),
-                                  announce_preference = VALUES(announce_preference),
-                                  alarm_start_time    = VALUES(alarm_start_time),
-                                  alarm_end_time      = VALUES(alarm_end_time),
-                                  is_alarm            = VALUES(is_alarm)
-        </insert>
+    <update id="updateSelective">
+        UPDATE alarm_preference
+        <set>
+            <if test="p.announcePreference != null">announce_preference = #{p.announcePreference},</if>
+            <if test="p.sosPreference != null">sos_preference = #{p.sosPreference},</if>
+            <if test="p.isAlarm != null">is_alarm = #{p.isAlarm},</if>
+            <if test="p.alarmStartTime != null">alarm_start_time = #{p.alarmStartTime},</if>
+            <if test="p.alarmEndTime != null">alarm_end_time = #{p.alarmEndTime},</if>
+        </set>
+        WHERE member_id = #{p.memberId}
+    </update>
 </mapper>

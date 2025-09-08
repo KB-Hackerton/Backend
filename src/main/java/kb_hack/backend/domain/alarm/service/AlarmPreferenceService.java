@@ -30,24 +30,36 @@ public class AlarmPreferenceService {
             p.setIsAlarm(true);
             p.setAlarmStartTime(LocalDateTime.of(1970,1,1, DEF_START_TIME.getHour(), DEF_START_TIME.getMinute()));
             p.setAlarmEndTime(LocalDateTime.of(1970,1,1, DEF_END_TIME.getHour(), DEF_END_TIME.getMinute()));
-            alarmMapper.upsert(p);
+            alarmMapper.updateSelective(p);
         }
         return toRes(p);
     }
 
     @Transactional
-    public void save(Long memberId, AlarmPreferenceReq req) {
-        var start = LocalTime.parse(req.getDndStart());
-        var end   = LocalTime.parse(req.getDndEnd());
-
-        var p = new AlarmPreference();
+    public void partialUpdate(Long memberId, AlarmPreferenceReq req) {
+        AlarmPreference p = new AlarmPreference();
         p.setMemberId(memberId);
-        p.setAnnouncePreference(req.getAnnounceEnabled());
-        p.setSosPreference(req.getSosEnabled());
-        p.setIsAlarm(req.getDndEnabled());
-        p.setAlarmStartTime(LocalDateTime.of(1970,1,1, start.getHour(), start.getMinute()));
-        p.setAlarmEndTime(LocalDateTime.of(1970,1,1, end.getHour(), end.getMinute()));
-        alarmMapper.upsert(p);
+
+        if (req.getAnnounceEnabled() != null)
+            p.setAnnouncePreference(req.getAnnounceEnabled());
+
+        if (req.getSosEnabled() != null)
+            p.setSosPreference(req.getSosEnabled());
+
+        if (req.getDndEnabled() != null)
+            p.setIsAlarm(req.getDndEnabled());
+
+        if (req.getDndStart() != null) {
+            LocalTime t = LocalTime.parse(req.getDndStart());
+            p.setAlarmStartTime(LocalDateTime.of(1970,1,1,t.getHour(),t.getMinute()));
+        }
+
+        if (req.getDndEnd() != null) {
+            LocalTime t = LocalTime.parse(req.getDndEnd());
+            p.setAlarmEndTime(LocalDateTime.of(1970,1,1,t.getHour(),t.getMinute()));
+        }
+
+        alarmMapper.updateSelective(p);
     }
 
     private AlarmPreferenceRes toRes(AlarmPreference p) {
