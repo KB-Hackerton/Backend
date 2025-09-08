@@ -24,8 +24,6 @@ public class CrawlController {
 
     /**
      * 특정 URL에 대한 크롤링을 시작하는 공개 API
-     * @param requestDto 크롤링할 URL이 담긴 DTO
-     * @return 요청 접수 완료 응답
      */
     @Operation(
             summary = "기사 크롤링 실행",

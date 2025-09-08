@@ -10,4 +10,7 @@
     <select id="existsByArticleUrl" resultType="boolean">
         SELECT EXISTS(SELECT 1 FROM articles WHERE article_url = #{articleUrl})
     </select>
+    <select id="getArticles" resultType="kb_hack.backend.domain.article.entity.Article">
+        SELECT * FROM articles
+    </select>
 </mapper>
