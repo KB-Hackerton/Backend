@@ -29,6 +29,8 @@ public enum SuccessStatusCode {
     SUCCESS_GET_FAVORITE(HttpStatus.OK, "즐겨찾기 불러오기 성공!"),
     SOS_GET_SUCCESS(HttpStatus.OK, "SOS 상세 불러오기 성공!"),
     ARTICLE_GET_SUCCESS(HttpStatus.OK, "기사 목록 가져오기 성공!"),
+    NOTICE_GET_SUCCESS(HttpStatus.OK, "공고 목록 불러오기 성공!"),
+
     HOME_DATA_LOAD_SUCCESS(HttpStatus.OK,"홈 뷰 데이터 불러오기 성공!");
     private final HttpStatus httpStatus;
     private final String message;
