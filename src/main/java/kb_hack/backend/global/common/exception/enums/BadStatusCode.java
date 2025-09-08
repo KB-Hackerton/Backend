@@ -57,6 +57,8 @@ public enum BadStatusCode {
     KAKAO_USERINFO_REQUEST_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 사용자 정보 요청 중 오류가 발생 했습니다."),
     FAIL_TO_COMMUNICATE_KAKAO_OAUTH_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"카카오 OAuth 통신 오류가 발생 했습니다"),
     FAIL_TO_PROCESSING_KAKAO_OAUTH_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"카카오 OAuth 로그인 과정 중 오류가 발생 했습니다"),
+    FAIL_TO_PROCESSING_NOTICE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"공지 정보를 불러오는 과정 중 오류가 발생 했습니다."),
+
 
 
 
