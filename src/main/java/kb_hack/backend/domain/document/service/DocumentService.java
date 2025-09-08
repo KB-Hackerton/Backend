@@ -13,9 +13,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +33,9 @@ public class DocumentService {
 	private final FavoriteMapper favoriteMapper;
 	private final DocumentMapper documentMapper;
 	private final AnnounceMapper announceMapper;   // ✅ 단일 공고 조회용
+
+	@Value("${openai.api.key}")
+	private String openaiApiKey;
 
 	/**
 	 * 즐겨찾기한 공고들의 첨부(PDF)에서 '제출서류' 섹션을 추출해 저장
@@ -49,7 +61,7 @@ public class DocumentService {
 		return extractAndSaveInternal(announce);
 	}
 
-	/** 공통 로직: 공고 1건에 대해 파일 내려받기 → PDF만 처리 → 텍스트 추출 → 제출서류 파싱 → 저장 */
+	/** 공통 로직: 공고 1건에 대해 파일 내려받기 → PDF만 처리 → 텍스트 추출 → GPT 호출 → 저장 */
 	private int extractAndSaveInternal(Announce announce) {
 		String url = firstNonBlank(announce.getPrintFilePathName(), announce.getFilePathName());
 		if (url == null || url.isBlank()) return 0;
@@ -63,7 +75,14 @@ public class DocumentService {
 			if (!isPdf) return 0;
 
 			String text = PdfTextExtractor.extract(f.file);
-			List<String> docs = parseRequiredDocuments(text);
+
+			// ✅ PDF 전체 텍스트 디버깅 출력
+			System.out.println("=== PDF 전체 텍스트 (앞 5000자) ===");
+			System.out.println(text);
+			System.out.println("================================");
+
+			// ✅ GPT에게 제출서류 목록 요청 (전체 텍스트 전달)
+			List<String> docs = callGptForRequiredDocuments(text);
 
 			int saved = 0;
 			for (String title : docs) {
@@ -90,102 +109,89 @@ public class DocumentService {
 	}
 
 	/**
-	 * 제출서류 섹션 파싱(정확도 강화)
+	 * ✅ GPT 호출해서 제출서류만 추출
 	 */
-	private List<String> parseRequiredDocuments(String text) {
-		if (text == null || text.isBlank()) return List.of();
+	/**
+	 * ✅ GPT 호출해서 제출/신청 서류만 추출 (안전 파싱 + 디버깅 로그 포함)
+	 */
+	/**
+	 * ✅ GPT 호출해서 제출/신청 서류만 추출 (마크다운 제거 + 안전 파싱)
+	 */
+	private List<String> callGptForRequiredDocuments(String text) throws Exception {
+		HttpClient client = HttpClient.newHttpClient();
+		ObjectMapper mapper = new ObjectMapper();
 
-		String norm = normalize(text);
+		// 프롬프트 강화
+		String prompt = """
+    아래 공고문 전체 텍스트에서 신청자가 제출해야 하는 '제출서류' 또는 '신청서류' 항목만 뽑아줘.
+    ⚠️ 반드시 JSON 배열만 출력해. (예: ["참가신청서", "사업계획서", "개인정보 동의서"])
+    ⚠️ 다른 설명, ```json 같은 마크다운 블록, 불필요한 텍스트는 절대 포함하지 마.
 
-		// 1) 앵커 탐지
-		Pattern ANCHOR = Pattern.compile("(제출|신청|구비|첨부|필수)\\s*(서류|자료|문서)|증빙\\s*자료");
-		Matcher m = ANCHOR.matcher(norm);
-		if (!m.find()) return List.of();
+    문서 내용:
+    """ + text;
 
-		int start = m.start();
-		String tail = norm.substring(start, Math.min(norm.length(), start + 8000)); // 섹션 길이 상한
-
-		// 2) 다음 섹션 경계
-		Pattern NEXT = Pattern.compile("(?m)^(지원대상|지원내용|신청방법|평가|선정|문의처|접수기간|유의사항|세부내용|추진절차|추진일정)\\b");
-		Matcher n = NEXT.matcher(tail);
-		int end = n.find() ? n.start() : tail.length();
-		String section = tail.substring(0, end);
-
-		// 3) 줄 병합(불릿 다음 들여쓰기/붙임줄 합치기)
-		List<String> lines = mergeWrappedLines(section);
-
-		// 4) 필터링
-		List<String> white = List.of(
-			"증명서","확인서","신청서","계획서","등록증","사본","명부","명세서","증빙",
-			"납부서","증명원","인감","위임장","재무제표","견적서","제출서","계약서",
-			"통장사본","사업자등록증","등본","초본","포트폴리오","재직증명서","4대보험",
-			"납부확인","면허증","허가증","수료증","졸업증명서","성적증명서","서약서"
-		);
-		List<String> black = List.of(
-			"지원대상","지원내용","신청방법","평가","선정","문의처","접수기간","유의사항",
-			"절차","일정","프로세스","평가위원","선정평가","문의","전화","이메일","전자문서",
-			"http","www.","@","접수","신청·접수","신청 접수","발표","협약","수행","사업수행",
-			"선정통보","종합평점","운영사","보육","멘토","추천","사전검토","프로그램","세부내용"
+		String body = mapper.writeValueAsString(
+			new java.util.HashMap<>() {{
+				put("model", "gpt-4o-mini");
+				put("messages", List.of(
+					java.util.Map.of("role", "system", "content", "너는 공고문에서 제출/신청 서류만 뽑는 AI야."),
+					java.util.Map.of("role", "user", "content", prompt)
+				));
+				put("temperature", 0);
+			}}
 		);
 
-		List<String> items = new ArrayList<>();
-		for (String raw : lines) {
-			String s = raw.trim();
+		HttpRequest request = HttpRequest.newBuilder()
+			.uri(URI.create("https://api.openai.com/v1/chat/completions"))
+			.header("Content-Type", "application/json")
+			.header("Authorization", "Bearer " + openaiApiKey)
+			.POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+			.build();
 
-			if (s.isBlank()) continue;
-			if (s.matches("^[0-9]+\\s*[-–—]?\\s*$")) continue; // "7 -" 등
-			if (s.length() <= 2) continue;
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-			boolean hasBlack = black.stream().anyMatch(s::contains);
-			if (hasBlack) continue;
+		// ✅ GPT Raw Response 로그
+		System.out.println("=== GPT Raw Response ===");
+		System.out.println(response.body());
+		System.out.println("========================");
 
-			boolean hasWhite = white.stream().anyMatch(s::contains);
-			boolean bulletish = s.matches("^\\s*(?:\\d{1,2}[).]|[①-⑳]|[가-힣A-Za-z]\\)|[-–—•·●○▪◦]).{2,}");
-			if (hasWhite && (bulletish || s.endsWith("서") || s.endsWith("증") || s.endsWith("서류"))) {
-				s = s.replaceAll("\\s*\\(사본\\s*\\d+\\s*부\\)\\s*$", "").trim();
-				s = s.replaceAll("\\s{2,}", " ");
-				items.add(s);
-			}
+		JsonNode root = mapper.readTree(response.body());
+		JsonNode choices = root.path("choices");
+
+		if (!choices.isArray() || choices.size() == 0) {
+			throw new RuntimeException("❌ GPT 응답에 choices가 없음: " + response.body());
 		}
 
-		items = items.stream().distinct().toList();
-		if (items.size() < 2) return List.of();
-		return items;
-	}
-
-	/** 불릿라인 뒤의 들여쓰기/붙임줄을 같은 항목으로 병합 */
-	private List<String> mergeWrappedLines(String section) {
-		String[] rawLines = section.split("\\r?\\n");
-		List<String> out = new ArrayList<>();
-
-		StringBuilder cur = new StringBuilder();
-		Pattern BULLET = Pattern.compile("^\\s*(?:\\d{1,2}[).]|[①-⑳]|[가-힣A-Za-z]\\)|[-–—•·●○▪◦])\\s+.+$");
-
-		for (String ln : rawLines) {
-			String line = ln.replace('\u00A0', ' ').trim();
-
-			if (BULLET.matcher(line).find()) {
-				if (cur.length() > 0) {
-					out.add(cur.toString().trim());
-					cur.setLength(0);
-				}
-				cur.append(line);
-			} else {
-				if (cur.length() > 0 && !line.isBlank()) {
-					cur.append(' ').append(line);
-				} else if (!line.isBlank()) {
-					cur.append(line);
-				}
-			}
+		JsonNode contentNode = choices.get(0).path("message").path("content");
+		if (contentNode.isMissingNode() || contentNode.asText().isBlank()) {
+			throw new RuntimeException("❌ GPT 응답에서 content가 없음: " + response.body());
 		}
-		if (cur.length() > 0) out.add(cur.toString().trim());
-		return out;
+
+		// GPT 응답 본문
+		String content = contentNode.asText().trim();
+
+		// ✅ 마크다운 제거
+		content = content.replaceAll("(?s)```json", "")
+			.replaceAll("(?s)```", "")
+			.trim();
+
+		// ✅ JSON 배열 파싱
+		try {
+			List<String> docs = new ArrayList<>();
+			for (JsonNode node : mapper.readTree(content)) {
+				docs.add(node.asText().trim());
+			}
+			return docs;
+		} catch (Exception e) {
+			// fallback (라인 단위 분리)
+			System.out.println("⚠️ GPT 응답 JSON 파싱 실패, 라인 분리 fallback: " + content);
+			return Arrays.stream(content.split("[\\r\\n]+"))
+				.map(String::trim)
+				.filter(s -> !s.isBlank())
+				.toList();
+		}
 	}
 
-	private String normalize(String s) {
-		return s.replace('\u00A0', ' ')
-			.replace("\r", "\n")
-			.replaceAll("\\t", " ")
-			.replaceAll(" {2,}", " ");
-	}
+
 }
+
