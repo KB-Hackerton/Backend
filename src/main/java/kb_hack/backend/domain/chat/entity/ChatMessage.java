@@ -1,5 +1,7 @@
 package kb_hack.backend.domain.chat.entity;
 
+import java.time.LocalDateTime;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +23,6 @@ public class ChatMessage {
 
 	private String content;
 
-	private String createdAt;
+	private LocalDateTime createdAt;
 
 }

@@ -35,6 +35,7 @@
         SELECT * FROM member
         WHERE member_email = #{memberEmail}
     </select>
+
     <select id="getMemberByMemberId" resultType="kb_hack.backend.domain.member.domain.Member">
         SELECT * FROM member
         WHERE member_id = #{memberId}

@@ -13,15 +13,16 @@ import kb_hack.backend.domain.chat.entity.ChatRoomState;
 public interface ChatRoomStateMapper {
 
 	@Insert("""
-		INSERT INTO chat_room_state (chat_room_id, member_id, last_read_message_id)
-		VALUES (#{chatRoomId}, #{memberId}, #{lastReadMessageId})
-	""")
+			INSERT INTO chat_room_state (chat_room_id, member_id, last_read_message_id)
+			VALUES (#{chatRoomId}, #{memberId}, #{lastReadMessageId})
+		""")
 	@Options(useGeneratedKeys = true, keyProperty = "chatRoomStateId", keyColumn = "chat_room_state_id")
 	int save(ChatRoomState chatRoomState);
+
 	@Select("""
 		SELECT *
 		FROM chat_room_state
 		WHERE chat_room_id = #{chatRoomId}
-""")
+	""")
 	List<ChatRoomState> findByChatRoom(Long chatRoomId);
 }

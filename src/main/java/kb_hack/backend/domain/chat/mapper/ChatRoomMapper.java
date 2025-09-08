@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 
 import kb_hack.backend.domain.chat.controller.ChatMessageResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
+
 import kb_hack.backend.domain.chat.entity.ChatRoom;
 
 @Mapper
@@ -57,4 +58,6 @@ public interface ChatRoomMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "chatMessageId", keyColumn = "chat_message_id")
 	int saveMessage(ChatMessage chatMessage);
 
+	// roomId로 메시지 목록을 가져올 때, 보낸 사람의 이메일도 함께 가져오는 메소드
+	List<ChatMessageResponse> findChatHistoryWithSenderEmailByRoomId(Long memberId, Long roomId);
 }

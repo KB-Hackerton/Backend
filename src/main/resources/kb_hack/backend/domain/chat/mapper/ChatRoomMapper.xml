@@ -5,7 +5,7 @@
     <resultMap id="ChatMapper" type="kb_hack.backend.domain.chat.entity.ChatRoom">
         <id property="chatRoomId" column="chat_room_id"/>
         <result property="roomName" column="room_name"/>
-        <result property="sosType" column="sos_type"/>
+        <result property="roomType" column="room_type"/>
         <result property="isComplete" column="is_complete"/>
         <result property="ownerId" column="owner_id"/>
         <result property="isComplete" column="is_complete"/>
@@ -16,6 +16,26 @@
         SELECT *
         FROM chat_room
         WHERE chat_room_id = #{roomId}
+    </select>
+    <select id="findChatHistoryWithSenderEmailByRoomId"
+            resultType="kb_hack.backend.domain.chat.controller.ChatMessageResponse">
+        SELECT
+            cm.chat_message_id    AS chatMessageId,
+            cm.sender_id          AS senderId,
+            m.member_email        AS senderEmail,
+            IFNULL(rs.is_read, 0) AS isRead,
+            cm.content            AS content,
+            cm.created_at         AS createdAt
+        FROM
+            chat_message cm
+        LEFT JOIN
+            member m ON cm.sender_id = m.member_id
+        LEFT JOIN
+            read_status rs ON cm.chat_message_id = rs.chat_message_id AND rs.member_id = #{memberId}
+        WHERE
+            cm.chat_room_id = #{roomId}
+        ORDER BY
+            cm.created_at ASC
     </select>
 
 </mapper>

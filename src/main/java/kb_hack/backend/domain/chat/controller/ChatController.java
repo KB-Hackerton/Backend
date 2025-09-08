@@ -57,5 +57,12 @@ public class ChatController {
 	}
 
 
+	@PostMapping("/chat/room/{roomId}/read")
+	public ResponseEntity<Void> markAsRead(@PathVariable Long roomId,
+		@AuthenticationPrincipal SecurityCustomUser customUser) {
+
+		chatService.markMessagesAsRead(roomId, customUser.getMemberVO().getMemberId());
+		return ResponseEntity.ok().build();
+	}
 
 }

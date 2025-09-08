@@ -20,12 +20,11 @@ import kb_hack.backend.domain.chat.mapper.ChatRoomStateMapper;
 import kb_hack.backend.domain.chat.mapper.ReadStatusMapper;
 import kb_hack.backend.domain.member.domain.Member;
 import kb_hack.backend.domain.member.mapper.MemberMapper;
-import kb_hack.backend.domain.member.service.MemberService;
 import kb_hack.backend.domain.sos.entity.Sos;
 import kb_hack.backend.domain.sos.mapper.SosMapper;
 import kb_hack.backend.global.common.exception.type.CustomException;
+import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import kb_hack.backend.global.security.entity.MemberVO;
-import kb_hack.backend.global.security.mapper.SecurityMemberMapper;
 import kb_hack.backend.global.util.JwtProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,12 +67,22 @@ public class ChatService {
 		// 해당 roomId에 email을 가진 사용자가 참여자인지 체크
 		// 1. 채팅방 조회
 		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
+		if (chatRoom == null) {
+			log.warn("참여자인지 확인하려 했으나, roomId '{}'에 해당하는 채팅방을 찾을 수 없습니다.", roomId);
+			return false; // 채팅방이 없으면 참여자가 아님
+		}
+
 		// 2. 현재 로그인한 사용자 조회
 		Member member = memberMapper.getMemberByEmail(email);
+		if (member == null) {
+			log.warn("참여자인지 확인하려 했으나, 이메일 '{}'에 해당하는 사용자를 찾을 수 없습니다.", email);
+			return false; // 사용자가 없으면 당연히 참여자가 아님
+		}
 
 		// 3. 참여자 여부 체크
 		List<ChatRoomState> chatRoomState = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
 		for (ChatRoomState c : chatRoomState) {
+			log.info("c.getMemberId(): {}, member.getMemberId(): {}", c.getMemberId(), member.getMemberId());
 			if (c.getMemberId().equals(member.getMemberId())) {
 				return true;
 			}
@@ -87,19 +96,16 @@ public class ChatService {
 	 * @param chatMessageDto
 	 */
 	@Transactional
-	public void saveMessage(Long roomId, ChatMessageDto chatMessageDto) {
+	public ChatMessage saveMessage(Long roomId, ChatMessageDto chatMessageDto, SecurityCustomUser customUser) {
 		// 1. 채팅방 조회
 		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
 		if (chatRoom == null) {
 			throw new CustomException(CHAT_ROOM_NOT_FOUND);
 		}
 		// 2. 보낸 사람 조회
+		Long memberId = customUser.getMemberVO().getMemberId(); // SecurityCustomUser에 MemberVO를 가져오는 getter가 있다고 가정
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		log.info("authentication: {}", authentication);
-		MemberVO memberVO = (MemberVO) authentication.getPrincipal();
-
-		Member member = memberMapper.getMemberByEmail(memberVO.getMemberEmail());
+		Member member = memberMapper.getMemberByMemberId(memberId);
 		if (member == null) {
 			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
 		}
@@ -128,6 +134,9 @@ public class ChatService {
 			}
 
 		}
+
+		return chatMessage;
+
 	}
 
 	/**
@@ -195,264 +204,26 @@ public class ChatService {
 		}
 		// 2. 특정 room에 대한 message 조회
 
-		List<ChatMessage> chatMessages = chatRoomMapper.getChatMessagesByRoomId(roomId);
-		List<ChatMessageResponse> chatMessageResponses = chatMessages.stream().map(c -> ChatMessageResponse.builder()
-			.chatMessageId(c.getChatMessageId())
-			.content(c.getContent())
-			.senderId(c.getSenderId())
-			.createdAt(c.getCreatedAt())
-			.build()).toList();
-		return chatMessageResponses;
+		return chatRoomMapper.findChatHistoryWithSenderEmailByRoomId(memberId,roomId);
 	}
 
-	// public void saveMessage(Long roomId, ChatMessageDto chatMessageDtoRequest) {
-	// 	// 1. 채팅방 조회
-	// 	ChatRoom chatRoom = chatRoomMapper.findById(roomId).orElseThrow(
-	// 		() -> new EntityNotFoundException("room cannot found. id: ")
-	// 	);
-	// 	// 2. 보낸 사람 조회
-	// 	Member sender = memberMapper.findByEmail(chatMessageDtoRequest.getSenderEmail()).orElseThrow(
-	// 		() -> new EntityNotFoundException("sender cannot found. email: ")
-	// 	);
-	// 	// 3. 채팅 메시지 저장
-	// 	ChatMessage chatMessage = ChatMessage.builder()
-	// 		.chatRoom(chatRoom)
-	// 		.member(sender)
-	// 		.content(chatMessageDtoRequest.getMessage())
-	// 		.build();
-	// 	chatMessageMapper.save(chatMessage);
-	// 	// 4. 사용자 별로 읽음 여부 저장
-	// 	List<ChatParticipant> chatParticipants = chatParticipantMapper.findByChatRoom(chatRoom);
-	// 	for (ChatParticipant c : chatParticipants) {
-	// 		ReadStatus readStatus = ReadStatus.builder()
-	// 			.chatRoom(c.getChatRoom())
-	// 			.member(c.getMember())
-	// 			.chatMessage(chatMessage)
-	// 			.isRead(c.getMember().equals(sender))
-	// 			.build();
-	// 		readStatusMapper.save(readStatus);
-	// 	}
-	//
-	// }
+	public void markMessagesAsRead(Long roomId, Long memberId) {
+		// 1. 해당 방의 모든 메시지를 가져온다.
+		List<ChatMessage> messages = chatRoomMapper.getChatMessagesByRoomId(roomId);
+		if (messages.isEmpty()) {
+			return; // 읽을 메시지가 없으면 종료
+		}
 
-	// public void createGroupChatRoom(String roomName) {
-	// 	Member member = memberMapper
-	// 		.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
-	// 		.orElseThrow(EntityNotFoundException::new);
-	//
-	// 	// 1. 채팅방 생성
-	// 	ChatRoom chatRoom = ChatRoom.builder()
-	// 		.name(roomName)
-	// 		.isGroupChat("Y")
-	// 		.build();
-	// 	chatRoomMapper.save(chatRoom);
-	// 	// 2. 채팅방 참여자 추가 (현재 로그인한 사용자)
-	// 	ChatParticipant chatParticipant = ChatParticipant.builder()
-	// 		.chatRoom(chatRoom)
-	// 		.member(member)
-	// 		.build();
-	//
-	// 	chatParticipantMapper.save(chatParticipant);
-	//
-	// }
+		// 2. 마지막 메시지의 ID를 찾는다.
+		Long lastMessageId = messages.get(messages.size() - 1).getChatMessageId();
 
-	/**
-	 * 전체 그룹채팅방 목록 조회
-	 * @return List<ChatRoomListResponse>
-	 */
-	// public List<ChatRoomListResponse> getAllGroupChatRooms() {
-	// 	List<ChatRoom> chatRooms = chatRoomMapper.findByIsGroupChat("Y");
-	// 	List<ChatRoomListResponse> chatRoomDtos = new ArrayList<>();
-	// 	for (ChatRoom c : chatRooms) {
-	// 		ChatRoomListResponse dto = ChatRoomListResponse.builder()
-	// 			.roomId(c.getChatRoomId())
-	// 			.roomName(c.getName())
-	// 			.build();
-	// 		chatRoomDtos.add(dto);
-	// 	}
-	// 	return chatRoomDtos;
-	// }
+		// 3. 해당 사용자의 읽음 상태를 마지막 메시지 ID로 업데이트한다.
+		// (ReadStatus 테이블을 업데이트하거나, ChatRoomState 테이블에 lastReadMessageId 같은 컬럼을 업데이트)
+		// 이 부분의 로직에서 에러가 발생했을 가능성이 높습니다.
+		readStatusMapper.updateLastReadMessage(roomId, memberId, lastMessageId);
 
-	/**
-	 * 자신이 속한 그룹채팅방 목록 조회
-	 * @return List<ChatRoomListResponse>
-	 */
-	// public List<MyChatListResponse> getMyChatRooms() {
-	// 	// 1. 현재 로그인한 사용자 조회
-	// 	Member member = memberMapper.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(EntityNotFoundException::new);
-	// 	// 2. 참여중인 그룹채팅방 조회
-	// 	List<ChatParticipant> chatParticipants = chatParticipantMapper.findAllByMember(member);
-	//
-	// 	// 3. DTO로 변환
-	// 	List<MyChatListResponse> myChatListResponses = new ArrayList<>();
-	// 	for (ChatParticipant c : chatParticipants) {
-	// 		Long count = readStatusMapper.countByChatRoomAndMemberAndIsReadFalse(c.getChatRoom(), member);
-	// 		MyChatListResponse dto = MyChatListResponse.builder()
-	// 			.roomId(c.getChatRoom().getChatRoomId())
-	// 			.roomName(c.getChatRoom().getName())
-	// 			.isGroupChat(c.getChatRoom().getIsGroupChat())
-	// 			.unReadCount(count)
-	// 			.build();
-	// 		myChatListResponses.add(dto);
-	// 	}
-	//
-	// 	return myChatListResponses;
-	//
-	// }
+		}
 
-	// public void addParticipantToGroupChat(Long roomId) {
-	// 	// 1. 채팅방 조회
-	// 	ChatRoom chatRoom = chatRoomMapper.findById(roomId).orElseThrow(
-	// 		() -> new EntityNotFoundException("room cannot found. id: " + roomId)
-	// 	);
-	//
-	// 	// 2. 현재 로그인한 사용자 조회
-	// 	Member member = memberMapper
-	// 		.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
-	// 		.orElseThrow(EntityNotFoundException::new);
-	//
-	// 	// 3. 단체 채팅방 여부 체크
-	// 	if(chatRoom.getIsGroupChat().equals("N")) {
-	// 		throw new IllegalArgumentException("단체 채팅방이 아닙니다.");
-	// 	}
-	//
-	// 	// 4. 중복 참여자 체크
-	// 	Optional<ChatParticipant> participant = chatParticipantMapper.findByChatRoomAndMember(chatRoom, member);
-	//
-	// 	if (!participant.isPresent()) {
-	// 		addParticipantToRoom(chatRoom, member);
-	// 	}
-	//
-	//
-	// }
-	//
-	// // ChatParticipant 엔티티 생성 및 저장
-	//
-	// public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
-	// 	ChatParticipant chatParticipant = ChatParticipant.builder()
-	// 		.chatRoom(chatRoom)
-	// 		.member(member)
-	// 		.build();
-	//
-	// 	chatParticipantMapper.save(chatParticipant);
-	// }
 
-	// public List<ChatMessageResponse> getChatHistory(Long roomId) {
-	// 	// 1. 해당 채팅방의 참여자가 아닐경우 예외처리
-	// 	// 1-1. 채팅방 조회
-	// 	ChatRoom chatRoom = chatRoomMapper.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room cannot found. id: " + roomId));
-	// 	// 1-2. 현재 로그인한 사용자 조회
-	// 	Member member = memberMapper.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(EntityNotFoundException::new);
-	// 	// 1-3. 참여자 여부 체크
-	// 	List<ChatParticipant> chatParticipants = chatParticipantMapper.findByChatRoom(chatRoom);
-	// 	boolean check = false;
-	// 	for (ChatParticipant c : chatParticipants) {
-	// 		if (c.getMember().equals(member)) {
-	// 			check = true;
-	// 		}
-	// 	}
-	// 	if (!check) {
-	// 		throw new IllegalArgumentException("본인이 속하지 않은 채팅방입니다." );
-	// 	}
-	//
-	// 	// 2. 특정 room에 대한 message 조회
-	// 	List<ChatMessage> chatMessages = chatMessageMapper.findByChatRoomOrderByCreatedTimeAsc(chatRoom);
-	// 	List<ChatMessageResponse> chatMessageResponses = new ArrayList<>();
-	// 	for (ChatMessage c : chatMessages) {
-	// 		ChatMessageResponse dto = ChatMessageResponse.builder()
-	// 			.message(c.getContent())
-	// 			.senderEmail(c.getMember().getEmail())
-	// 			.build();
-	//
-	// 		chatMessageResponses.add(dto);
-	// 	}
-	//
-	// 	return chatMessageResponses;
-	//
-	// }
 
-	// public boolean isRoomParticipant(String email, Long roomId) {
-	// 	// 해당 roomId에 email을 가진 사용자가 참여자인지 체크
-	//
-	// 	// 1. 채팅방 조회
-	// 	ChatRoom chatRoom = chatRoomMapper.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room cannot found. id: " + roomId));
-	// 	// 2. 현재 로그인한 사용자 조회
-	// 	Member member = memberMapper.findByEmail(email).orElseThrow(EntityNotFoundException::new);
-	//
-	// 	// 3. 참여자 여부 체크
-	// 	List<ChatParticipant> chatParticipants = chatParticipantMapper.findByChatRoom(chatRoom);
-	// 	for (ChatParticipant c : chatParticipants) {
-	// 		if (c.getMember().equals(member)) {
-	// 			return true;
-	// 		}
-	// 	}
-	// 	return false;
-	// }
-
-	// public void messageRead(Long roomId) {
-	// 	// 1. 해당 채팅방의 참여자가 아닐경우 예외처리
-	// 	// 1.1. 채팅방 조회
-	// 	ChatRoom chatRoom = chatRoomMapper.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room cannot found. id: " + roomId));
-	// 	// 1.2. 현재 로그인한 사용자 조회
-	// 	Member member = memberMapper.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(EntityNotFoundException::new);
-	// 	// 2.1. 메시지 읽음 여부 조회
-	// 	List<ReadStatus> readStatuses = readStatusMapper.findByChatRoomAndMember(chatRoom, member);
-	// 	// 2.2. 읽음 처리
-	// 	for (ReadStatus r : readStatuses) {
-	// 		r.updateReadStatus(true);
-	// 	}
-	//
-	// }
-
-	// del Y/N
-	// 1. 참여자 객체 삭제
-	// 2. 모두가 나갔을 경우 모든 엔티티 삭제
-	// public void leaveChatRoom(Long roomId) {
-	// 	// 1.1. 채팅방 조회
-	// 	ChatRoom chatRoom = chatRoomMapper.findById(roomId).orElseThrow(() -> new EntityNotFoundException("room cannot found. id: " + roomId));
-	// 	// 1.2. 현재 로그인한 사용자 조회
-	// 	Member member = memberMapper.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow(EntityNotFoundException::new);
-	//
-	// 	if(chatRoom.getIsGroupChat().equals("N")) {
-	// 		throw new IllegalArgumentException("단체 채팅방이 아닙니다.");
-	// 	}
-	//
-	// 	ChatParticipant c = chatParticipantMapper.findByChatRoomAndMember(chatRoom, member).orElseThrow(() -> new EntityNotFoundException("participant cannot found. roomId: " + roomId + ", memberId: " + member.getMemberId()));
-	// 	chatParticipantMapper.delete(c);
-	//
-	// 	List<ChatParticipant> participants = chatParticipantMapper.findByChatRoom(chatRoom);
-	// 	if (participants.isEmpty()) {
-	// 		chatRoomMapper.delete(chatRoom);
-	// 	}
-	//
-	// }
-
-	// public Long getOrCreatePrivateChatRoom(String otherMemberId) {
-	// 	// 1-1. 현재 로그인한 사용자 조회
-	// 	Member member = memberMapper
-	// 		.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
-	// 		.orElseThrow(EntityNotFoundException::new);
-	//
-	// 	// 1.2. 상대방 사용자 조회
-	// 	Member otherMember = memberMapper
-	// 		.findById(Long.parseLong(otherMemberId)).orElseThrow(() -> new EntityNotFoundException("member cannot found. id: " + otherMemberId));
-	//
-	// 	// 2. 상대방이 1:1 채팅에 이미 참여하고 있다면 roomId return
-	// 	Optional<ChatRoom> chatRoom = chatParticipantMapper.findChatRoomIdExistingPrivateRoom(member.getMemberId(), otherMember.getMemberId());
-	// 	if (chatRoom.isPresent()) {
-	// 		return chatRoom.get().getChatRoomId();
-	// 	}
-	// 	// 3. 만약 1:1 채팅방이 없다면 새로 생성
-	// 	ChatRoom newChatRoom = ChatRoom.builder()
-	// 		.isGroupChat("N")
-	// 		.name(member.getName() + "-" + otherMember.getName())
-	// 		.owner(member)
-	// 		.build();
-	// 	chatRoomMapper.save(newChatRoom);
-	//
-	// 	// 4. 두사람 모두 참여자로 추가
-	// 	addParticipantToRoom(newChatRoom, member);
-	// 	addParticipantToRoom(newChatRoom, otherMember);
-	// 	return newChatRoom.getChatRoomId();
-	// }
 }

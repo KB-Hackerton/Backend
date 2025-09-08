@@ -60,8 +60,8 @@ public class SosController {
 		@Parameter(description = "SOS 제목") @RequestParam(required = false) String sosTitle,
 		@Parameter(description = "SOS 유형") @RequestParam SosType sosType,
 		@Parameter(description = "SOS 내용") @RequestParam String sosContent,
-		@Parameter(description = "만료일 (yyyy-MM-dd HH:mm:ss)") @RequestParam String expiresAt
-		// @Parameter(description = "이미지 파일들") @RequestPart(name = "images", required = false) List<MultipartFile> images
+		@Parameter(description = "만료일 (yyyy-MM-dd HH:mm:ss)") @RequestParam String expiresAt,
+		@Parameter(description = "이미지 파일들") @RequestPart(name = "images", required = false) List<MultipartFile> images
 	) {
 		Long memberId = getLoginMemberId();
 
@@ -71,7 +71,7 @@ public class SosController {
 			.sosType(sosType)
 			.sosContent(sosContent)
 			.expiresAt(expiresAt)
-			// .images(images)
+			.images(images)
 			.build();
 
 		SosCreateResponse response = sosService.create(req);

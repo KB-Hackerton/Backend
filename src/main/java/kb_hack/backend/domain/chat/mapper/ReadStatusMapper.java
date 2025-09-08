@@ -3,6 +3,7 @@ package kb_hack.backend.domain.chat.mapper;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Update;
 
 import kb_hack.backend.domain.chat.entity.ReadStatus;
 
@@ -18,4 +19,18 @@ public interface ReadStatusMapper {
 """)
 	@Options(useGeneratedKeys = true, keyProperty = "readStatusId", keyColumn = "read_status_id")
 	int save(ReadStatus readStatus);
+
+	@Update("""
+	UPDATE read_status
+	SET chat_message_id = #{lastMessageId}, is_read = 1
+	WHERE chat_room_id = #{roomId} AND member_id = #{memberId}
+	""")
+	int updateLastReadMessage(Long roomId, Long memberId, Long lastMessageId);
+
+	@Update("""
+	UPDATE read_status
+	SET is_read = 1
+	WHERE chat_room_id = #{roomId} AND member_id = #{memberId} AND is_read = 0
+	""")
+	int markAsRead(Long roomId, Long memberId);
 }
