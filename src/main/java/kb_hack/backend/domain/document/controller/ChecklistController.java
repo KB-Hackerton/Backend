@@ -31,6 +31,10 @@ public class ChecklistController {
 	// 	int savedCount = documentService.extractAndSaveDocumentsFromFavorites(memberId);
 	// 	return ResponseEntity.ok(savedCount + "개의 제출서류가 저장되었습니다.");
 	// }
+	@Operation(
+		summary = "특정 공고 제출서류 추출 & 저장",
+		description = "공고 ID(`announceId`)를 기반으로 해당 공고의 제출서류를 추출하여 DB에 저장합니다."
+	)
 
 	/** ✅ 특정 공고 제출서류 추출 & 저장 */
 	@PostMapping("/{announceId}/extract")
@@ -45,21 +49,31 @@ public class ChecklistController {
 	// 	return ResponseEntity.ok(checklistService.getChecklist());
 	// }
 
+	@Operation(
+		summary = "공고별 체크리스트 조회",
+		description = "특정 공고 ID(`announceId`)에 해당하는 제출서류 체크리스트를 조회합니다."
+	)
 	/** ✅ 공고별 체크리스트 조회 */
 	@GetMapping("/{announceId}")
 	public ResponseEntity<List<DocumentResponseDto>> getChecklistByAnnounce(@PathVariable Long announceId) {
 		return ResponseEntity.ok(checklistService.getChecklistByAnnounce(announceId));
 	}
-
-	/** ✅ 단건 체크/해제 */
-	@PutMapping("/documents/{documentId}/check")
-	public ResponseEntity<String> updateCheckStatus(
-		@PathVariable Long documentId,
-		@RequestBody DocumentCheckRequestDto dto) {
-		checklistService.updateCheckStatus(documentId, dto);
-		return ResponseEntity.ok("체크 상태가 업데이트되었습니다.");
-	}
-
+	// @Operation(
+	// 	summary = "단건 체크/해제",
+	// 	description = "제출서류 ID(`documentId`)에 대해 체크 상태를 ON/OFF로 변경합니다."
+	// )
+	// /** ✅ 단건 체크/해제 */
+	// @PutMapping("/documents/{documentId}/check")
+	// public ResponseEntity<String> updateCheckStatus(
+	// 	@PathVariable Long documentId,
+	// 	@RequestBody DocumentCheckRequestDto dto) {
+	// 	checklistService.updateCheckStatus(documentId, dto);
+	// 	return ResponseEntity.ok("체크 상태가 업데이트되었습니다.");
+	// }
+	@Operation(
+		summary = "공고별 배치 체크/해제",
+		description = "특정 공고 ID(`announceId`)에 대해 제출서류 전체의 체크 상태를 일괄 저장합니다."
+	)
 	/** ✅ 공고별 배치 체크/해제 */
 	@PutMapping("/announces/{announceId}/check")
 	public ResponseEntity<String> updateCheckStatusBulk(
