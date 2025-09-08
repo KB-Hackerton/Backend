@@ -21,6 +21,8 @@ public class announceDto {
     private LocalDate startDate;
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate endDate;
+    @JsonFormat(pattern = "yyyyMMdd")
+    private LocalDate pubDate;
     private boolean isFavorite;
 
     //announce => AnnounceDto
@@ -31,6 +33,7 @@ public class announceDto {
                 .excInsttNm(announce.getExcInsttNm())
                 .startDate(announce.getStartDate())
                 .endDate(announce.getEndDate())
+                .pubDate(announce.getPubDate())
                 .isFavorite(false)
                 .build();
     }
