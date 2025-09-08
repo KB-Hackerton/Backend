@@ -24,13 +24,13 @@ public class ChecklistController {
 	private final DocumentService documentService;
 	private final ChecklistService checklistService;
 
-	/** ✅ 즐겨찾기된 모든 공고 제출서류 추출 & 저장 */
-	@PostMapping("/extract")
-	public ResponseEntity<String> extractFromFavorites() {
-		Long memberId = getLoginMemberId();
-		int savedCount = documentService.extractAndSaveDocumentsFromFavorites(memberId);
-		return ResponseEntity.ok(savedCount + "개의 제출서류가 저장되었습니다.");
-	}
+	// /** ✅ 즐겨찾기된 모든 공고 제출서류 추출 & 저장 */
+	// @PostMapping("/extract")
+	// public ResponseEntity<String> extractFromFavorites() {
+	// 	Long memberId = getLoginMemberId();
+	// 	int savedCount = documentService.extractAndSaveDocumentsFromFavorites(memberId);
+	// 	return ResponseEntity.ok(savedCount + "개의 제출서류가 저장되었습니다.");
+	// }
 
 	/** ✅ 특정 공고 제출서류 추출 & 저장 */
 	@PostMapping("/{announceId}/extract")
@@ -39,11 +39,11 @@ public class ChecklistController {
 		return ResponseEntity.ok("[announceId=" + announceId + "] " + savedCount + "개의 제출서류가 저장되었습니다.");
 	}
 
-	/** ✅ 전체 체크리스트 조회 */
-	@GetMapping
-	public ResponseEntity<List<DocumentResponseDto>> getChecklist() {
-		return ResponseEntity.ok(checklistService.getChecklist());
-	}
+	// /** ✅ 전체 체크리스트 조회 */
+	// @GetMapping
+	// public ResponseEntity<List<DocumentResponseDto>> getChecklist() {
+	// 	return ResponseEntity.ok(checklistService.getChecklist());
+	// }
 
 	/** ✅ 공고별 체크리스트 조회 */
 	@GetMapping("/{announceId}")

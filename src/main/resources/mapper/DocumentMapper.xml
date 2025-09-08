@@ -18,6 +18,7 @@
     </insert>
 
     <!-- 즐겨찾기 전체 -->
+    <!-- 즐겨찾기 전체 -->
     <select id="findDocumentsByMemberId" resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
         SELECT
             d.document_id   AS documentId,
@@ -27,22 +28,28 @@
             COALESCE(mdc.status, 0) AS checked,
             a.announce_title AS announceTitle,
             a.reqst_end_date AS deadline,
-            COUNT(DISTINCT d2.document_id) AS totalDocs,
-            COUNT(DISTINCT CASE WHEN mdc2.status = 1 THEN d2.document_id END) AS checkedDocs
+            -- 🔑 공고 단위 총 문서 개수
+            (SELECT COUNT(*)
+             FROM document d2
+             WHERE d2.announce_id = d.announce_id) AS totalDocs,
+            -- 🔑 공고 단위 체크된 문서 개수
+            (SELECT COUNT(*)
+             FROM member_document_check mdc2
+                      JOIN document d3 ON mdc2.document_id = d3.document_id
+             WHERE d3.announce_id = d.announce_id
+               AND mdc2.member_id = #{memberId}
+               AND mdc2.status = 1) AS checkedDocs
         FROM document d
                  JOIN announce a ON d.announce_id = a.announce_id
                  LEFT JOIN member_document_check mdc
-                           ON d.document_id = mdc.document_id AND mdc.member_id = #{memberId}
-                 LEFT JOIN document d2 ON d.announce_id = d2.announce_id
-                 LEFT JOIN member_document_check mdc2
-                           ON d2.document_id = mdc2.document_id AND mdc2.member_id = #{memberId}
+                           ON d.document_id = mdc.document_id
+                               AND mdc.member_id = #{memberId}
         WHERE a.announce_id IN (
             SELECT announce_id FROM member_favorite WHERE member_id = #{memberId}
         )
-        GROUP BY d.document_id, d.announce_id, d.title, d.description,
-                 a.announce_title, a.reqst_end_date, mdc.status
     </select>
 
+    <!-- 공고별 -->
     <select id="findDocumentsByMemberAndAnnounce" resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
         SELECT
             d.document_id   AS documentId,
@@ -52,19 +59,25 @@
             COALESCE(mdc.status, 0) AS checked,
             a.announce_title AS announceTitle,
             a.reqst_end_date AS deadline,
-            COUNT(DISTINCT d2.document_id) AS totalDocs,
-            COUNT(DISTINCT CASE WHEN mdc2.status = 1 THEN d2.document_id END) AS checkedDocs
+            -- 🔑 공고 단위 총 문서 개수
+            (SELECT COUNT(*)
+             FROM document d2
+             WHERE d2.announce_id = d.announce_id) AS totalDocs,
+            -- 🔑 공고 단위 체크된 문서 개수
+            (SELECT COUNT(*)
+             FROM member_document_check mdc2
+                      JOIN document d3 ON mdc2.document_id = d3.document_id
+             WHERE d3.announce_id = d.announce_id
+               AND mdc2.member_id = #{memberId}
+               AND mdc2.status = 1) AS checkedDocs
         FROM document d
                  JOIN announce a ON d.announce_id = a.announce_id
                  LEFT JOIN member_document_check mdc
-                           ON d.document_id = mdc.document_id AND mdc.member_id = #{memberId}
-                 LEFT JOIN document d2 ON d.announce_id = d2.announce_id
-                 LEFT JOIN member_document_check mdc2
-                           ON d2.document_id = mdc2.document_id AND mdc2.member_id = #{memberId}
+                           ON d.document_id = mdc.document_id
+                               AND mdc.member_id = #{memberId}
         WHERE d.announce_id = #{announceId}
-        GROUP BY d.document_id, d.announce_id, d.title, d.description,
-                 a.announce_title, a.reqst_end_date, mdc.status
     </select>
+
 
 
     <!-- 체크/해제 (UPSERT) -->
