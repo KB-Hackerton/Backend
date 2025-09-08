@@ -7,6 +7,7 @@ import kb_hack.backend.domain.announce.Announce;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
@@ -24,6 +25,7 @@ public class announceDto {
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate pubDate;
     private boolean isFavorite;
+    private String lcategory;
 
     //announce => AnnounceDto
     public static announceDto from(Announce announce,boolean isFavorite) {
@@ -35,6 +37,7 @@ public class announceDto {
                 .endDate(announce.getEndDate())
                 .pubDate(announce.getPubDate())
                 .isFavorite(isFavorite)
+                .lcategory(announce.getLcategory())
                 .build();
     }
 }
