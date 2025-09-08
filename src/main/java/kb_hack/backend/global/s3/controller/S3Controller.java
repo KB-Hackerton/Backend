@@ -1,6 +1,8 @@
 package kb_hack.backend.global.s3.controller;
 
 import com.google.common.net.HttpHeaders;
+import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
+import kb_hack.backend.global.common.response.success.SuccessResponse;
 import kb_hack.backend.global.s3.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -20,17 +22,9 @@ public class S3Controller {
     private final S3Service s3Service;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> upload(@RequestPart("file") MultipartFile file) throws IOException {
+    public SuccessResponse<String> upload(@RequestPart("file") MultipartFile file) throws IOException {
         String key = s3Service.uploadFile(file);
-        return ResponseEntity.ok("Uploaded to S3 with key: " + key);
+        return SuccessResponse.makeResponse(SuccessStatusCode.IMAGE_UPLOAD_SUCCESS, s3Service.uploadFile(file));
     }
 
-    @GetMapping("/download/{key}")
-    public ResponseEntity<InputStreamResource> download(@PathVariable String key) throws IOException {
-        InputStream inputStream = s3Service.downloadFile(key);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + key)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new InputStreamResource(inputStream));
-    }
 }
