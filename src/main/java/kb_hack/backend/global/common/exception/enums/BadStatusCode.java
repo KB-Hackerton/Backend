@@ -20,6 +20,7 @@ public enum BadStatusCode {
     INVAID_EMAIL_EXCEPTION(HttpStatus.BAD_REQUEST,"유효하지 않은 이메일 입니다."),
     ALREADY_REGISTERED_EMAIL_EXCEPTION(HttpStatus.BAD_REQUEST, "이미 가입된 이메일입니다."),
     INCORRECT_ORIGINAL_PASSWORD_EXCEPTION(HttpStatus.BAD_REQUEST,"기존 비밀번호가 일치 하지 않습니다."),
+    INVALID_FILE_UPLOAD_EXCEPTION(HttpStatus.BAD_REQUEST,"업로드할 파일이 없습니다."),
 
 
     //401 UNAUTHORIZED
@@ -58,6 +59,8 @@ public enum BadStatusCode {
     FAIL_TO_COMMUNICATE_KAKAO_OAUTH_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"카카오 OAuth 통신 오류가 발생 했습니다"),
     FAIL_TO_PROCESSING_KAKAO_OAUTH_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"카카오 OAuth 로그인 과정 중 오류가 발생 했습니다"),
     FAIL_TO_PROCESSING_NOTICE_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"공지 정보를 불러오는 과정 중 오류가 발생 했습니다."),
+    FAIL_TO_PROCESSING_FILE_UPLOAD_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 알 수 없는 오류가 발생 했습니다."),
+    FILE_UPLOAD_FAILED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"파일 업로드에 실패 했습니다."),
 
 
 

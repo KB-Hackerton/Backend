@@ -21,7 +21,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SecurityMemberInfoDTO {
     private Long memberId;
-    private Long profileImageId;
+    private String profileImageId;
     private String memberEmail;
     private String memberName;
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
@@ -35,7 +35,7 @@ public class SecurityMemberInfoDTO {
     public static SecurityMemberInfoDTO convertToDTO(MemberVO vo) {
         return SecurityMemberInfoDTO.builder()
                 .memberId(vo.getMemberId())
-                .profileImageId(vo.getProfileImageId())
+                .profileImageId(vo.getStorageKey())
                 .memberEmail(vo.getMemberEmail())
                 .memberName(vo.getMemberName())
                 .createdAt(vo.getCreatedAt())

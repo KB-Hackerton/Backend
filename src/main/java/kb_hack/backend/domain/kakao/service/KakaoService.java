@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.jdbc.metadata.DataSourcePoolMetadataProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -33,6 +34,7 @@ public class KakaoService {
 
     @Qualifier("kakaoApiWebClient")
     private final WebClient kakaoApiWebClient;
+    private final DataSourcePoolMetadataProvider hikariPoolDataSourceMetadataProvider;
 
     @Value("${kakao.rest_key}")
     private String REST_API_KEY;
@@ -95,38 +97,53 @@ public class KakaoService {
             KakaoTokenResponseDTO kakaoTokenResponseDTO = getAccessToken(kakaoCodeRequestDTO.getCode());
             KakaoMemberInfoDTO userInfo = getUserInfo(kakaoTokenResponseDTO.getAccessToken());
 
-            boolean exists = kakaoMapper.existsByKakaoId(userInfo.getId()) == 1;
+            String email = userInfo.getKakaoAccount().getEmail();
+            Long kakaoId = userInfo.getId();
 
-            if (exists) {
-                MemberVO vo = kakaoMapper.findByKakaoId(userInfo.getId());
+            boolean kakaoExists = kakaoMapper.existsByKakaoId(kakaoId) == 1;
+            boolean emailExists = kakaoMapper.existByMemberEmail(email) == 1;
+
+
+            if (kakaoExists) {
+                MemberVO vo = kakaoMapper.findByKakaoId(kakaoId);
                 if (vo == null) {
                     throw new ServerErrorException(BadStatusCode.DATABASE_PROCESSING_EXCEPTION);
                 }
-                String email = vo.getMemberEmail();
+                return buildLoginResponse(vo);
 
+            } else if (emailExists) {
+                kakaoMapper.updateKakaoIdByEmail(email, kakaoId);
+                MemberVO vo = securityMemberMapper.getMemberByMemberEmail(email);
+                if (vo == null) {
+                    throw new ServerErrorException(BadStatusCode.DATABASE_PROCESSING_EXCEPTION);
+                }
+                return buildLoginResponse(vo);
 
-                //jwt 생성
-                String accessToken = jwtProcessor.generateAccessToken(email);
-                String refreshToken = jwtProcessor.generateRefreshToken(email);
-
-
-                SecurityMemberInfoDTO dto = SecurityMemberInfoDTO.convertToDTO(vo);
-                dto.setMinorNm(securityMemberMapper.getMinorNmByBusinessId(dto.getBusinessDTO().getBusinessId()));
-
-
-                SecurityResponseDTO result = new SecurityResponseDTO(accessToken, refreshToken, dto);
-                return result;
             } else {
                 return KakaoLoginResponse.builder()
                         .flag("NEW_USER")
-                        .kakaoId(userInfo.getId())
-                        .memberEmail(userInfo.getKakaoAccount().getEmail())
+                        .kakaoId(kakaoId)
+                        .memberEmail(email)
                         .build();
             }
+
+
         } catch (WebClientResponseException e) {
             throw new ServerErrorException(BadStatusCode.FAIL_TO_COMMUNICATE_KAKAO_OAUTH_EXCEPTION);
         } catch (Exception e) {
             throw new ServerErrorException(BadStatusCode.FAIL_TO_PROCESSING_KAKAO_OAUTH_EXCEPTION);
         }
     }
+
+    private SecurityResponseDTO buildLoginResponse(MemberVO vo) {
+        String email = vo.getMemberEmail();
+        String accessToken = jwtProcessor.generateAccessToken(email);
+        String refreshToken = jwtProcessor.generateRefreshToken(email);
+
+        SecurityMemberInfoDTO dto = SecurityMemberInfoDTO.convertToDTO(vo);
+        dto.setMinorNm(securityMemberMapper.getMinorNmByBusinessId(dto.getBusinessDTO().getBusinessId()));
+
+        return new SecurityResponseDTO(accessToken, refreshToken, dto);
+    }
+
 }
