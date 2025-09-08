@@ -1,7 +1,7 @@
 package kb_hack.backend.domain.chat.entity;
 
-import kb_hack.backend.domain.common.Superclass.BaseTimeEntity;
-import kb_hack.backend.domain.sos.entity.SosType;
+import java.time.LocalDateTime;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,17 +14,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ChatRoom extends BaseTimeEntity {
+public class ChatMessage {
+	private Long chatMessageId;
 
 	private Long chatRoomId;
 
-	private String roomName;
+	private Long senderId;
 
-	private Long sosId;
+	private String content;
 
-	private SosType roomType;
+	private LocalDateTime createdAt;
 
-	private int isComplete; // 0: 진행중, 1: 완료
-
-	private Long ownerId;
 }

@@ -60,5 +60,10 @@
                  LEFT JOIN sos_image si ON si.sos_id = s.sos_id
         WHERE s.sos_id = #{sosId}
     </select>
+    <select id="findById" resultType="kb_hack.backend.domain.sos.entity.Sos">
+        SELECT *
+        FROM sos
+        WHERE sos_id = #{sosId}
+    </select>
 
 </mapper>
