@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @Tag(name = "Checklist", description = "공고별 제출서류 체크리스트 API ")
-@RequestMapping("/api/checklists")
+@RequestMapping("/checklists")
 @RequiredArgsConstructor
 public class ChecklistController {
 
