@@ -33,7 +33,9 @@ public enum SuccessStatusCode {
     IMAGE_UPLOAD_SUCCESS(HttpStatus.OK, "이미지 업로드 성공!"),
     HOME_DATA_LOAD_SUCCESS(HttpStatus.OK,"홈 뷰 데이터 불러오기 성공!"),
 
-    ALARM_SETTING_GET_SUCCESS(HttpStatus.OK,"알림 선호 설정 데이터 불러오기 성공!");
+    ALARM_SETTING_GET_SUCCESS(HttpStatus.OK,"알림 선호 설정 데이터 불러오기 성공!"),
+    ALARM_LIST_GET_SUCCESS(HttpStatus.OK,"알림리스트 불러오기 성공!");
+
     private final HttpStatus httpStatus;
     private final String message;
 

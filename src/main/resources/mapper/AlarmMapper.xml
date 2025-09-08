@@ -12,6 +12,17 @@
         <result property="isAlarm"           column="is_alarm"/>
     </resultMap>
 
+    <resultMap id="NotificationMap" type="kb_hack.backend.domain.alarm.Notification">
+        <id property="notificationId" column="notification_id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="notiType" column="noti_type"/>
+        <result property="isRead" column="is_read"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+
     <select id="findById" resultMap="Map">
         SELECT * FROM alarm_preference
         WHERE member_id = #{memberId}
@@ -28,4 +39,39 @@
         </set>
         WHERE member_id = #{p.memberId}
     </update>
+
+    <insert id="insert">
+        insert into notification  (member_id, title, content, noti_type, is_read)
+        values  (#{p.memberId}, #{p.title}, #{p.content}, #{p.notiType}, 0)
+    </insert>
+
+    <select id="findByMemberId" resultMap="NotificationMap">
+        SELECT * FROM notification
+        WHERE member_id = #{memberId}
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="markRead">
+        update notification
+        set is_read =1
+        where member_id =#{memberId}
+        and notification_id = #{notificationId}
+    </update>
+
+    <update id="markAllRead">
+        UPDATE notification
+        SET is_read = 1
+        WHERE member_id = #{memberId}
+    </update>
+
+    <delete id="deleteOne">
+        DELETE FROM notification
+        WHERE member_id = #{memberId}
+          AND notification_id = #{notificationId}
+    </delete>
+
+    <delete id="deleteAll">
+        DELETE FROM notification
+        WHERE member_id = #{memberId}
+    </delete>
 </mapper>

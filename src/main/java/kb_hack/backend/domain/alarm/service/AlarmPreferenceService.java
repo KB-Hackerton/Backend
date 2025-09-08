@@ -1,8 +1,10 @@
 package kb_hack.backend.domain.alarm.service;
 
 import kb_hack.backend.domain.alarm.AlarmPreference;
+import kb_hack.backend.domain.alarm.Notification;
 import kb_hack.backend.domain.alarm.dto.AlarmPreferenceReq;
 import kb_hack.backend.domain.alarm.dto.AlarmPreferenceRes;
+import kb_hack.backend.domain.alarm.dto.NotificationRes;
 import kb_hack.backend.domain.alarm.mapper.AlarmMapper;
 import kb_hack.backend.domain.favorite.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -73,5 +76,42 @@ public class AlarmPreferenceService {
                 .dndStart(s.toString()) // "HH:mm"
                 .dndEnd(e.toString())
                 .build();
+    }
+
+    private NotificationRes toRes(Notification n) {
+        return NotificationRes.builder()
+                .notificationId(n.getNotificationId())
+                .title(n.getTitle())
+                .content(n.getContent())
+                .notiType(n.getNotiType())
+                .isRead(n.getIsRead())
+                .createdAt(n.getCreatedAt())
+                .build();
+    }
+
+    public List<NotificationRes> list (Long memberId) {
+        return alarmMapper.findByMemberId(memberId).stream()
+                .map(this::toRes)
+                .toList();
+    }
+
+    public void create(Notification n) {
+        alarmMapper.insert(n);
+    }
+
+    public void markRead(Long memberId, Long notificationId) {
+        alarmMapper.markRead(memberId, notificationId);
+    }
+
+    public void markAllRead(Long memberId) {
+        alarmMapper.markAllRead(memberId);
+    }
+
+    public void deleteOne(Long memberId, Long notificationId) {
+        alarmMapper.deleteOne(memberId, notificationId);
+    }
+
+    public void deleteAll(Long memberId) {
+        alarmMapper.deleteAll(memberId);
     }
 }

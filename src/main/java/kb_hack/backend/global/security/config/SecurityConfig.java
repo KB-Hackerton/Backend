@@ -95,7 +95,7 @@ public class SecurityConfig {
                         .requestMatchers("/sos/**").hasRole("Member")
                         .requestMatchers("/profile-image/**").hasRole("Member")
                         .requestMatchers("/connect/**").permitAll()
-
+                        .requestMatchers(HttpMethod.POST, "/alarm").hasRole("Admin")
                     .anyRequest().authenticated()
                 );
 
