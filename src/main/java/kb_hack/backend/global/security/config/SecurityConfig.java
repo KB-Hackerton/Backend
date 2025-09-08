@@ -93,6 +93,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/bizinfo").hasRole("Member")
                         .requestMatchers("/favorites/**").hasRole("Member")
                         .requestMatchers("/sos/**").hasRole("Member")
+                        .requestMatchers("/profile-image/**").hasRole("Member")
+                        .requestMatchers("/connect/**").permitAll()
 
                     .anyRequest().authenticated()
                 );

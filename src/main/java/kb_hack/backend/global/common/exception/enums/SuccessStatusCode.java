@@ -30,8 +30,9 @@ public enum SuccessStatusCode {
     SOS_GET_SUCCESS(HttpStatus.OK, "SOS 상세 불러오기 성공!"),
     ARTICLE_GET_SUCCESS(HttpStatus.OK, "기사 목록 가져오기 성공!"),
     NOTICE_GET_SUCCESS(HttpStatus.OK, "공고 목록 불러오기 성공!"),
-
+    IMAGE_UPLOAD_SUCCESS(HttpStatus.OK, "이미지 업로드 성공!"),
     HOME_DATA_LOAD_SUCCESS(HttpStatus.OK,"홈 뷰 데이터 불러오기 성공!"),
+
     ALARM_SETTING_GET_SUCCESS(HttpStatus.OK,"알림 선호 설정 데이터 불러오기 성공!");
     private final HttpStatus httpStatus;
     private final String message;

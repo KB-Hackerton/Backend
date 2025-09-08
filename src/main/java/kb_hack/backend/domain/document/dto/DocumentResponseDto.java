@@ -1,5 +1,7 @@
 package kb_hack.backend.domain.document.dto;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Builder;
@@ -14,4 +16,9 @@ public class DocumentResponseDto {
 	private String title;
 	private String description;
 	private boolean checked;
+
+	private String announceTitle; // 공고 제목
+	private LocalDate deadline;   // announce.reqst_end_date
+	private int totalDocs;        // 총 서류 개수
+	private int checkedDocs;      // 체크한 서류 개수
 }
