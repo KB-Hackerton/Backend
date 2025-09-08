@@ -44,7 +44,8 @@
             announce_title,
             exc_insttNm,
             reqst_start_date,
-            reqst_end_date
+            reqst_end_date,
+            pub_date
         from announce
     </select>
 
