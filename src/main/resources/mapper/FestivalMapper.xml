@@ -52,7 +52,8 @@
             add1,
             add2,
             event_startdate,
-            event_enddate
+            event_enddate,
+            first_image
         from festival
     </select>
 

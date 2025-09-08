@@ -62,21 +62,30 @@ public class TourIngestService {
                 });
     }
 
-    /** 페이지의 모든 아이템에 대해 상세 정보 가져와서 DB에 저장 */
     private Mono<Integer> processPage(Page page) {
         if (page.items.isEmpty()) return Mono.just(0);
 
         return Flux.fromIterable(page.items)
-                .flatMap(f -> client.fetchOverview(f.getContentId()) // 호출
+                .concatMap(f -> client.fetchOverview(f.getContentId()) // **변경: flatMap -> concatMap**
                         .map(detailedFestival -> {
                             // 상세 정보로 Festival 객체 업데이트
                             f.setOverview(detailedFestival.getOverview());
                             f.setTelName(detailedFestival.getTelName());
                             return f;
+                        })
+                        // **추가: API 호출 실패 시 에러 핸들링**
+                        .onErrorResume(e -> {
+                            System.err.println("Failed to fetch overview for contentId=" + f.getContentId() + ": " + e.getMessage());
+                            // 오류 발생 시 해당 항목은 무시하고 Mono.empty() 반환
+                            return Mono.empty();
                         }))
                 .collectList()
                 .map(list -> {
-                    if (list.isEmpty()) return 0;
+                    if (list.isEmpty()) {
+                        System.err.println("No items to save to DB.");
+                        return 0;
+                    }
+                    // 성공적으로 상세 정보를 가져온 항목만 DB에 저장
                     return festivalMapper.batchUpsert(list);
                 });
     }

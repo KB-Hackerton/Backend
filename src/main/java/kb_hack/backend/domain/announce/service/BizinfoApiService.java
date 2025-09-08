@@ -83,15 +83,17 @@ public class BizinfoApiService {
                     }
                 }
 
+
                 String pblancUrl = item.path("pblancUrl").asText(null);
                 if (pblancUrl != null && !pblancUrl.startsWith("http")) {
                     pblancUrl = "https://www.bizinfo.go.kr" + pblancUrl;
                 }
 
                 String targetName = item.path("trgetNm").asText(null);
-                if(targetName!=null && targetName.contains("중소기업")){
+                if (targetName == null || !targetName.contains("소상공인")) {
                     continue;
                 }
+
                 Announce announce = Announce.builder()
                         .announceTitle(item.path("pblancNm").asText(null))
                         .link(pblancUrl)

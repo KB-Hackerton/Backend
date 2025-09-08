@@ -27,6 +27,7 @@ public class festivalDto {
     private LocalDate eventStartdate;
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate eventEnddate;
+    private String first_image;
 
     public static festivalDto from(Festival festival) {
         return  festivalDto.builder()
@@ -35,6 +36,7 @@ public class festivalDto {
                 .addr(festival.getAdd1()+" "+festival.getAdd2())
                 .eventStartdate(festival.getEventStartdate())
                 .eventEnddate(festival.getEventEnddate())
+                .first_image(festival.getFirstImage())
                 .build();
     }
 }
