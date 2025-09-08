@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kb_hack.backend.domain.alarm.mapper.AlarmMapper">
+
+    <resultMap id="Map" type="kb_hack.backend.domain.alarm.AlarmPreference">
+        <id     property="alarmPreferenceId" column="alarm_preference_id"/>
+        <result property="memberId"          column="member_id"/>
+        <result property="sosPreference"     column="sos_preference"/>
+        <result property="announcePreference" column="announce_preference"/>
+        <result property="alarmStartTime"    column="alarm_start_time"/>
+        <result property="alarmEndTime"      column="alarm_end_time"/>
+        <result property="isAlarm"           column="is_alarm"/>
+    </resultMap>
+
+    <select id="findById" resultMap="Map">
+        SELECT * FROM alarm_preference
+        WHERE member_id = #{memberId}
+    </select>
+
+    <update id="updateSelective">
+        UPDATE alarm_preference
+        <set>
+            <if test="p.announcePreference != null">announce_preference = #{p.announcePreference},</if>
+            <if test="p.sosPreference != null">sos_preference = #{p.sosPreference},</if>
+            <if test="p.isAlarm != null">is_alarm = #{p.isAlarm},</if>
+            <if test="p.alarmStartTime != null">alarm_start_time = #{p.alarmStartTime},</if>
+            <if test="p.alarmEndTime != null">alarm_end_time = #{p.alarmEndTime},</if>
+        </set>
+        WHERE member_id = #{p.memberId}
+    </update>
+</mapper>
