@@ -18,36 +18,54 @@
     </insert>
 
     <!-- 즐겨찾기 전체 -->
-    <select id="findDocumentsByMemberId" parameterType="long"
-            resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
-        SELECT d.document_id   AS documentId,
-               d.announce_id   AS announceId,
-               d.title,
-               d.description,
-               IF(mdc.status = 1, TRUE, FALSE) AS checked
-        FROM member_favorite mf
-                 JOIN document d ON mf.announce_id = d.announce_id
+    <select id="findDocumentsByMemberId" resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
+        SELECT
+            d.document_id   AS documentId,
+            d.announce_id   AS announceId,
+            d.title         AS title,
+            d.description   AS description,
+            COALESCE(mdc.status, 0) AS checked,
+            a.announce_title AS announceTitle,
+            a.reqst_end_date AS deadline,
+            COUNT(DISTINCT d2.document_id) AS totalDocs,
+            COUNT(DISTINCT CASE WHEN mdc2.status = 1 THEN d2.document_id END) AS checkedDocs
+        FROM document d
+                 JOIN announce a ON d.announce_id = a.announce_id
                  LEFT JOIN member_document_check mdc
-                           ON d.document_id = mdc.document_id
-                               AND mdc.member_id = #{memberId}
-        WHERE mf.member_id = #{memberId}
-        ORDER BY d.created_at DESC
+                           ON d.document_id = mdc.document_id AND mdc.member_id = #{memberId}
+                 LEFT JOIN document d2 ON d.announce_id = d2.announce_id
+                 LEFT JOIN member_document_check mdc2
+                           ON d2.document_id = mdc2.document_id AND mdc2.member_id = #{memberId}
+        WHERE a.announce_id IN (
+            SELECT announce_id FROM member_favorite WHERE member_id = #{memberId}
+        )
+        GROUP BY d.document_id, d.announce_id, d.title, d.description,
+                 a.announce_title, a.reqst_end_date, mdc.status
     </select>
 
-    <!-- ✅ 공고별 -->
     <select id="findDocumentsByMemberAndAnnounce" resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
-        SELECT d.document_id   AS documentId,
-               d.announce_id   AS announceId,
-               d.title,
-               d.description,
-               IF(mdc.status = 1, TRUE, FALSE) AS checked
+        SELECT
+            d.document_id   AS documentId,
+            d.announce_id   AS announceId,
+            d.title         AS title,
+            d.description   AS description,
+            COALESCE(mdc.status, 0) AS checked,
+            a.announce_title AS announceTitle,
+            a.reqst_end_date AS deadline,
+            COUNT(DISTINCT d2.document_id) AS totalDocs,
+            COUNT(DISTINCT CASE WHEN mdc2.status = 1 THEN d2.document_id END) AS checkedDocs
         FROM document d
+                 JOIN announce a ON d.announce_id = a.announce_id
                  LEFT JOIN member_document_check mdc
-                           ON d.document_id = mdc.document_id
-                               AND mdc.member_id = #{memberId}
+                           ON d.document_id = mdc.document_id AND mdc.member_id = #{memberId}
+                 LEFT JOIN document d2 ON d.announce_id = d2.announce_id
+                 LEFT JOIN member_document_check mdc2
+                           ON d2.document_id = mdc2.document_id AND mdc2.member_id = #{memberId}
         WHERE d.announce_id = #{announceId}
-        ORDER BY d.created_at ASC
+        GROUP BY d.document_id, d.announce_id, d.title, d.description,
+                 a.announce_title, a.reqst_end_date, mdc.status
     </select>
+
 
     <!-- 체크/해제 (UPSERT) -->
     <insert id="upsertDocumentCheck">

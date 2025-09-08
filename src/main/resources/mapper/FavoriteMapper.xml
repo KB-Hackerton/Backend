@@ -15,15 +15,23 @@
         WHERE announce_id = #{announceId}
           AND member_id = #{memberId}
     </delete>
-    <select id="findFavoritesByMemberId" parameterType="long" resultType="kb_hack.backend.domain.favorite.dto.FavoriteResponseDto">
-        SELECT a.announce_id    AS announceId,
-               a.announce_title AS announceTitle,
-               a.link           AS link
-        FROM member_favorite mf
-                 JOIN announce a ON mf.announce_id = a.announce_id
-        WHERE mf.member_id = #{memberId}
-        ORDER BY mf.created_at DESC
+    <select id="findFavoritesByMemberId" resultType="kb_hack.backend.domain.favorite.dto.FavoriteResponseDto">
+        SELECT
+            a.announce_id       AS announceId,
+            a.announce_title    AS announceTitle,
+            a.reqst_end_date    AS deadline,
+            COUNT(DISTINCT d.document_id) AS totalDocs,
+            COUNT(DISTINCT CASE WHEN mdc.status = 1 THEN d.document_id END) AS checkedDocs
+        FROM member_favorite f
+                 JOIN announce a ON f.announce_id = a.announce_id
+                 LEFT JOIN document d ON a.announce_id = d.announce_id
+                 LEFT JOIN member_document_check mdc
+                           ON d.document_id = mdc.document_id AND mdc.member_id = f.member_id
+        WHERE f.member_id = #{memberId}
+        GROUP BY a.announce_id, a.announce_title, a.reqst_end_date
+        ORDER BY a.created_at DESC
     </select>
+
 
     <select id="findAnnouncesByMemberId" parameterType="long"
             resultType="kb_hack.backend.domain.announce.Announce">
