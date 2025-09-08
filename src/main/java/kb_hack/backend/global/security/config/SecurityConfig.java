@@ -85,6 +85,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/home").hasRole("Member")
                         .requestMatchers(HttpMethod.DELETE, "/announce/**").hasRole("Member")
                         .requestMatchers( "/kakao-login/**").permitAll()
+                        .requestMatchers("/articles/list").hasRole("Member")
+                        .requestMatchers("/notice").hasRole("Member")
                         .requestMatchers("/test").hasRole("Member")
                         .requestMatchers("/crawl/admin").hasRole("Admin")
                         .requestMatchers("/admin/ingest/gyeongsang").hasRole("Admin")

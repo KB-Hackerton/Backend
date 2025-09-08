@@ -27,7 +27,9 @@ public class ArticleController {
 
 	@Operation(
 		summary = "소상공인 관련 기사 목록 조회 ",
-		description = "소상공인 관련 최신 기사 목록을 조회합니다."
+		description = "소상공인 관련 최신 기사 목록을 조회합니다.",
+			security = @SecurityRequirement(name = "bearerAuth")
+
 	)
 	@GetMapping("/list")
 	public SuccessResponse<List<ArticleListResponse>> getArticles() {
