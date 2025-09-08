@@ -93,6 +93,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/bizinfo").hasRole("Member")
                         .requestMatchers("/favorites/**").hasRole("Member")
                         .requestMatchers("/sos/**").hasRole("Member")
+                        .requestMatchers("/s3/**").hasRole("Member")
 
                     .anyRequest().authenticated()
                 );
