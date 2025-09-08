@@ -34,7 +34,7 @@ public class announceDto {
                 .startDate(announce.getStartDate())
                 .endDate(announce.getEndDate())
                 .pubDate(announce.getPubDate())
-                .isFavorite(false)
+                .isFavorite(isFavorite)
                 .build();
     }
 }
