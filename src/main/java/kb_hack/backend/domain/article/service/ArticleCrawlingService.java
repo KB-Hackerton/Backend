@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j // Slf4j 어노테이션으로 로거 자동 생성
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ArticleCrawlingService {
