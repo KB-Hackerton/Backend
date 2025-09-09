@@ -10,8 +10,8 @@ import java.util.List;
 @Mapper
 public interface AlarmMapper {
     AlarmPreference findById(@Param("memberId") Long memberId);
-    int updateSelective(@Param("p") AlarmPreference p);
-
+    int updateSelective(AlarmPreference p);
+    int insertPreference(AlarmPreference p);
 
     List<Notification> findByMemberId(@Param("memberId") Long memberId);
     int insert (@Param("p") Notification p);

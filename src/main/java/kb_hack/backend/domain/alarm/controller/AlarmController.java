@@ -1,46 +1,41 @@
 package kb_hack.backend.domain.alarm.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kb_hack.backend.domain.alarm.Notification;
 import kb_hack.backend.domain.alarm.dto.AlarmPreferenceReq;
 import kb_hack.backend.domain.alarm.dto.AlarmPreferenceRes;
+import kb_hack.backend.domain.alarm.dto.NotificationCreateReq;
 import kb_hack.backend.domain.alarm.dto.NotificationRes;
-import kb_hack.backend.domain.alarm.service.AlarmPreferenceService;
-import kb_hack.backend.domain.email.dto.request.MailVerificationDTO;
+import kb_hack.backend.domain.alarm.service.AlarmService;
 import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
 import kb_hack.backend.global.common.response.success.SuccessResponse;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
-import kb_hack.backend.global.security.entity.MemberVO;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/alarm")
 @RequiredArgsConstructor
 @Tag(name = "alarm ", description = "알림 API ")
 public class AlarmController {
-    private final AlarmPreferenceService alarmPreferenceService;
+    private final AlarmService alarmPreferenceService;
 
     @GetMapping("/preference")
     @Operation(
             summary = "선호 알림 가져오기 ",
-            description = "사용자가 받고자 하는 알림을 확인합니다",
+            description = "사용자가 받고자 하는 알림 조회합니다",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public SuccessResponse<AlarmPreferenceRes> get(@AuthenticationPrincipal SecurityCustomUser user){
         Long memberId = user.getMemberVO().getMemberId();
+        log.info("memberId: {}", memberId);
         return SuccessResponse.makeResponse(SuccessStatusCode.ALARM_SETTING_GET_SUCCESS,alarmPreferenceService.getOrCreate(memberId));
     }
 
@@ -59,7 +54,7 @@ public class AlarmController {
     @GetMapping
     @Operation(
             summary = "알림 조회",
-            description = "수신받은 알림 내용을 조회합니다.",
+            description = "알림 내용을 조회합니다.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public SuccessResponse<List<NotificationRes>> list(@AuthenticationPrincipal SecurityCustomUser user){
@@ -67,17 +62,28 @@ public class AlarmController {
         return SuccessResponse.makeResponse(SuccessStatusCode.ALARM_LIST_GET_SUCCESS,alarmPreferenceService.list(memberId));
     }
 
-    @PostMapping
+    @PostMapping("/admin")
     @Operation(
-            summary = "알림 생성",
-            description = "알림을 생성합니다 (관리자용)",
+            summary = "특정 개인 알림 생성",
+            description = " 특정한 개인의 알림을 생성합니다 (관리자용)",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public void create(@AuthenticationPrincipal SecurityCustomUser user,
-                       @RequestBody Notification p) {
-        p.setMemberId(user.getMemberVO().getMemberId());
-        alarmPreferenceService.create(p);
+                       @RequestBody NotificationCreateReq Np) {
+        alarmPreferenceService.create(Np);
     }
+
+    @PostMapping("/admin/all")
+    @Operation(
+            summary = "전체 알림 생성",
+            description = "모든 사용자에게 보내는 알림을 생성합니다 (관리자용)",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public void createAll(@AuthenticationPrincipal SecurityCustomUser user,
+                       @RequestBody NotificationCreateReq Np) {
+        alarmPreferenceService.createAll(Np);
+    }
+
 
     @PatchMapping("/{notificationId}/read")
     @Operation(
