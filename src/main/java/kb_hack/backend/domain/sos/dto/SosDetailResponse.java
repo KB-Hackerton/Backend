@@ -7,6 +7,7 @@ import kb_hack.backend.domain.sos.entity.SosType;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -43,6 +44,8 @@ public class SosDetailResponse {
 
 	@Schema(description = "SOS 종료 시각", example = "2025-09-07T18:00:00")
 	private LocalDateTime expiresAt;
+
+	private Date createdAt;
 
 	@Schema(description = "SOS 이미지 스토리지 키 리스트",
 		example = "[\"sos/2025/09/01/uuid1.jpg\", \"sos/2025/09/01/uuid2.png\"]")

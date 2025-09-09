@@ -5,6 +5,7 @@ import kb_hack.backend.domain.sos.entity.SosType;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -21,5 +22,6 @@ public class SosDetailRow {
 	private SosType sosType;
 	private String sosContent;
 	private LocalDateTime expiresAt;
+	private Date createdAt;
 	private String imageKey;           // sos_image.storage_key
 }

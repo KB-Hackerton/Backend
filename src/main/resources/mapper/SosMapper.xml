@@ -30,11 +30,13 @@
 
     <select id="findAll" resultType="kb_hack.backend.domain.sos.dto.SosListResponse">
         SELECT
-            s.sos_id       AS sosId,
-            b.business_nm  AS businessName,
-            s.sos_title    AS sosTitle,
-            s.sos_type     AS sosType,
-            s.expires_at   AS expiresAt
+            s.sos_id,
+            b.business_nm AS businessName,
+            s.sos_title,
+            s.sos_type,
+            s.expires_at,
+            s.created_at
+
         FROM sos s
                  JOIN member m ON s.member_id = m.member_id
                  JOIN business b ON b.member_id = m.member_id
@@ -53,7 +55,8 @@
             s.sos_type       AS sosType,
             s.sos_content    AS sosContent,
             s.expires_at     AS expiresAt,
-            si.storage_key   AS imageKey
+            si.storage_key   AS imageKey,
+            s.created_at
         FROM sos s
                  JOIN member m ON s.member_id = m.member_id
                  JOIN business b ON b.member_id = m.member_id
