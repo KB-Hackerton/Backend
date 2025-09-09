@@ -10,4 +10,6 @@ public interface BusinessMapper {
     int insertBusiness(BusinessDTO businessVO);
     long findBusinessClassIdByMinorname(String minorName);
     int updateBusiness(@Param("dto") MemberInfoRequestDTO dto,
-                       @Param("businessId") Long businessId);}
+                       @Param("businessId") Long businessId);
+    String findMinorNameByBusinessId(Long businessId);
+}

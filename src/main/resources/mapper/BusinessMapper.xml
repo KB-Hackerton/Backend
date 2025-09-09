@@ -13,6 +13,14 @@
         FROM business_class
         WHERE minor_name = #{minorName}
     </select>
+    <select id="findMinorNameByBusinessId" resultType="java.lang.String">
+        SELECT bc.minor_name
+        FROM business b
+                 LEFT JOIN business_class bc
+                           ON b.business_class_id = bc.business_class_id
+        WHERE b.business_id = #{businessId}
+
+    </select>
 
 
     <update id="updateBusiness">
