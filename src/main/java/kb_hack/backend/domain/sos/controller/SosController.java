@@ -47,36 +47,48 @@ public class SosController {
 
 	private final SosService sosService;
 
-	@Operation(summary = "SOS 생성", description = "새로운 SOS 요청을 생성합니다.",security = @SecurityRequirement(name = "bearerAuth"))
+	@Operation(summary = "SOS 생성", description = "새로운 SOS 요청을 생성합니다.",
+			security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "201", description = "SOS 생성 성공",
-			content = @Content(schema = @Schema(implementation = SosCreateResponse.class))),
-		@ApiResponse(responseCode = "400", description = "잘못된 요청"),
-		@ApiResponse(responseCode = "500", description = "서버 에러")
-
+			@ApiResponse(responseCode = "201", description = "SOS 생성 성공",
+					content = @Content(schema = @Schema(implementation = SosCreateResponse.class))),
+			@ApiResponse(responseCode = "400", description = "잘못된 요청"),
+			@ApiResponse(responseCode = "500", description = "서버 에러")
 	})
-	@PostMapping(value = "")
+	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public SuccessResponse<SosCreateResponse> createSos(
-		@Parameter(description = "SOS 제목") @RequestParam(required = false) String sosTitle,
-		@Parameter(description = "SOS 유형") @RequestParam SosType sosType,
-		@Parameter(description = "SOS 내용") @RequestParam String sosContent,
-		@Parameter(description = "만료일 (yyyy-MM-dd HH:mm:ss)") @RequestParam String expiresAt,
-		@Parameter(description = "이미지 파일들") @RequestPart(name = "images", required = false) List<MultipartFile> images
+			@Parameter(description = "SOS 요청 제목", example = "급히 타이어 구합니다")
+			@RequestParam(required = false) String sos_title,
+
+			@Parameter(description = "SOS 요청 카테고리", example = "stock",
+					schema = @Schema(allowableValues = {"stock","labor","equipment","etc"}))
+			@RequestParam SosType sos_type,
+
+			@Parameter(description = "SOS 요청 상세 내용", example = "오늘 안에 타이어 4개 필요합니다")
+			@RequestParam String sos_content,
+
+			@Parameter(description = "요청 만료 시각 (yyyy-MM-dd HH:mm)", example = "2025-09-07 23:59")
+			@RequestParam (required = false) String expires_at,
+
+			@Parameter(description = "첨부 이미지 파일들")
+			@Schema(type = "string", format = "binary")
+			@RequestPart(required = false) List<MultipartFile> images
 	) {
 		Long memberId = getLoginMemberId();
 
 		SosCreateRequest req = SosCreateRequest.builder()
-			.memberId(memberId)
-			.sosTitle(sosTitle)
-			.sosType(sosType)
-			.sosContent(sosContent)
-			.expiresAt(expiresAt)
-			.images(images)
-			.build();
+				.memberId(memberId)
+				.sosTitle(sos_title)
+				.sosType(sos_type)
+				.sosContent(sos_content)
+				.expiresAt(expires_at)
+				.images(images)
+				.build();
 
 		SosCreateResponse response = sosService.create(req);
-		return SuccessResponse.makeResponse(SuccessStatusCode.SOS_CREATE_SUCCESS,response);
+		return SuccessResponse.makeResponse(SuccessStatusCode.SOS_CREATE_SUCCESS, response);
 	}
+
 
 	@Operation(summary = "SOS 수정", description = "기존 SOS 요청을 수정합니다.",security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {
@@ -84,22 +96,42 @@ public class SosController {
 		@ApiResponse(responseCode = "400", description = "잘못된 요청"),
 		@ApiResponse(responseCode = "404", description = "존재하지 않는 SOS")
 	})
-	@PutMapping("/{sosId}")
+	@PutMapping(value = "/{sosId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public SuccessResponse<Void> updateSos(
 		@PathVariable Long sosId,
-		@RequestParam(required = false) String sosTitle,
-		@RequestParam SosType sosType,
-		@RequestParam String sosContent,
-		@RequestParam String expiresAt
+//		@RequestParam(required = false) String sos_title,
+//		@RequestParam SosType sos_type,
+//		@RequestParam String sos_content,
+//		@RequestParam String expires_at,
+//		@RequestPart(required = false) List<MultipartFile> images
+			@Parameter(description = "SOS 요청 제목", example = "급히 타이어 구합니다")
+			@RequestParam(required = false) String sos_title,
+
+			@Parameter(description = "SOS 요청 카테고리", example = "stock",
+					schema = @Schema(allowableValues = {"stock","labor","equipment","etc"}))
+			@RequestParam SosType sos_type,
+
+			@Parameter(description = "SOS 요청 상세 내용", example = "오늘 안에 타이어 4개 필요합니다")
+			@RequestParam String sos_content,
+
+			@Parameter(description = "요청 만료 시각 (yyyy-MM-dd HH:mm)", example = "2025-09-07 23:59")
+			@RequestParam (required = false) String expires_at,
+
+			@Parameter(description = "첨부 이미지 파일들")
+			@Schema(type = "string", format = "binary")
+			@RequestPart(required = false) List<MultipartFile> images
+
+
 	) {
 		Long memberId = getLoginMemberId();
 		SosCreateRequest req = SosCreateRequest.builder()
-			.memberId(memberId)
-			.sosTitle(sosTitle)
-			.sosType(sosType)
-			.sosContent(sosContent)
-			.expiresAt(expiresAt)
-			.build();
+				.memberId(memberId)
+				.sosTitle(sos_title)
+				.sosType(sos_type)
+				.sosContent(sos_content)
+				.expiresAt(expires_at)
+				.images(images)
+				.build();
 		sosService.update(sosId, req);
 		return SuccessResponse.makeResponse(SuccessStatusCode.SOS_UPDATE_SUCCESS);
 	}

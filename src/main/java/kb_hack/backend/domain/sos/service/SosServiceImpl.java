@@ -71,9 +71,9 @@ public class SosServiceImpl implements SosService {
 
 		// 3) 이미지 업로드 (storage_key 리스트 생성)
 		List<MultipartFile> files = req.getImages();
-		List<String> keys = storageService.uploadAll(files);
+		List<String> keys = storageService.uploadAll(files, sos.getSosId());
 
-		// 4) sos_image 저장
+
 		for (String key : keys) {
 			SosImage image = SosImage.builder()
 				.sosId(sos.getSosId())
@@ -83,7 +83,7 @@ public class SosServiceImpl implements SosService {
 			sosImageMapper.insert(image);
 		}
 
-		// 5) 응답 DTO 생성
+
 		return SosCreateResponse.builder()
 			.sosId(sos.getSosId())
 			.imageKeys(keys)
@@ -93,22 +93,44 @@ public class SosServiceImpl implements SosService {
 	@Override
 	@Transactional
 	public void update(Long sosId, SosCreateRequest req) {
-		// 만료일 파싱
+		// 1) 만료일 파싱
 		LocalDateTime expiresAt = parseExpiresAt(req.getExpiresAt());
 
+		// 2) SOS row 수정
 		Sos sos = Sos.builder()
-			.sosId(sosId)
-			.sosTitle(req.getSosTitle())
-			.sosType(req.getSosType())
-			.sosContent(req.getSosContent())
-			.expiresAt(expiresAt)
-			.build();
+				.sosId(sosId)
+				.sosTitle(req.getSosTitle())
+				.sosType(req.getSosType())
+				.sosContent(req.getSosContent())
+				.expiresAt(expiresAt)
+				.build();
 
 		int updated = sosMapper.update(sos);
 		if (updated == 0) {
 			throw new IllegalArgumentException("해당 SOS가 존재하지 않거나 삭제된 상태입니다.");
 		}
+
+
+		List<MultipartFile> files = req.getImages();
+		if (files != null && !files.isEmpty()) {
+			//  기존 이미지 삭제
+			List<SosImage> oldImages = sosImageMapper.findBySosId(sosId);
+
+			sosImageMapper.deleteBySosId(sosId);
+
+			List<String> keys = storageService.uploadAll(files, sosId);
+			for (String key : keys) {
+				SosImage image = SosImage.builder()
+						.sosId(sosId)
+						.storageKey(key)
+						.isDeleted(false)
+						.build();
+				sosImageMapper.insert(image);
+			}
+		}
 	}
+
+
 	@Override
 	@Transactional
 	public void hardDelete(Long sosId) {
