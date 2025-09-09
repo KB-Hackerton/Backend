@@ -16,4 +16,9 @@ public interface SosImageMapper {
 	int insert(SosImage image);
 	@Select("SELECT storage_key FROM sos_image WHERE sos_id = #{sosId}")
 	List<String> findImageKeysBySosId(Long sosId);
+
+
+	List<SosImage> findBySosId(Long sosId);
+
+	void deleteBySosId(Long sosId);
 }
