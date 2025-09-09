@@ -17,6 +17,7 @@
         FROM chat_room
         WHERE chat_room_id = #{roomId}
     </select>
+
     <select id="findChatHistoryWithSenderEmailByRoomId"
             resultType="kb_hack.backend.domain.chat.controller.ChatMessageResponse">
         SELECT
