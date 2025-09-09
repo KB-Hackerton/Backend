@@ -73,7 +73,7 @@ public class SosServiceImpl implements SosService {
 		List<MultipartFile> files = req.getImages();
 		List<String> keys = storageService.uploadAll(files, sos.getSosId());
 
-		// 4) sos_image 저장
+
 		for (String key : keys) {
 			SosImage image = SosImage.builder()
 				.sosId(sos.getSosId())
@@ -83,7 +83,7 @@ public class SosServiceImpl implements SosService {
 			sosImageMapper.insert(image);
 		}
 
-		// 5) 응답 DTO 생성
+
 		return SosCreateResponse.builder()
 			.sosId(sos.getSosId())
 			.imageKeys(keys)

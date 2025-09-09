@@ -42,15 +42,6 @@ public class StorageServiceStub implements StorageService {
 
 				String key = "sos/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
 				s3Template.upload(bucket, key, file.getInputStream());
-				SosImage sosImage = new SosImage();
-				sosImage.setStorageKey(key);
-				sosImage.setSosId(sosId);
-
-
-				int result = sosImageMapper.insert(sosImage);
-				if (result <= 0) {
-					throw new ServerErrorException(BadStatusCode.DATABASE_PROCESSING_EXCEPTION);
-				}
 
 				return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + key;
 
