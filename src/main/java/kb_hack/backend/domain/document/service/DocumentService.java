@@ -61,6 +61,16 @@ public class DocumentService {
 		return extractAndSaveInternal(announce);
 	}
 
+	@Transactional
+	public int extractAndSaveDocumentsForAllAnnounces() {
+		int savedCount = 0;
+		List<Announce> announces = announceMapper.findAll(); // ✅ 모든 공고 조회 (이제 모든 컬럼 포함)
+		for (Announce announce : announces) {
+			savedCount += extractAndSaveInternal(announce);
+		}
+		return savedCount;
+	}
+
 	/** 공통 로직: 공고 1건에 대해 파일 내려받기 → PDF만 처리 → 텍스트 추출 → GPT 호출 → 저장 */
 	private int extractAndSaveInternal(Announce announce) {
 		String url = firstNonBlank(announce.getPrintFilePathName(), announce.getFilePathName());
@@ -194,4 +204,3 @@ public class DocumentService {
 
 
 }
-
