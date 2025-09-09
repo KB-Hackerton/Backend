@@ -48,16 +48,15 @@ public class ChecklistController {
 	// public ResponseEntity<List<DocumentResponseDto>> getChecklist() {
 	// 	return ResponseEntity.ok(checklistService.getChecklist());
 	// }
-
 	@Operation(
 		summary = "공고별 체크리스트 조회",
 		description = "특정 공고 ID(`announceId`)에 해당하는 제출서류 체크리스트를 조회합니다."
 	)
-	/** ✅ 공고별 체크리스트 조회 */
 	@GetMapping("/{announceId}")
-	public ResponseEntity<List<DocumentResponseDto>> getChecklistByAnnounce(@PathVariable Long announceId) {
+	public ResponseEntity<ChecklistResponseDto> getChecklistByAnnounce(@PathVariable Long announceId) {
 		return ResponseEntity.ok(checklistService.getChecklistByAnnounce(announceId));
 	}
+
 	// @Operation(
 	// 	summary = "단건 체크/해제",
 	// 	description = "제출서류 ID(`documentId`)에 대해 체크 상태를 ON/OFF로 변경합니다."
