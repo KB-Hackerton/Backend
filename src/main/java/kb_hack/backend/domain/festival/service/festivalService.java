@@ -5,7 +5,6 @@ import kb_hack.backend.domain.announce.dto.announceDetailDto;
 import kb_hack.backend.domain.announce.dto.announceDto;
 import kb_hack.backend.domain.announce.mapper.AnnounceMapper;
 import kb_hack.backend.domain.festival.Festival;
-import kb_hack.backend.domain.festival.controller.FestivalController;
 import kb_hack.backend.domain.festival.dto.festivalDetailDto;
 import kb_hack.backend.domain.festival.dto.festivalDto;
 import kb_hack.backend.domain.festival.mapper.FestivalMapper;

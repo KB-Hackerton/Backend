@@ -15,7 +15,7 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberVO {
     private Long memberId;
-    private Long profileImageId;
+    private String storageKey;
     private String memberEmail;
     private String password;
     private String memberName;

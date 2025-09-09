@@ -1,0 +1,229 @@
+package kb_hack.backend.domain.chat.service;
+
+import static kb_hack.backend.global.common.exception.enums.BadStatusCode.*;
+
+import java.util.List;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kb_hack.backend.domain.chat.controller.ChatMessageResponse;
+import kb_hack.backend.domain.chat.dto.ChatMessageDto;
+import kb_hack.backend.domain.chat.entity.ChatMessage;
+import kb_hack.backend.domain.chat.entity.ChatRoom;
+import kb_hack.backend.domain.chat.entity.ChatRoomState;
+import kb_hack.backend.domain.chat.entity.ReadStatus;
+import kb_hack.backend.domain.chat.mapper.ChatRoomMapper;
+import kb_hack.backend.domain.chat.mapper.ChatRoomStateMapper;
+import kb_hack.backend.domain.chat.mapper.ReadStatusMapper;
+import kb_hack.backend.domain.member.domain.Member;
+import kb_hack.backend.domain.member.mapper.MemberMapper;
+import kb_hack.backend.domain.sos.entity.Sos;
+import kb_hack.backend.domain.sos.mapper.SosMapper;
+import kb_hack.backend.global.common.exception.type.CustomException;
+import kb_hack.backend.global.security.dto.SecurityCustomUser;
+import kb_hack.backend.global.security.entity.MemberVO;
+import kb_hack.backend.global.util.JwtProcessor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class ChatService {
+
+	private final ChatRoomMapper chatRoomMapper;
+	private final MemberMapper memberMapper;
+	private final SosMapper sosMapper;
+	private final JwtProcessor jwtProcessor;
+	private final ReadStatusMapper readStatusMapper;
+	// private final ChatMessageMapper chatMessageMapper;
+
+	private final ChatRoomStateMapper chatRoomStateMapper;
+
+	// private final ReadStatusMapper readStatusMapper;
+
+	// private final MemberDomainMapper memberDomainMapper;
+
+
+	public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
+		ChatRoomState chatRoomState = ChatRoomState.builder()
+			.chatRoomId(chatRoom.getChatRoomId())
+			.memberId(member.getMemberId())
+			.build();
+		chatRoomStateMapper.save(chatRoomState);
+	}
+
+	/**
+	 * 해당 roomId에 email을 가진 사용자가 참여자인지 체크
+	 * @param email
+	 * @param roomId
+	 * @return
+	 */
+	public boolean isRoomParticipant(String email, Long roomId) {
+		// 해당 roomId에 email을 가진 사용자가 참여자인지 체크
+		// 1. 채팅방 조회
+		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
+		if (chatRoom == null) {
+			log.warn("참여자인지 확인하려 했으나, roomId '{}'에 해당하는 채팅방을 찾을 수 없습니다.", roomId);
+			return false; // 채팅방이 없으면 참여자가 아님
+		}
+
+		// 2. 현재 로그인한 사용자 조회
+		Member member = memberMapper.getMemberByEmail(email);
+		if (member == null) {
+			log.warn("참여자인지 확인하려 했으나, 이메일 '{}'에 해당하는 사용자를 찾을 수 없습니다.", email);
+			return false; // 사용자가 없으면 당연히 참여자가 아님
+		}
+
+		// 3. 참여자 여부 체크
+		List<ChatRoomState> chatRoomState = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
+		for (ChatRoomState c : chatRoomState) {
+			log.info("c.getMemberId(): {}, member.getMemberId(): {}", c.getMemberId(), member.getMemberId());
+			if (c.getMemberId().equals(member.getMemberId())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * 메시지 저장하기
+	 * @param roomId
+	 * @param chatMessageDto
+	 */
+	@Transactional
+	public ChatMessage saveMessage(Long roomId, ChatMessageDto chatMessageDto, SecurityCustomUser customUser) {
+		// 1. 채팅방 조회
+		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
+		if (chatRoom == null) {
+			throw new CustomException(CHAT_ROOM_NOT_FOUND);
+		}
+		// 2. 보낸 사람 조회
+		Long memberId = customUser.getMemberVO().getMemberId(); // SecurityCustomUser에 MemberVO를 가져오는 getter가 있다고 가정
+
+		Member member = memberMapper.getMemberByMemberId(memberId);
+		if (member == null) {
+			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
+		}
+		// 3. 채팅 메시지 저장
+		ChatMessage chatMessage = ChatMessage.builder()
+			.chatRoomId(chatRoom.getChatRoomId())
+			.senderId(member.getMemberId())
+			.content(chatMessageDto.getMessage())
+			.build();
+		int affectedRows = chatRoomMapper.saveMessage(chatMessage);
+		if (affectedRows < 1) {
+			throw new CustomException(CHAT_MESSAGE_SAVE_FAIL);
+		}
+		// 4. 사용자 별로 읽음 여부 저장
+		List<ChatRoomState> chatRoomStates = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
+		for (ChatRoomState c : chatRoomStates) {
+			ReadStatus readStatus = ReadStatus.builder()
+				.chatRoomId(c.getChatRoomId())
+				.memberId(c.getMemberId())
+				.chatMessageId(chatMessage.getChatMessageId())
+				.isRead(c.getMemberId().equals(member.getMemberId()))
+				.build();
+			int saved = readStatusMapper.save(readStatus);
+			if (saved < 1) {
+				throw new CustomException(CHAT_MESSAGE_SAVE_FAIL);
+			}
+
+		}
+
+		return chatMessage;
+
+	}
+
+	/**
+	 * 1:1 채팅방 생성
+	 * @param sosId
+	 * @param otherMemberId
+	 * @return
+	 */
+	public void createPrivateChatRoom(MemberVO memberVO, Long sosId, Long otherMemberId) {
+		// 1-1. 현재 로그인한 사용자 조회
+		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
+		// 1.2. 상대방 사용자 조회
+		Member otherMember = memberMapper.getMemberByMemberId(otherMemberId);
+		if (otherMember == null) {
+			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
+		}
+		// 1.3. sos 조회
+		Sos sos = sosMapper.findById(sosId);
+		if (sos == null) {
+			throw new CustomException(CHAT_SOS_NOT_FOUND);
+		}
+		// 2. 채팅방 생성
+		ChatRoom newChatRoom = ChatRoom
+			.builder()
+			.roomName(sos.getSosTitle())
+			.sosId(sosId)
+			.roomType(sos.getSosType())
+			.isComplete(0)
+			.ownerId(otherMemberId)
+			.build();
+
+		log.info("chatRoom: {}", newChatRoom);
+		int affectedRows = chatRoomMapper.save(newChatRoom);
+		log.info("chatRoom: {}", newChatRoom.getChatRoomId());
+		// 3. 두사람 모두 참여자로 추가
+		addParticipantToRoom(newChatRoom, member);
+		addParticipantToRoom(newChatRoom, otherMember);
+
+		if (affectedRows < 1) {
+			throw new CustomException(CHAT_ROOM_CREATE_FAIL);
+		}
+
+	}
+
+	public List<ChatMessageResponse> getChatHistory(Long roomId, Long memberId) {
+		// 1. 해당 채팅방의 참여자가 아닐경우 예외처리
+		// 1-1. 채팅방 조회
+		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
+		if (chatRoom == null) {
+			throw new CustomException(CHAT_ROOM_NOT_FOUND);
+		}
+		// 1-2. 현재 로그인한 사용자 조회
+		Member member = memberMapper.getMemberByMemberId(memberId);
+
+		// 1-3. 참여자 여부 체크
+		List<ChatRoomState> chatRoomStates = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
+		boolean check = false;
+		for (ChatRoomState c : chatRoomStates) {
+			if (c.getMemberId().equals(member.getMemberId())) {
+				check = true;
+			}
+		}
+		if (!check) {
+			throw new IllegalArgumentException("본인이 속하지 않은 채팅방입니다." );
+		}
+		// 2. 특정 room에 대한 message 조회
+
+		return chatRoomMapper.findChatHistoryWithSenderEmailByRoomId(memberId,roomId);
+	}
+
+	public void markMessagesAsRead(Long roomId, Long memberId) {
+		// 1. 해당 방의 모든 메시지를 가져온다.
+		List<ChatMessage> messages = chatRoomMapper.getChatMessagesByRoomId(roomId);
+		if (messages.isEmpty()) {
+			return; // 읽을 메시지가 없으면 종료
+		}
+
+		// 2. 마지막 메시지의 ID를 찾는다.
+		Long lastMessageId = messages.get(messages.size() - 1).getChatMessageId();
+
+		// 3. 해당 사용자의 읽음 상태를 마지막 메시지 ID로 업데이트한다.
+		// (ReadStatus 테이블을 업데이트하거나, ChatRoomState 테이블에 lastReadMessageId 같은 컬럼을 업데이트)
+		// 이 부분의 로직에서 에러가 발생했을 가능성이 높습니다.
+		readStatusMapper.updateLastReadMessage(roomId, memberId, lastMessageId);
+
+		}
+
+
+
+}

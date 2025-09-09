@@ -55,7 +55,7 @@ public class SosController {
 		@ApiResponse(responseCode = "500", description = "서버 에러")
 
 	})
-	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "")
 	public SuccessResponse<SosCreateResponse> createSos(
 		@Parameter(description = "SOS 제목") @RequestParam(required = false) String sosTitle,
 		@Parameter(description = "SOS 유형") @RequestParam SosType sosType,

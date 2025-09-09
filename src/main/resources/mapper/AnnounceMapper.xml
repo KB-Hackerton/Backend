@@ -45,7 +45,8 @@
             exc_insttNm,
             reqst_start_date,
             reqst_end_date,
-            pub_date
+            pub_date,
+            lcategory
         from announce
     </select>
 

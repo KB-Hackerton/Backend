@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +23,7 @@ public class CrawlController {
 
     /**
      * 특정 URL에 대한 크롤링을 시작하는 공개 API
+     * @return 요청 접수 완료 응답
      */
     @Operation(
             summary = "기사 크롤링 실행",
