@@ -12,20 +12,72 @@
         <result property="isAlarm"           column="is_alarm"/>
     </resultMap>
 
+    <resultMap id="NotificationMap" type="kb_hack.backend.domain.alarm.Notification">
+        <id property="notificationId" column="notification_id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="notiType" column="noti_type"/>
+        <result property="isRead" column="is_read"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+
     <select id="findById" resultMap="Map">
         SELECT * FROM alarm_preference
         WHERE member_id = #{memberId}
     </select>
 
-    <update id="updateSelective">
+    <update id="updateSelective" parameterType="kb_hack.backend.domain.alarm.AlarmPreference">
         UPDATE alarm_preference
         <set>
-            <if test="p.announcePreference != null">announce_preference = #{p.announcePreference},</if>
-            <if test="p.sosPreference != null">sos_preference = #{p.sosPreference},</if>
-            <if test="p.isAlarm != null">is_alarm = #{p.isAlarm},</if>
-            <if test="p.alarmStartTime != null">alarm_start_time = #{p.alarmStartTime},</if>
-            <if test="p.alarmEndTime != null">alarm_end_time = #{p.alarmEndTime},</if>
+            <if test="announcePreference != null">announce_preference = #{announcePreference},</if>
+            <if test="sosPreference != null">sos_preference = #{sosPreference},</if>
+            <if test="isAlarm != null">is_alarm = #{isAlarm},</if>
+            <if test="alarmStartTime != null">alarm_start_time = #{alarmStartTime},</if>
+            <if test="alarmEndTime != null">alarm_end_time = #{alarmEndTime},</if>
         </set>
-        WHERE member_id = #{p.memberId}
+        WHERE member_id = #{memberId}
     </update>
+
+    <insert id="insertPreference" parameterType="kb_hack.backend.domain.alarm.AlarmPreference">
+        INSERT INTO alarm_preference
+        (member_id, sos_preference, announce_preference, is_alarm, alarm_start_time, alarm_end_time)
+        VALUES (#{memberId}, #{sosPreference}, #{announcePreference}, #{isAlarm}, #{alarmStartTime}, #{alarmEndTime})
+    </insert>
+
+    <insert id="insert">
+        insert into notification  (member_id, title, content, noti_type, is_read)
+        values  (#{p.memberId}, #{p.title}, #{p.content}, #{p.notiType}, 0)
+        </insert>
+
+    <select id="findByMemberId" resultMap="NotificationMap">
+        SELECT * FROM notification
+        WHERE member_id = #{memberId}
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="markRead">
+        update notification
+        set is_read =1
+        where member_id =#{memberId}
+        and notification_id = #{notificationId}
+    </update>
+
+    <update id="markAllRead">
+        UPDATE notification
+        SET is_read = 1
+        WHERE member_id = #{memberId}
+    </update>
+
+    <delete id="deleteOne">
+        DELETE FROM notification
+        WHERE member_id = #{memberId}
+          AND notification_id = #{notificationId}
+    </delete>
+
+    <delete id="deleteAll">
+        DELETE FROM notification
+        WHERE member_id = #{memberId}
+    </delete>
 </mapper>

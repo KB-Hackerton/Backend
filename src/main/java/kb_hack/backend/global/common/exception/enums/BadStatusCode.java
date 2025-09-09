@@ -35,7 +35,7 @@ public enum BadStatusCode {
     // 404 Not Found
     ANNOUNCE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 공고번호 입니다."),
     USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "해당 유저가 존재하지 않습니다."),
-
+    USERID_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND,"해당 이메일의 유저가 존재하지 않습니다"),
 
     // 5xx(Server Error)
     INTERNAL_SERVER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
