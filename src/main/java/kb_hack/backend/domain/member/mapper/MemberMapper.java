@@ -16,9 +16,8 @@ public interface MemberMapper {
     int updatePasswordByMemberEmail(@Param("memberEmail") String memberEmail, @Param("newPassword")String newPassword);
     int updateMembernameByMemberId(@Param("memberName") String memberName, @Param("memberId") Long memberId);
     Member getMemberByEmail(String email);
-
     Member getMemberByMemberId(Long memberId);
-
     Long getMemberIdByEmail(@Param("memberEmail") String email);
     List<Long> getAllMemberId();
+
 }
