@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import kb_hack.backend.domain.chat.dto.request.RoomCreateRequest;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.service.ChatService;
@@ -37,11 +38,18 @@ public class ChatController {
 	 * @param customUser
 	 * @return
 	 */
+
+	@Operation(
+		summary = "1:1 채팅방 생성",
+		description = "특정 SOS와 관련된 1:1 채팅방을 생성하거나, 이미 존재하는 경우 해당 채팅방 ID를 반환합니다."
+	)
 	@PostMapping("/room/private/create")
-	public ResponseEntity<?> getOrCreatePrivateChatRoom(@RequestBody RoomCreateRequest request,
+	public ResponseEntity<Long> getOrCreatePrivateChatRoom(@RequestBody RoomCreateRequest request,
 	@AuthenticationPrincipal SecurityCustomUser customUser) {
-		chatService.createPrivateChatRoom(customUser.getMemberVO(), request.getSosId(), request.getOtherMemberId());
-		return ResponseEntity.ok().build();
+		Long chatRoomId = chatService.
+			createPrivateChatRoom(customUser.getMemberVO(), request.getSosId(), request.getOtherMemberId());
+
+		return ResponseEntity.ok().body(chatRoomId);
 	}
 
 	// 이전 메시지 조회
