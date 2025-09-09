@@ -143,7 +143,7 @@ public class ChatService {
 	 * @param otherMemberId
 	 * @return
 	 */
-	public void createPrivateChatRoom(MemberVO memberVO, Long sosId, Long otherMemberId) {
+	public Long createPrivateChatRoom(MemberVO memberVO, Long sosId, Long otherMemberId) {
 		// 1-1. 현재 로그인한 사용자 조회
 		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
 		// 1.2. sos 조회
@@ -157,6 +157,12 @@ public class ChatService {
 			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
 		}
 
+		// 1-4. 이미 존재하는 채팅방인지 확인
+		ChatRoom existingRooms = chatRoomStateMapper.findChatRoomsByMemberIdAndSosId(member.getMemberId(), sosId);
+		if (existingRooms != null) {
+			log.info("이미 존재하는 채팅방입니다. roomId: {}", existingRooms.getChatRoomId());
+			return existingRooms.getChatRoomId();
+		}
 		// 2. 채팅방 생성
 		ChatRoom newChatRoom = ChatRoom
 			.builder()
@@ -167,9 +173,7 @@ public class ChatService {
 			.ownerId(sos.getMemberId())
 			.build();
 
-		log.info("chatRoom: {}", newChatRoom);
 		int affectedRows = chatRoomMapper.save(newChatRoom);
-		log.info("chatRoom: {}", newChatRoom.getChatRoomId());
 		// 3. 두사람 모두 참여자로 추가
 		addParticipantToRoom(newChatRoom, member);
 		addParticipantToRoom(newChatRoom, otherMember);
@@ -177,6 +181,7 @@ public class ChatService {
 		if (affectedRows < 1) {
 			throw new CustomException(CHAT_ROOM_CREATE_FAIL);
 		}
+		return newChatRoom.getChatRoomId();
 
 	}
 
@@ -199,10 +204,10 @@ public class ChatService {
 			}
 		}
 		if (!check) {
-			throw new IllegalArgumentException("본인이 속하지 않은 채팅방입니다." );
+			throw new CustomException(CHAT_ROOM_NOT_PARTICIPANT);
 		}
 		// 2. 특정 room에 대한 message 조회
-		return chatRoomMapper.findChatHistoryWithSenderEmailByRoomId(memberId,roomId);
+		return chatRoomMapper.findChatHistoryWithSenderEmailByRoomId(memberId, roomId);
 	}
 
 	public void markMessagesAsRead(Long roomId, Long memberId) {

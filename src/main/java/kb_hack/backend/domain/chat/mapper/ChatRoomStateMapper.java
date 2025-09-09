@@ -34,4 +34,12 @@ public interface ChatRoomStateMapper {
 		WHERE crs.member_id = #{memberId}
 	""")
 	List<ChatRoom> findChatRoomsByMemberId(Long memberId);
+
+	@Select("""
+		SELECT cr.*
+		FROM chat_room cr
+		JOIN chat_room_state crs ON cr.chat_room_id = crs.chat_room_id
+		WHERE crs.member_id = #{memberId} AND cr.sos_id = #{sosId}
+	""")
+	ChatRoom findChatRoomsByMemberIdAndSosId(Long memberId, Long sosId);
 }
