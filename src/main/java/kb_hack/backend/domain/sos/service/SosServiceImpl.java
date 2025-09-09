@@ -71,7 +71,7 @@ public class SosServiceImpl implements SosService {
 
 		// 3) 이미지 업로드 (storage_key 리스트 생성)
 		List<MultipartFile> files = req.getImages();
-		List<String> keys = storageService.uploadAll(files);
+		List<String> keys = storageService.uploadAll(files, sos.getSosId());
 
 		// 4) sos_image 저장
 		for (String key : keys) {
