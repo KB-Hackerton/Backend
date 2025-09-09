@@ -11,5 +11,11 @@
         VALUES
             (#{sosId}, #{storageKey})
     </insert>
+    <delete id="deleteBySosId">
+        DELETE FROM sos_image WHERE sos_id = #{sosId}
+    </delete>
+    <select id="findBySosId" resultType="kb_hack.backend.domain.sos.entity.SosImage">
+        SELECT * FROM sos_image WHERE sos_id = #{sosId}
+    </select>
 
 </mapper>

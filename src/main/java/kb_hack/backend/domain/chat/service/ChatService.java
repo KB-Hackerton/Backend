@@ -2,15 +2,15 @@ package kb_hack.backend.domain.chat.service;
 
 import static kb_hack.backend.global.common.exception.enums.BadStatusCode.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kb_hack.backend.domain.chat.controller.ChatMessageResponse;
 import kb_hack.backend.domain.chat.dto.ChatMessageDto;
+import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
 import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.entity.ChatRoomState;
@@ -44,9 +44,7 @@ public class ChatService {
 
 	private final ChatRoomStateMapper chatRoomStateMapper;
 
-	// private final ReadStatusMapper readStatusMapper;
 
-	// private final MemberDomainMapper memberDomainMapper;
 
 
 	public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
@@ -148,16 +146,17 @@ public class ChatService {
 	public void createPrivateChatRoom(MemberVO memberVO, Long sosId, Long otherMemberId) {
 		// 1-1. 현재 로그인한 사용자 조회
 		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
-		// 1.2. 상대방 사용자 조회
-		Member otherMember = memberMapper.getMemberByMemberId(otherMemberId);
-		if (otherMember == null) {
-			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
-		}
-		// 1.3. sos 조회
+		// 1.2. sos 조회
 		Sos sos = sosMapper.findById(sosId);
 		if (sos == null) {
 			throw new CustomException(CHAT_SOS_NOT_FOUND);
 		}
+		// 1.3. 상대방 사용자 조회
+		Member otherMember = memberMapper.getMemberByMemberId(sos.getMemberId());
+		if (otherMember == null) {
+			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
+		}
+
 		// 2. 채팅방 생성
 		ChatRoom newChatRoom = ChatRoom
 			.builder()
@@ -165,7 +164,7 @@ public class ChatService {
 			.sosId(sosId)
 			.roomType(sos.getSosType())
 			.isComplete(0)
-			.ownerId(otherMemberId)
+			.ownerId(sos.getMemberId())
 			.build();
 
 		log.info("chatRoom: {}", newChatRoom);
@@ -203,7 +202,6 @@ public class ChatService {
 			throw new IllegalArgumentException("본인이 속하지 않은 채팅방입니다." );
 		}
 		// 2. 특정 room에 대한 message 조회
-
 		return chatRoomMapper.findChatHistoryWithSenderEmailByRoomId(memberId,roomId);
 	}
 
@@ -224,6 +222,24 @@ public class ChatService {
 
 		}
 
-
-
+	public List<MyChatListResponse> getMyChatRooms(MemberVO memberVO) {
+		// 1. 현재 로그인한 사용자 조회
+		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
+		if (member == null) {
+			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
+		}
+		// 2. 자신이 속한 채팅방 목록 조회
+		List<ChatRoom> chatRooms = chatRoomStateMapper.findChatRoomsByMemberId(member.getMemberId());
+		List<MyChatListResponse> myChatListResponses = new ArrayList<>();
+		for (ChatRoom c : chatRooms) {
+			Long count = readStatusMapper.countUnreadMessages(c.getChatRoomId(), member.getMemberId());
+			MyChatListResponse dto = MyChatListResponse.builder()
+				.roomId(c.getChatRoomId())
+				.roomName(c.getRoomName())
+				.unReadCount(count)
+				.build();
+			myChatListResponses.add(dto);
+		}
+		return myChatListResponses;
+	}
 }

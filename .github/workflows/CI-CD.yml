@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: 📢 깃허브 checkout!
+      - name: 📢 깃허브 checkout!!
         uses: actions/checkout@v3
 
       - name: 📢 GitHubAction JDK 17 설치
