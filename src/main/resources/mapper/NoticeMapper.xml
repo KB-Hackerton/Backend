@@ -6,7 +6,7 @@
 <mapper namespace="kb_hack.backend.domain.notice.mapper.NoticeMapper">
 
     <select id="getAllNotice" resultType="kb_hack.backend.domain.notice.dto.response.NoticeDTO">
-        SELECT title,content,created_at
+        SELECT *
         FROM notice
     </select>
 </mapper>
