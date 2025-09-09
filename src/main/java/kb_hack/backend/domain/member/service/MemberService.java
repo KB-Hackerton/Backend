@@ -9,6 +9,7 @@ import kb_hack.backend.domain.member.mapper.MemberMapper;
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 import kb_hack.backend.global.common.exception.type.BadRequestException;
 import kb_hack.backend.global.common.exception.type.ServerErrorException;
+import kb_hack.backend.global.s3.mapper.S3Mapper;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import kb_hack.backend.global.security.entity.MemberVO;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 public class MemberService {
     private final MemberMapper memberMapper ;
     private final BusinessService businessService;
+    private final S3Mapper s3Mapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public MemberDTO signUpInsertMemberInfo(SigunUpRequestDTO sigunUpRequestDTO) {
@@ -75,6 +77,7 @@ public class MemberService {
     @Transactional
     public void signup (SigunUpRequestDTO sigunUpRequestDTO){
         MemberDTO dto = signUpInsertMemberInfo(sigunUpRequestDTO);
+        s3Mapper.insertDefaultProfileImage(dto.getMemberId());
         businessService.sigunUpInsertBusinessInfo(sigunUpRequestDTO, dto.getMemberId());
 
     }
