@@ -170,6 +170,7 @@ public class SosServiceImpl implements SosService {
 			.sosType(first.getSosType())
 			.sosContent(first.getSosContent())
 			.expiresAt(first.getExpiresAt())
+				.createdAt(first.getCreatedAt())
 			.imageKeys(imageKeys)
 			.build();
 	}
