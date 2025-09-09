@@ -6,7 +6,12 @@
 <mapper namespace="kb_hack.backend.domain.notice.mapper.NoticeMapper">
 
     <select id="getAllNotice" resultType="kb_hack.backend.domain.notice.dto.response.NoticeDTO">
+        SELECT title , notice_id
+        FROM notice
+    </select>
+    <select id="getNoticeDetail" resultType="kb_hack.backend.domain.notice.dto.response.NoticeDetailDTO">
         SELECT *
         FROM notice
+        WHERE notice_id = #{noticeId}
     </select>
 </mapper>
