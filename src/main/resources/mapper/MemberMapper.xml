@@ -41,5 +41,16 @@
         WHERE member_id = #{memberId}
     </select>
 
+    <select id="getMemberIdByEmail"  parameterType="string" resultType="Long">
+        select member_id from member
+        where member_email=#{memberEmail}
+    </select>
 
+
+    <select id="getAllMemberId" resultType="long">
+        SELECT m.member_id
+        FROM member m
+                 LEFT JOIN auth a ON m.member_id = a.member_id
+        WHERE (a.auth IS NULL OR a.auth != 'ROLE_Admin')
+    </select>
 </mapper>

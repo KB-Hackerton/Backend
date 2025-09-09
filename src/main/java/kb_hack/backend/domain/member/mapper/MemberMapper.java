@@ -6,6 +6,8 @@ import kb_hack.backend.domain.member.dto.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface MemberMapper {
     int insertMember(MemberDTO memberDTO);
@@ -17,4 +19,6 @@ public interface MemberMapper {
 
     Member getMemberByMemberId(Long memberId);
 
+    Long getMemberIdByEmail(@Param("memberEmail") String email);
+    List<Long> getAllMemberId();
 }

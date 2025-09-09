@@ -1,5 +1,6 @@
 package kb_hack.backend.domain.sos.service;
 
+import kb_hack.backend.domain.business.mapper.BusinessMapper;
 import kb_hack.backend.domain.sos.dto.SosCreateRequest;
 import kb_hack.backend.domain.sos.dto.SosCreateResponse;
 import kb_hack.backend.domain.sos.dto.SosDetailResponse;
@@ -31,6 +32,7 @@ public class SosServiceImpl implements SosService {
 	private final SosMapper sosMapper;
 	private final SosImageMapper sosImageMapper;
 	private final StorageService storageService;
+	private final BusinessMapper businessMapper;
 
 	// 지원하는 날짜 포맷
 	private static final List<DateTimeFormatter> EXPIRES_FORMATS = List.of(
@@ -160,18 +162,24 @@ public class SosServiceImpl implements SosService {
 			.filter(k -> k != null)
 			.toList();
 
-		return SosDetailResponse.builder()
-			.sosId(first.getSosId())
-			.businessName(first.getBusinessName())
-			.badge(first.getBadge())
-			.businessAddr(first.getBusinessAddr())
-			.businessAddrDetail(first.getBusinessAddrDetail())
-			.sosTitle(first.getSosTitle())
-			.sosType(first.getSosType())
-			.sosContent(first.getSosContent())
-			.expiresAt(first.getExpiresAt())
-			.imageKeys(imageKeys)
-			.build();
+		String minorName = businessMapper.findMinorNameByBusinessId(first.getBusinessId());
+
+		SosDetailResponse result = SosDetailResponse.builder()
+				.sosId(first.getSosId())
+				.businessName(first.getBusinessName())
+				.badge(first.getBadge())
+				.businessAddr(first.getBusinessAddr())
+				.businessAddrDetail(first.getBusinessAddrDetail())
+				.sosTitle(first.getSosTitle())
+				.sosType(first.getSosType())
+				.sosContent(first.getSosContent())
+				.expiresAt(first.getExpiresAt())
+				.createdAt(first.getCreatedAt())
+				.imageKeys(imageKeys)
+				.minorName(minorName)
+				.build();
+
+		return result;
 	}
 
 

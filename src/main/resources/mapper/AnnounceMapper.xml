@@ -36,6 +36,25 @@
                    #{targetName}, #{viewNum}, #{filePathName}, #{fileName},
                    #{howToRegister}, #{callCompany} ,#{printFileName} ,#{printFilePathName}
                )
+
+            on duplicate key update
+                                 announce_title = values(announce_title),
+                                 author         = values(author),
+                                 exc_insttNm    = values(exc_insttNm),
+                                 description    = values(description),
+                                 lcategory      = values(lcategory),
+                                 pub_date       = values(pub_date),
+                                 reqst_start_date = values(reqst_start_date),
+                                 reqst_end_date   = values(reqst_end_date),
+                                 taget_name     = values(taget_name),
+                                 view_num       = values(view_num),
+                                 file_path_name = values(file_path_name),
+                                 file_name      = values(file_name),
+                                 how_to_register= values(how_to_register),
+                                 call_company   = values(call_company),
+                                 print_file_name = values(print_file_name),
+                                 print_file_path_name = values(print_file_path_name),
+                                 created_at     = now()
     </insert>
 
     <select id="findAll" resultMap="announceResultMap">

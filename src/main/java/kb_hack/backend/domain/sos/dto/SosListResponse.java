@@ -7,6 +7,7 @@ import kb_hack.backend.domain.sos.entity.SosType;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -28,6 +29,18 @@ public class SosListResponse {
 	@Schema(description = "SOS 요청 카테고리", example = "stock")
 	private SosType sosType;        // sos.sos_type
 
+	@Schema(description = "SOS 생성 시간", example = "12:12")
+	private Date createdAt;
+
 	@Schema(description = "SOS 종료 시각", example = "2025-09-07T18:00:00")
 	private LocalDateTime expiresAt; // sos.expires_at
+
+	@Schema(description = "가게 주소", example = "서울특별시 동작구~~")
+	private String businessAddr;
+
+	@Schema(description = "가게 상세 주소", example = "101호")
+	private String businessAddrDetail;
+
+	@Schema(description = "프로필 이미지", example = "https:~~~~~")
+	private String imageURL;
 }
