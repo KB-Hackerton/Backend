@@ -30,6 +30,11 @@
         SET member_name = #{memberName}
         WHERE member_id = #{memberId}
     </update>
+    <update id="incrementHelpCount">
+        UPDATE member
+        SET help_count = help_count + 1
+        WHERE member_id = #{memberId}
+    </update>
 
     <select id="getMemberByEmail" resultType="kb_hack.backend.domain.member.domain.Member">
         SELECT * FROM member

@@ -3,14 +3,15 @@ package kb_hack.backend.domain.chat.service;
 import static kb_hack.backend.global.common.exception.enums.BadStatusCode.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kb_hack.backend.domain.chat.dto.response.ChatMemberListResponse;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.ChatMessageDto;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageResponse;
@@ -281,30 +282,94 @@ public class ChatService {
 		return chatRoom;
 	}
 
-	public void leaveChatRoom(Long roomId, MemberVO memberVO) {
-		// 1. 현재 로그인한 사용자 조회
-		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
-		if (member == null) {
-			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
+	public List<ChatMemberListResponse> leaveSelectMember(Long roomId, MemberVO memberVO) {
+		// 1. 현재 로그인한 사용자 정보 (메소드 파라미터로 받음)
+		Long currentMemberId = memberVO.getMemberId();
+
+		// 2. roomId로 현재 채팅방 정보 조회
+		ChatRoom currentChatRoom = chatRoomMapper.findByRoomId(roomId);
+		if (currentChatRoom == null) {
+			throw new CustomException(CHATROOM_NOT_FOUND_EXCEPTION);
 		}
-		// 2. 채팅방 조회
-		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
-		if (chatRoom == null) {
-			throw new CustomException(CHAT_ROOM_NOT_FOUND);
+
+		// 3. 채팅방에 연결된 SOS 정보 조회
+		Long sosId = currentChatRoom.getSosId();
+		Sos sos = sosMapper.findById(sosId);
+		if (sos == null) {
+			throw new CustomException(SOS_NOT_FOUND_EXCEPTION);
 		}
-		// 3. 참여자 여부 체크
-		List<ChatRoomState> chatRoomStates = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
-		boolean check = false;
-		for (ChatRoomState c : chatRoomStates) {
-			if (c.getMemberId().equals(member.getMemberId())) {
-				check = true;
+
+		// 4. 권한 확인: SOS 작성자와 현재 로그인한 사용자가 동일한지 확인
+		if (!sos.getMemberId().equals(currentMemberId)) {
+			throw new CustomException(FORBIDDEN_EXCEPTION); // 권한 없음
+		}
+		// 5. 이 SOS와 관련된 모든 채팅방 목록 조회
+		List<ChatRoom> allRelatedChatRooms = chatRoomMapper.findAllBySosId(sosId);
+		// 6. 모든 채팅방의 모든 참여자 목록을 중복 없이 가져오기
+
+		// Set을 사용하여 중복 자동 제거
+		for (ChatRoom allRelatedChatRoom : allRelatedChatRooms) {
+			log.info(allRelatedChatRoom.getRoomName());
+		}
+
+		Set<Member> allParticipants = new HashSet<>();
+		for (ChatRoom chatRoom : allRelatedChatRooms) {
+			List<Member> participantsInRoom = chatRoomStateMapper.findMembersByRoomId(chatRoom.getChatRoomId());
+			allParticipants.addAll(participantsInRoom);
+		}
+
+
+		// 7. 참여자 목록에서 본인(SOS 작성자)을 제외하고, DTO로 변환
+		return allParticipants.stream()
+			.filter(member -> !member.getMemberId().equals(currentMemberId))
+			.map(member -> ChatMemberListResponse.builder()
+				.memberId(member.getMemberId())
+				.memberName(member.getMemberName())
+				.build())
+			.collect(Collectors.toList());
+	}
+
+	@Transactional // 이 메소드 내의 모든 DB 작업은 하나의 트랜잭션으로 처리됩니다.
+	public void completeSos(Long sosId, List<Long> helperMemberIds, MemberVO memberVO) {
+		// 1. SOS 정보 조회 및 권한 확인
+		Sos sos = sosMapper.findById(sosId);
+		if (sos == null) {
+			throw new CustomException(SOS_NOT_FOUND_EXCEPTION);
+		}
+		// SOS를 생성한 사용자인지 확인
+		if (!sos.getMemberId().equals(memberVO.getMemberId())) {
+			throw new CustomException(FORBIDDEN_EXCEPTION); // 권한 없음
+		}
+		// 이미 완료된 요청인지 확인 (중복 처리 방지)
+		if (sos.getIsComplete() == true) {
+			throw new CustomException(ALREADY_COMPLETED_EXCEPTION);
+		}
+
+		// 2. SOS와 관련된 모든 채팅방 조회
+		List<ChatRoom> relatedChatRooms = chatRoomMapper.findAllBySosId(sosId);
+		if (relatedChatRooms.isEmpty()) {
+			// 채팅방이 없는 경우에도 SOS는 종료 처리해야 할 수 있습니다.
+			// 이 부분은 정책에 따라 결정합니다. 여기서는 일단 계속 진행합니다.
+		}
+
+		// 3. 각 채팅방의 상태를 '완료'로 변경하고, 참여자 정보(state) 삭제
+		for (ChatRoom room : relatedChatRooms) {
+			// 3-1. chat_room의 is_complete = 1 로 업데이트
+			chatRoomMapper.updateIsComplete(room.getChatRoomId());
+
+			// 3-2. chat_room_state 에서 해당 채팅방의 모든 참여자 정보 삭제
+			chatRoomStateMapper.deleteByRoomId(room.getChatRoomId());
+		}
+
+		// 4. 원본 SOS의 상태를 '완료'로 변경
+		sosMapper.updateIsComplete(sosId);
+
+		// 5. (선택사항) 도움을 준 사용자(helper)에게 보상 제공
+		if (helperMemberIds != null && !helperMemberIds.isEmpty()) {
+			for (Long helperId : helperMemberIds) {
+				memberMapper.incrementHelpCount(helperId); // 예: help_count + 1
 			}
 		}
-		if (!check) {
-			throw new CustomException(CHAT_ROOM_NOT_PARTICIPANT);
-		}
-		// 4. 채팅방에서 나가기
-		chatRoomMapper.leaveChatRoom(roomId, member.getMemberId());
 
 	}
 }

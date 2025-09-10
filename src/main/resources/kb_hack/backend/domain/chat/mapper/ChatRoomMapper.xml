@@ -14,6 +14,9 @@
     <update id="leaveChatRoom">
         UPDATE chat_room SET is_complete = 1 WHERE chat_room_id = #{roomId}
     </update>
+    <update id="updateIsComplete">
+        UPDATE chat_room SET is_complete = 1 WHERE chat_room_id = #{roomId}
+    </update>
 
     <select id="findByRoomId" resultMap="ChatMapper">
         SELECT *
@@ -79,6 +82,12 @@
         SELECT *
         FROM chat_message
         WHERE chat_message_id = #{messageId}
+    </select>
+    <select id="findAllBySosId" resultType="kb_hack.backend.domain.chat.entity.ChatRoom">
+        SELECT *
+        FROM chat_room
+        WHERE sos_id = #{sosId}
+        ORDER BY created_at DESC
     </select>
 </mapper>
 
