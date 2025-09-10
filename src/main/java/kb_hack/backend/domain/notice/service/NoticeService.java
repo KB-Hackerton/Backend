@@ -1,9 +1,9 @@
 package kb_hack.backend.domain.notice.service;
 
+import kb_hack.backend.domain.notice.dto.response.NoticeDetailDTO;
 import kb_hack.backend.domain.notice.dto.response.NoticeDTO;
 import kb_hack.backend.domain.notice.mapper.NoticeMapper;
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
-import kb_hack.backend.global.common.exception.type.BadRequestException;
 import kb_hack.backend.global.common.exception.type.ServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,4 +23,8 @@ public class NoticeService {
         return notices;
     }
 
+    public NoticeDetailDTO getNoticeById(Long noticeId) {
+        NoticeDetailDTO detail = noticeMapper.getNoticeDetail(noticeId);
+        return detail;
+    }
 }

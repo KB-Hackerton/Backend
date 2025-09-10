@@ -7,5 +7,9 @@
         INSERT INTO profile_image (storage_key, member_id, created_at)
         VALUES (#{storageKey}, #{memberId}, NOW())
     </insert>
+    <insert id="insertDefaultProfileImage">
+        INSERT INTO profile_image(member_id)
+        VALUES (#{memberId})
+    </insert>
 
 </mapper>
