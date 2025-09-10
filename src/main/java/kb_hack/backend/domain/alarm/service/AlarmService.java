@@ -9,6 +9,7 @@ import kb_hack.backend.domain.alarm.dto.NotificationRes;
 import kb_hack.backend.domain.alarm.mapper.AlarmMapper;
 import kb_hack.backend.domain.member.mapper.MemberMapper;
 import kb_hack.backend.global.common.exception.type.CustomException;
+import kb_hack.backend.global.common.exception.type.ServerErrorException;
 import kb_hack.backend.global.common.response.bad.BadResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import static kb_hack.backend.global.common.exception.enums.BadStatusCode.USERID_NOT_FOUND_EXCEPTION;
-import static kb_hack.backend.global.common.exception.enums.BadStatusCode.USER_NOT_FOUND_EXCEPTION;
+import static kb_hack.backend.global.common.exception.enums.BadStatusCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -101,10 +101,39 @@ public class AlarmService {
                 .toList();
     }
 
+    //관리자 모드에서 알림 생성
     public void create( NotificationCreateReq req) {
         Long memberId = memberMapper.getMemberIdByEmail(req.getTargetEmail());
         if(memberId ==null){
                 throw new CustomException(USERID_NOT_FOUND_EXCEPTION);
+        }
+
+        AlarmPreference pref = alarmMapper.findById(memberId);
+
+        if(req.getNotiType().equals("sos") && !Boolean.TRUE.equals(pref.getSosPreference())){
+            throw new ServerErrorException(FAIL_TO_SEND_ALARM);
+        }
+        if(req.getNotiType().equals("announce") && !Boolean.TRUE.equals(pref.getAnnouncePreference())){
+            throw new ServerErrorException(FAIL_TO_SEND_ALARM);
+        }
+
+        //잠자기 설정 했으면
+        if (Boolean.TRUE.equals(pref.getIsAlarm())) {
+            LocalTime now = LocalTime.now();
+            LocalTime start = pref.getAlarmStartTime().toLocalTime();
+            LocalTime end = pref.getAlarmEndTime().toLocalTime();
+
+            boolean inDnd;
+
+            if (start.isBefore(end)) {
+                inDnd = now.isAfter(start) && now.isBefore(end);
+            } else {
+                // 자정을 넘기는 구간
+                inDnd = now.isAfter(start) || now.isBefore(end);
+            }
+            if (inDnd) {
+                throw new ServerErrorException(FAIL_TO_SEND_ALARM2);
+            }
         }
         Notification p = new Notification();
         p.setMemberId(memberId);
@@ -112,12 +141,37 @@ public class AlarmService {
         p.setContent(req.getContent());
         p.setNotiType(req.getNotiType());
         alarmMapper.insert(p);
-
     }
 
     public void createAll(NotificationCreateReq req) {
         List<Long> memberIds = memberMapper.getAllMemberId();
+
         for(Long memberId : memberIds){
+            if(memberId ==null){
+                throw new CustomException(USERID_NOT_FOUND_EXCEPTION);
+            }
+            AlarmPreference pref = alarmMapper.findById(memberId);
+            if (pref == null) {
+                continue; // 설정 없으면 그냥 스킵
+            }
+
+            LocalTime now = LocalTime.now();
+            LocalTime start = pref.getAlarmStartTime().toLocalTime();
+            LocalTime end = pref.getAlarmEndTime().toLocalTime();
+
+            boolean inDnd;
+            if (start.isBefore(end)) {
+                // 자정을 넘지 않는 경우
+                inDnd = now.isAfter(start) && now.isBefore(end);
+            } else {
+                // 자정을 넘는 경우
+                inDnd = now.isAfter(start) || now.isBefore(end);
+            }
+
+            // 2. 방해 금지 시간이면 알림 생성 안 함
+            if (inDnd) {
+                continue;
+            }
             Notification p = new Notification();
             p.setMemberId(memberId);
             p.setTitle(req.getTitle());

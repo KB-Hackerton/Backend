@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kb_hack.backend.domain.email.dto.request.MailDTO;
+import kb_hack.backend.domain.email.service.EmailService;
 import kb_hack.backend.domain.member.dto.request.LoginUpdateNewPassword;
 import kb_hack.backend.domain.member.dto.request.MemberInfoRequestDTO;
 import kb_hack.backend.domain.member.dto.request.SigunUpRequestDTO;
@@ -27,6 +29,7 @@ public class AuthController {
 
     private final MemberService memberService;
     private final MemberInfoService memberInfoService;
+    private final EmailService emailService;
 
     @Operation(
             summary = "회원가입 API",
@@ -119,6 +122,21 @@ public class AuthController {
     ) {
         memberInfoService.updateMemberInfo(memberInfoRequestDTO);
         return SuccessResponse.makeResponse(SuccessStatusCode.CHANGE_MEMBER_INFO_SUCCESS);
+    }
+
+    @PostMapping("/email")
+    @Operation(
+            summary = "마이페이지 이메일 인증번호 발송",
+            description = "입력받은 이메일 주소로 6자리 인증번호를 발송합니다. 인증번호는 Redis에 저장되며 5분간 유효합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "이메일 발송 성공",
+                            content = @Content(schema = @Schema(implementation = SuccessResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "이미 가입한 이메일 입니다 or 이메일 발송 실패 ")
+            }
+    )
+    public SuccessResponse<Void>sendEmail(@RequestBody MailDTO mailDTO){
+        emailService.sendVerificationCodeMemberInfo(mailDTO.getEmail());
+        return SuccessResponse.makeResponse(SuccessStatusCode.EMAIL_SEND_SUCCESS);
     }
 }
 

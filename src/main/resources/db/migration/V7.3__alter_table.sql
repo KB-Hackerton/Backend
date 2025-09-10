@@ -1,1 +1,4 @@
-ALTER TABLE sos ADD CONSTRAINT uq_member_sos UNIQUE (member_id);
+
+ALTER TABLE notification
+    MODIFY COLUMN noti_type ENUM('notice', 'sos', 'announce', 'festival') NULL;
+

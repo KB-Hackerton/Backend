@@ -46,9 +46,10 @@ public class AlarmController {
             description = "하나라도 알림설정이 바뀌면 바로 db 변경",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    public void update(@AuthenticationPrincipal SecurityCustomUser user,
+    public SuccessResponse<Void>  update(@AuthenticationPrincipal SecurityCustomUser user,
                        @Valid @RequestBody AlarmPreferenceReq req) {
         alarmPreferenceService.partialUpdate(user.getMemberVO().getMemberId(), req);
+        return SuccessResponse.makeResponse(SuccessStatusCode.ALARM_SETTING_PATCH_SUCCESS);
     }
 
     @GetMapping

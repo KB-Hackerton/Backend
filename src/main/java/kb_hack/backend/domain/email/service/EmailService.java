@@ -92,4 +92,44 @@ public class EmailService {
             throw new ServerErrorException(BadStatusCode.FAIL_TO_HANDLE_VERIFICATION_CODE_REDIS_EXCEPTION);
         }
     }
+
+    public void sendVerificationCodeMemberInfo(String email) {
+        Long memberId = emailMapper.findMemberIDByEmail(email);
+        if (memberId == null) {
+            throw new BadRequestException(BadStatusCode.USER_NOT_FOUND_EXCEPTION);
+        }
+
+        String verificationCode = generateCode();
+        String key = email + ":email-verification";
+
+        try {
+            //  Redis에 인증코드 저장 (5분 TTL)
+            redisTemplate.opsForValue().set(key, verificationCode, 5, TimeUnit.MINUTES);
+        } catch (DataAccessException e) {
+            throw new ServerErrorException(BadStatusCode.FAIL_TO_SAVE_VERIFICATION_CODE_REDIS_EXCEPTION);
+        }
+
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(new InternetAddress("zibi_official@naver.com", "경상났네 운영팀"));
+            helper.setTo(email);
+            helper.setSubject("[경상났네] 이메일 인증번호 안내");
+
+            Context context = new Context();
+            context.setVariable("code", verificationCode);
+
+            String htmlContent = templateEngine.process("email/verification", context);
+            helper.setText(htmlContent, true);
+
+            emailSender.send(message);
+
+        } catch (MailException e) {
+            throw new ServerErrorException(BadStatusCode.FAIL_TO_SEND_MAIL_EXCEPTION);
+        } catch (Exception e) {
+            throw new ServerErrorException(BadStatusCode.FAIL_TO_SEND_MAIL_EXCEPTION);
+        }
+    }
+
 }

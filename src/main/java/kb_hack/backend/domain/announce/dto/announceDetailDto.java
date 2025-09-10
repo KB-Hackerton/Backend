@@ -32,6 +32,7 @@ public class announceDetailDto {
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate endDate;
     private String targetName;
+    private String hashtags;
     private Integer viewNum;
     private String filePathName;
     private String fileName;
@@ -54,6 +55,7 @@ public class announceDetailDto {
                 .startDate(announce.getStartDate())
                 .endDate(announce.getEndDate())
                 .targetName(announce.getTargetName())
+                .hashtags(announce.getHashtags())
                 .viewNum(announce.getViewNum())
                 .filePathName(announce.getFilePathName())
                 .fileName(announce.getFileName())

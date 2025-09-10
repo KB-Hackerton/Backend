@@ -11,6 +11,7 @@ import java.util.List;
 public interface AlarmMapper {
     AlarmPreference findById(@Param("memberId") Long memberId);
     int updateSelective(AlarmPreference p);
+    //알림 생성 (관리자)
     int insertPreference(AlarmPreference p);
 
     List<Notification> findByMemberId(@Param("memberId") Long memberId);
