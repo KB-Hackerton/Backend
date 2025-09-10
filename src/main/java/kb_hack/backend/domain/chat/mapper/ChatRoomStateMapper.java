@@ -2,6 +2,7 @@ package kb_hack.backend.domain.chat.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -9,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 
 import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.entity.ChatRoomState;
+import kb_hack.backend.domain.member.domain.Member;
 
 @Mapper
 public interface ChatRoomStateMapper {
@@ -42,4 +44,19 @@ public interface ChatRoomStateMapper {
 		WHERE crs.member_id = #{memberId} AND cr.sos_id = #{sosId}
 	""")
 	ChatRoom findChatRoomsByMemberIdAndSosId(Long memberId, Long sosId);
+
+	@Select("""
+		SELECT m.*
+		FROM member m
+		JOIN chat_room_state crs ON m.member_id = crs.member_id
+		WHERE crs.chat_room_id = #{chatRoomId}
+		
+	""")
+	List<Member> findMembersByRoomId(Long chatRoomId);
+
+	@Delete("""
+    		DELETE FROM chat_room_state 
+    		WHERE chat_room_id = #{chatRoomId}
+    """)
+	void deleteByRoomId(Long chatRoomId);
 }

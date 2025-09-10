@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import kb_hack.backend.domain.chat.dto.request.RoomCreateRequest;
+import kb_hack.backend.domain.chat.dto.request.SosCompleteRequest;
+import kb_hack.backend.domain.chat.dto.response.ChatMemberListResponse;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatRoom;
@@ -47,10 +49,12 @@ public class ChatController {
 	public ResponseEntity<Long> getOrCreatePrivateChatRoom(@RequestBody RoomCreateRequest request,
 	@AuthenticationPrincipal SecurityCustomUser customUser) {
 		Long chatRoomId = chatService.
-			createPrivateChatRoom(customUser.getMemberVO(), request.getSosId(), request.getOtherMemberId());
+			createPrivateChatRoom(customUser.getMemberVO(), request.getSosId());
 
 		return ResponseEntity.ok().body(chatRoomId);
 	}
+
+	//----------------------------------------------------------------------------------------------------------------------
 
 	@Operation(
 		summary = "채팅방 대화 내역 조회",
@@ -67,6 +71,14 @@ public class ChatController {
 	}
 
 
+
+
+
+
+
+
+
+
 	@Operation(
 		summary = "채팅방 메시지 읽음 처리",
 		description = "특정 채팅방의 모든 메시지를 읽음 처리합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
@@ -79,6 +91,16 @@ public class ChatController {
 		return ResponseEntity.ok().build();
 	}
 
+
+
+
+
+
+
+
+
+
+
 	@Operation(
 		summary = "채팅방 상세 정보 조회",
 		description = "특정 채팅방의 상세 정보를 조회합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
@@ -90,6 +112,15 @@ public class ChatController {
 		return ResponseEntity.ok(chatRoomDetail);
 	}
 
+
+
+
+
+
+
+
+
+
 	@Operation(
 		summary = "내가 속한 채팅방 목록 조회",
 		description = "현재 로그인한 사용자가 속한 모든 채팅방의 목록을 조회합니다."
@@ -100,15 +131,41 @@ public class ChatController {
 		return ResponseEntity.ok(chatRooms);
 	}
 
+
+
+
+
+
+
+
+
+
+
 	@Operation(
 		summary = "채팅방 나가기",
-		description = "특정 채팅방에서 나갑니다. 사용자는 해당 채팅방의 참여자여야 합니다."
+		description = "채팅방에서 나가기를 클릭하면 해당 sos에 대한 채팅방에 참여한 사람들을 모두 보여주게 됩니다."
 	)
-	@PostMapping("/room/{roomId}/leave")
-	public ResponseEntity<?> leaveChatRoom(@PathVariable Long roomId,
+	@PostMapping("/room/{roomId}/leave/select")
+	public ResponseEntity<List<ChatMemberListResponse>> leaveChatRoom(@PathVariable Long roomId,
 		@AuthenticationPrincipal SecurityCustomUser customUser) {
-		chatService.leaveChatRoom(roomId, customUser.getMemberVO());
-		return ResponseEntity.ok().build();
+		List<ChatMemberListResponse> chatMemberListResponses = chatService
+			.leaveSelectMember(roomId, customUser.getMemberVO());
+		return ResponseEntity.ok(chatMemberListResponses);
+	}
+
+
+	@Operation(
+		summary = "SOS 요청 최종 종료",
+		description = "도움을 준 사람들을 선택하고 SOS 요청을 최종적으로 종료합니다. 해당 SOS와 관련된 모든 채팅방이 비활성화됩니다."
+	)
+	@PostMapping("/sos/{sosId}/complete")
+	public ResponseEntity<Void> completeSosRequest(
+		@PathVariable Long sosId,
+		@RequestBody SosCompleteRequest request,
+		@AuthenticationPrincipal SecurityCustomUser customUser) {
+
+		chatService.completeSos(sosId, request.getHelperMemberIds(), customUser.getMemberVO());
+		return ResponseEntity.ok().build(); // 성공 시 200 OK 응답
 	}
 
 

@@ -29,4 +29,5 @@ public interface SosMapper {
 	Sos findById(Long sosId);
 	Sos findByMemberId(Long memberId);
 
+	int updateIsComplete(Long sosId);
 }

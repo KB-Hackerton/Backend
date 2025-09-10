@@ -20,4 +20,5 @@ public interface MemberMapper {
     Long getMemberIdByEmail(@Param("memberEmail") String email);
     List<Long> getAllMemberId();
 
+    int incrementHelpCount(Long helperId);
 }
