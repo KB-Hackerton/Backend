@@ -1,6 +1,5 @@
 package kb_hack.backend.global.config.websocket.config;
 
-import static kb_hack.backend.global.security.filter.JwtAuthenticationFilter.*;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -16,23 +15,17 @@ import kb_hack.backend.domain.chat.service.ChatService;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import kb_hack.backend.global.security.entity.MemberVO;
 import kb_hack.backend.global.util.JwtProcessor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtProcessor jwtProcessor;
     private final ChatService chatService;
-    // UserDetailsService를 주입받아 사용자 정보를 조회합니다.
     private final UserDetailsService userDetailsService;
-
-    // 생성자 수정
-    public StompHandler(JwtProcessor jwtProcessor, ChatService chatService, UserDetailsService userDetailsService) {
-        this.jwtProcessor = jwtProcessor;
-        this.chatService = chatService;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -78,19 +71,5 @@ public class StompHandler implements ChannelInterceptor {
 
         return message;
     }
-    
-    // 쿼리 파라미터에서 토큰을 추출하는 헬퍼 메소드
-    private String extractTokenFromQueryParam(StompHeaderAccessor accessor) {
-        // NativeHeader는 MultiValueMap 형태이므로 List<String>으로 반환됩니다.
-        java.util.List<String> tokenList = accessor.getNativeHeader("token");
-        if (tokenList != null && !tokenList.isEmpty()) {
-            // "Bearer " 접두사가 있다면 제거하고, 없다면 그대로 반환
-            String bearerToken = tokenList.get(0);
-            if (bearerToken.startsWith(BEARER_PREFIX)) {
-                return bearerToken.substring(BEARER_PREFIX.length());
-            }
-            return bearerToken;
-        }
-        return null;
-    }
+
 }

@@ -8,7 +8,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
-import kb_hack.backend.domain.chat.controller.ChatMessageResponse;
+import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
+import kb_hack.backend.domain.chat.dto.response.ChatMessageResponse;
+import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
 
 import kb_hack.backend.domain.chat.entity.ChatRoom;
@@ -18,12 +20,6 @@ public interface ChatRoomMapper {
 
 	ChatRoom findByRoomId(Long roomId);
 
-	// private Long chatRoomId;
-	// 	private String roomName;
-	// 	private Long sosId;
-	// 	private SosType sosType;
-	// 	private int isComplete; // 0: 진행중, 1: 완료
-	// 	private Long ownerId;
 	@Insert("""
 		INSERT INTO chat_room (sos_id, room_name, room_type, is_complete, owner_id)
 		VALUES (#{sosId}, #{roomName}, #{roomType}, #{isComplete}, #{ownerId} )
@@ -31,25 +27,13 @@ public interface ChatRoomMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "chatRoomId", keyColumn = "chat_room_id")
 	int save(ChatRoom newChatRoom);
 
-	// create table chat_message
-	// (
-	//     chat_message_id bigint auto_increment
-	//         primary key,
-	//     chat_room_id    bigint                             not null,
-	//     sender_id       varchar(100)                       null,
-	//     content         text                               null,
-	//     created_at      datetime default CURRENT_TIMESTAMP not null,
-	//     constraint fk_chat_message_room
-	//         foreign key (chat_room_id) references chat_room (chat_room_id)
-	//             on update cascade on delete cascade
-	// );
-	@Select("""
-		SELECT cm.chat_message_id, cm.chat_room_id, cm.sender_id, cm.content, cm.created_at
-		FROM chat_message cm
-		WHERE cm.chat_room_id = #{roomId}
-		ORDER BY cm.created_at ASC
-""")
-	List<ChatMessage> getChatMessagesByRoomId(Long roomId);
+// 	@Select("""
+// 		SELECT cm.chat_message_id, cm.chat_room_id, cm.sender_id, cm.content, cm.created_at
+// 		FROM chat_message cm
+// 		WHERE cm.chat_room_id = #{roomId}
+// 		ORDER BY cm.created_at ASC
+// """)
+	List<ChatMessageResponse> getChatMessagesByRoomId(Long roomId);
 
 	@Insert("""
 		INSERT INTO chat_message (chat_room_id, sender_id, content)
@@ -59,5 +43,7 @@ public interface ChatRoomMapper {
 	int saveMessage(ChatMessage chatMessage);
 
 	// roomId로 메시지 목록을 가져올 때, 보낸 사람의 이메일도 함께 가져오는 메소드
-	List<ChatMessageResponse> findChatHistoryWithSenderEmailByRoomId(Long memberId, Long roomId);
+	List<ChatMessageHistoryDto> findChatHistoryWithSenderEmailByRoomId(Long memberId, Long roomId);
+
+	ChatMessage findMessageById(Long chatMessageId);
 }
