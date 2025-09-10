@@ -3,13 +3,17 @@ package kb_hack.backend.domain.chat.service;
 import static kb_hack.backend.global.common.exception.enums.BadStatusCode.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kb_hack.backend.domain.chat.controller.ChatMessageResponse;
+import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.ChatMessageDto;
+import kb_hack.backend.domain.chat.dto.response.ChatMessageResponse;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
 import kb_hack.backend.domain.chat.entity.ChatRoom;
@@ -40,12 +44,8 @@ public class ChatService {
 	private final SosMapper sosMapper;
 	private final JwtProcessor jwtProcessor;
 	private final ReadStatusMapper readStatusMapper;
-	// private final ChatMessageMapper chatMessageMapper;
 
 	private final ChatRoomStateMapper chatRoomStateMapper;
-
-
-
 
 	public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
 		ChatRoomState chatRoomState = ChatRoomState.builder()
@@ -57,6 +57,7 @@ public class ChatService {
 
 	/**
 	 * 해당 roomId에 email을 가진 사용자가 참여자인지 체크
+	 *
 	 * @param email
 	 * @param roomId
 	 * @return
@@ -90,6 +91,7 @@ public class ChatService {
 
 	/**
 	 * 메시지 저장하기
+	 *
 	 * @param roomId
 	 * @param chatMessageDto
 	 */
@@ -133,8 +135,7 @@ public class ChatService {
 
 		}
 
-		return chatMessage;
-
+		return chatRoomMapper.findMessageById(chatMessage.getChatMessageId());
 	}
 
 	/**
@@ -185,7 +186,7 @@ public class ChatService {
 
 	}
 
-	public List<ChatMessageResponse> getChatHistory(Long roomId, Long memberId) {
+	public List<ChatMessageHistoryDto> getChatHistory(Long roomId, Long memberId) {
 		// 1. 해당 채팅방의 참여자가 아닐경우 예외처리
 		// 1-1. 채팅방 조회
 		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
@@ -210,22 +211,27 @@ public class ChatService {
 		return chatRoomMapper.findChatHistoryWithSenderEmailByRoomId(memberId, roomId);
 	}
 
+	@Transactional
 	public void markMessagesAsRead(Long roomId, Long memberId) {
+
 		// 1. 해당 방의 모든 메시지를 가져온다.
-		List<ChatMessage> messages = chatRoomMapper.getChatMessagesByRoomId(roomId);
+		List<ChatMessageResponse> messages = chatRoomMapper.getChatMessagesByRoomId(roomId);
+
 		if (messages.isEmpty()) {
 			return; // 읽을 메시지가 없으면 종료
+
 		}
+
 
 		// 2. 마지막 메시지의 ID를 찾는다.
 		Long lastMessageId = messages.get(messages.size() - 1).getChatMessageId();
 
 		// 3. 해당 사용자의 읽음 상태를 마지막 메시지 ID로 업데이트한다.
-		// (ReadStatus 테이블을 업데이트하거나, ChatRoomState 테이블에 lastReadMessageId 같은 컬럼을 업데이트)
-		// 이 부분의 로직에서 에러가 발생했을 가능성이 높습니다.
+
 		readStatusMapper.updateLastReadMessage(roomId, memberId, lastMessageId);
 
-		}
+
+	}
 
 	public List<MyChatListResponse> getMyChatRooms(MemberVO memberVO) {
 		// 1. 현재 로그인한 사용자 조회
@@ -247,4 +253,30 @@ public class ChatService {
 		}
 		return myChatListResponses;
 	}
+
+	public ChatRoom getChatRoomDetail(Long roomId, MemberVO memberVO) {
+		// 1. 현재 로그인한 사용자 조회
+		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
+		if (member == null) {
+			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
+		}
+		// 2. 채팅방 조회
+		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
+		if (chatRoom == null) {
+			throw new CustomException(CHAT_ROOM_NOT_FOUND);
+		}
+		// 3. 참여자 여부 체크
+		List<ChatRoomState> chatRoomStates = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
+		boolean check = false;
+		for (ChatRoomState c : chatRoomStates) {
+			if (c.getMemberId().equals(member.getMemberId())) {
+				check = true;
+			}
+		}
+		if (!check) {
+			throw new CustomException(CHAT_ROOM_NOT_PARTICIPANT);
+		}
+		return chatRoom;
+	}
+
 }

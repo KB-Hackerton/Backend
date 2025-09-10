@@ -19,24 +19,63 @@
     </select>
 
     <select id="findChatHistoryWithSenderEmailByRoomId"
-            resultType="kb_hack.backend.domain.chat.controller.ChatMessageResponse">
+            resultType="kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto">
         SELECT
             cm.chat_message_id    AS chatMessageId,
             cm.sender_id          AS senderId,
             m.member_email        AS senderEmail,
             IFNULL(rs.is_read, 0) AS isRead,
+            -- 이 메시지를 안 읽은 사람의 수를 계산합니다.
+            -- (이 채팅방의 전체 참여자 수 - 이 메시지를 읽은 사람 수)
+            (
+                (SELECT COUNT(*) FROM chat_room_state crs WHERE crs.chat_room_id = cm.chat_room_id)
+                    -
+                (SELECT COUNT(*) FROM read_status rs_count WHERE rs_count.chat_message_id = cm.chat_message_id)
+                ) AS unreadCount,
             cm.content            AS content,
             cm.created_at         AS createdAt
         FROM
             chat_message cm
-        LEFT JOIN
+                LEFT JOIN
             member m ON cm.sender_id = m.member_id
-        LEFT JOIN
+                LEFT JOIN
             read_status rs ON cm.chat_message_id = rs.chat_message_id AND rs.member_id = #{memberId}
         WHERE
             cm.chat_room_id = #{roomId}
         ORDER BY
             cm.created_at ASC
     </select>
+    <select id="getChatMessagesByRoomId" resultType="kb_hack.backend.domain.chat.dto.response.ChatMessageResponse">
+        SELECT
+        cm.chat_message_id,
+        cm.chat_room_id,
+        cm.sender_id,
+        m.member_email AS senderEmail, -- sender의 이메일도 함께 조회
+        cm.content,
+        cm.created_at,
+        -- [핵심] 이 메시지를 읽지 않은 참여자의 수를 계산합니다.
+        (SELECT COUNT(crm.member_id)
+        FROM chat_room_member crm
+        LEFT JOIN read_status rs ON crm.member_id = rs.member_id AND crm.chat_room_id = cm.chat_room_id
+        WHERE crm.chat_room_id = cm.chat_room_id -- 현재 채팅방의 멤버 중에서
+        AND crm.member_id != cm.sender_id -- 메시지를 보낸 사람은 제외
 
+            AND (<![CDATA[rs.chat_message_id IS NULL OR rs.chat_message_id < cm.chat_message_id]]>)
+        ) AS unreadCount
+        FROM
+        chat_message cm
+        JOIN
+        member m ON cm.sender_id = m.member_id -- sender 정보 조인을 위해 추가
+        WHERE
+        cm.chat_room_id = #{roomId}
+        ORDER BY
+        cm.created_at ASC;
+    </select>
+
+    <select id="findMessageById" resultType="kb_hack.backend.domain.chat.entity.ChatMessage">
+        SELECT *
+        FROM chat_message
+        WHERE chat_message_id = #{messageId}
+    </select>
 </mapper>
+
