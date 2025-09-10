@@ -2,6 +2,7 @@ package kb_hack.backend.domain.home.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import kb_hack.backend.domain.announce.dto.AnnounceRankingDTO;
 import kb_hack.backend.domain.announce.dto.RecentViewAnnounceDTO;
 import kb_hack.backend.domain.home.dto.request.RecentAnnounceDTO;
 import kb_hack.backend.domain.home.dto.request.RecentArticleDTO;
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class HomeResponse {
+    List<AnnounceRankingDTO> announceRanking;
     List<RecentAnnounceDTO> recentAnnounce;
     List<RecentFestivalDTO> recentFestival;
 

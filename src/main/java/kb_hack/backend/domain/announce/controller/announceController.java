@@ -3,18 +3,17 @@ package kb_hack.backend.domain.announce.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kb_hack.backend.domain.announce.dto.AnnounceRankingDTO;
 import kb_hack.backend.domain.announce.dto.announceDetailDto;
 import kb_hack.backend.domain.announce.dto.announceDto;
+import kb_hack.backend.domain.announce.service.AnnounceRankingService;
 import kb_hack.backend.domain.announce.service.announceService;
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 import kb_hack.backend.global.common.exception.enums.SuccessStatusCode;
 import kb_hack.backend.global.common.exception.type.BadRequestException;
 import kb_hack.backend.global.common.response.success.SuccessResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,6 +24,7 @@ import java.util.List;
 public class announceController {
 
     private final announceService announceService;
+    private final AnnounceRankingService announceRankingService;
 
     @Operation(
             summary = "공고 목록 조회",
@@ -50,4 +50,5 @@ public class announceController {
         }
         return SuccessResponse.makeResponse(SuccessStatusCode.ANNOUNCE_GET_SUCCESS, dto);
     }
+
 }

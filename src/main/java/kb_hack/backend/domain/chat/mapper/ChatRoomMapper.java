@@ -46,4 +46,6 @@ public interface ChatRoomMapper {
 	List<ChatMessageHistoryDto> findChatHistoryWithSenderEmailByRoomId(Long memberId, Long roomId);
 
 	ChatMessage findMessageById(Long chatMessageId);
+
+	int leaveChatRoom(Long roomId, Long memberId);
 }
