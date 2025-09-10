@@ -31,20 +31,22 @@
     <select id="findAll" resultType="kb_hack.backend.domain.sos.dto.SosListResponse">
         SELECT
             s.sos_id,
+            s.member_id,
             b.business_nm AS businessName,
             s.sos_title,
             s.sos_type,
-            s.expires_at,
             s.created_at,
+            s.expires_at,
             b.business_addr,
             b.business_addr_detail,
             i.storage_key AS imageURL
         FROM sos s
-                 JOIN member m ON s.member_id = m.member_id
-                 JOIN business b ON b.member_id = m.member_id
-                 JOIN profile_image i ON i.member_id = m.member_id
+                 LEFT JOIN member m ON s.member_id = m.member_id
+                 LEFT JOIN business b ON b.member_id = m.member_id
+                 LEFT JOIN profile_image i ON i.member_id = m.member_id
         ORDER BY s.created_at DESC;
     </select>
+
 
     <select id="findDetail" parameterType="long"
             resultType="kb_hack.backend.domain.sos.dto.SosDetailRow">
@@ -71,6 +73,13 @@
         SELECT *
         FROM sos
         WHERE sos_id = #{sosId}
+    </select>
+
+    <select id="findByMemberId" resultType="kb_hack.backend.domain.sos.entity.Sos">
+        SELECT *
+        FROM sos
+        WHERE member_id = #{memberId}
+            LIMIT 1
     </select>
 
 </mapper>
