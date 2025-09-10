@@ -56,27 +56,37 @@
             cm.sender_id       AS senderId,
             m.member_email     AS senderEmail,
             CASE
-                WHEN crs.last_read_message_id IS NULL
-                    OR cm.chat_message_id > crs.last_read_message_id
-                    THEN 0 ELSE 1
+                -- 내가 보낸 메시지면 상대방의 last_read_message_id 기준으로 읽음 여부 판단
+                WHEN cm.sender_id = #{memberId} THEN
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM chat_room_state crs2
+                            WHERE crs2.chat_room_id = cm.chat_room_id
+                              AND crs2.member_id != #{memberId}
+                          AND crs2.last_read_message_id >= cm.chat_message_id
+                        )
+                            THEN 1 ELSE 0
+                        END
+                -- 내가 아닌 다른 사람이 보낸 메시지면, 내 last_read_message_id 기준
+                ELSE
+                    CASE
+                        WHEN crs.last_read_message_id IS NULL
+                            OR cm.chat_message_id > crs.last_read_message_id
+                            THEN 0 ELSE 1
+                        END
                 END AS isRead,
-            (
-                SELECT COUNT(*)
-                FROM chat_message cm2
-                WHERE cm2.chat_room_id = cm.chat_room_id
-                  AND cm2.chat_message_id > COALESCE(crs.last_read_message_id, 0)
-                  AND cm2.sender_id != #{memberId}
-            ) AS unreadCount,
             cm.content   AS content,
             cm.created_at AS createdAt
         FROM chat_message cm
-            JOIN member m ON cm.sender_id = m.member_id
-            LEFT JOIN chat_room_state crs
-            ON crs.chat_room_id = cm.chat_room_id
-            AND crs.member_id = #{memberId}
+                 JOIN member m ON cm.sender_id = m.member_id
+                 LEFT JOIN chat_room_state crs
+                           ON crs.chat_room_id = cm.chat_room_id
+                               AND crs.member_id = #{memberId}
         WHERE cm.chat_room_id = #{roomId}
         ORDER BY cm.created_at ASC;
     </select>
+
 
 
 
