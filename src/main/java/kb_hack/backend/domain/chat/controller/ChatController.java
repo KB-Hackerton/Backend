@@ -52,6 +52,8 @@ public class ChatController {
 		return ResponseEntity.ok().body(chatRoomId);
 	}
 
+	//----------------------------------------------------------------------------------------------------------------------
+
 	@Operation(
 		summary = "채팅방 대화 내역 조회",
 		description = "특정 채팅방의 대화 내역을 조회합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
@@ -67,6 +69,14 @@ public class ChatController {
 	}
 
 
+
+
+
+
+
+
+
+
 	@Operation(
 		summary = "채팅방 메시지 읽음 처리",
 		description = "특정 채팅방의 모든 메시지를 읽음 처리합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
@@ -79,6 +89,16 @@ public class ChatController {
 		return ResponseEntity.ok().build();
 	}
 
+
+
+
+
+
+
+
+
+
+
 	@Operation(
 		summary = "채팅방 상세 정보 조회",
 		description = "특정 채팅방의 상세 정보를 조회합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
@@ -90,6 +110,15 @@ public class ChatController {
 		return ResponseEntity.ok(chatRoomDetail);
 	}
 
+
+
+
+
+
+
+
+
+
 	@Operation(
 		summary = "내가 속한 채팅방 목록 조회",
 		description = "현재 로그인한 사용자가 속한 모든 채팅방의 목록을 조회합니다."
@@ -99,6 +128,16 @@ public class ChatController {
 		List<MyChatListResponse> chatRooms = chatService.getMyChatRooms(customUser.getMemberVO());
 		return ResponseEntity.ok(chatRooms);
 	}
+
+
+
+
+
+
+
+
+
+
 
 	@Operation(
 		summary = "채팅방 나가기",
