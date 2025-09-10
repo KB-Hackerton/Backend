@@ -31,12 +31,10 @@ public class ChecklistService {
 		List<DocumentResponseDto> docs = documentMapper.findDocumentsByMemberAndAnnounce(memberId, announceId);
 
 		if (docs.isEmpty()) {
-			return null; // or throw custom exception
+			return null;
 		}
 
-		// 공고 정보는 첫 번째 항목에서 꺼냄
-		Long announceIdVal = docs.get(0).getAnnounceId();
-		String announceTitle = docs.get(0).getAnnounceTitle();
+		DocumentResponseDto first = docs.get(0);
 
 		List<DocumentItemDto> checklist = docs.stream()
 			.map(d -> DocumentItemDto.builder()
@@ -48,11 +46,16 @@ public class ChecklistService {
 			.toList();
 
 		return ChecklistResponseDto.builder()
-			.announceId(announceIdVal)
-			.announceTitle(announceTitle)
+			.announceId(first.getAnnounceId())
+			.announceTitle(first.getAnnounceTitle())
+			.totalDocs(first.getTotalDocs())         // ✅ 추가
+			.checkedDocs(first.getCheckedDocs())     // ✅ 추가
+			.reqstStartDate(first.getReqstStartDate()) // ✅ 추가
+			.reqstEndDate(first.getReqstEndDate())     // ✅ 추가
 			.checklist(checklist)
 			.build();
 	}
+
 
 	/** 회원 전체 즐겨찾기 체크리스트 */
 	@Transactional(readOnly = true)
