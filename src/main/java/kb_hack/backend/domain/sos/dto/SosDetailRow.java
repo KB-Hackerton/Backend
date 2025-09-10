@@ -14,6 +14,7 @@ import java.util.Date;
 @Builder
 public class SosDetailRow {
 	private Long sosId;
+	private Long businessId;
 	private String businessName;       // business.business_nm
 	private String badge;              // member.badge
 	private String businessAddr;       // business.business_addr

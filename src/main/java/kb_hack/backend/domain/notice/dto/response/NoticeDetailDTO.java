@@ -8,9 +8,10 @@ import java.util.Date;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class NoticeDTO {
+public class NoticeDetailDTO {
     private String title;
     private Long noticeId;
-
+    private String content;
+    private Date createdAt;
 
 }

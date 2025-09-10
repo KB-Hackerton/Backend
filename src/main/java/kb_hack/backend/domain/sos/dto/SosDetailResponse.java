@@ -33,6 +33,8 @@ public class SosDetailResponse {
 	@Schema(description = "가게 상세 주소", example = "어딘가에 있을것 같아요")
 	private String businessAddrDetail;
 
+	private String minorName;
+
 	@Schema(description = "SOS 요청 제목", example = "긴급 타이어 지원 요청")
 	private String sosTitle;
 
@@ -50,4 +52,7 @@ public class SosDetailResponse {
 	@Schema(description = "SOS 이미지 스토리지 키 리스트",
 		example = "[\"sos/2025/09/01/uuid1.jpg\", \"sos/2025/09/01/uuid2.png\"]")
 	private List<String> imageKeys;
+
+
+
 }
