@@ -62,8 +62,8 @@
             FAIL_TO_PROCESSING_FILE_UPLOAD_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 중 알 수 없는 오류가 발생 했습니다."),
             FILE_UPLOAD_FAILED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"파일 업로드에 실패 했습니다."),
             FAIL_TO_SEND_ALARM(HttpStatus.INTERNAL_SERVER_ERROR,"사용자가 수신거부한 알림입니다."),
-            FAIL_TO_SEND_ALARM2(HttpStatus.INTERNAL_SERVER_ERROR,"사용자가 수신거부한 시간대입니다"),
-
+            FAIL_TO_SEND_ALARM2(HttpStatus.INTERNAL_SERVER_ERROR,"사용자가 수신거부한 시간대 입니다"),
+            FAILT_TO_GET_RANKING_ANNOUNCE(HttpStatus.INTERNAL_SERVER_ERROR,"인기 공고 불러오는데 실패 했습니다."),
 
 
             // 크롤링 관련 5xx
