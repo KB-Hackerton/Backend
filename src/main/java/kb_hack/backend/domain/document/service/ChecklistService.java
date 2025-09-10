@@ -52,6 +52,7 @@ public class ChecklistService {
 			.checkedDocs(first.getCheckedDocs())     // ✅ 추가
 			.reqstStartDate(first.getReqstStartDate()) // ✅ 추가
 			.reqstEndDate(first.getReqstEndDate())     // ✅ 추가
+			.pubDate(first.getPubDate())
 			.checklist(checklist)
 			.build();
 	}

@@ -38,6 +38,7 @@ public interface ChatRoomMapper {
 
 	ChatMessage findMessageById(Long chatMessageId);
 
+
 	int leaveChatRoom(Long roomId, Long memberId);
 
 	// 마지막 메시지 ID 가져오기
@@ -47,6 +48,13 @@ public interface ChatRoomMapper {
     WHERE chat_room_id = #{roomId}
 """)
 	Long findLastMessageId(Long roomId);
+
+
+
+	List<ChatRoom> findAllBySosId(Long sosId);
+
+
+	int updateIsComplete(Long chatRoomId);
 
 
 }

@@ -18,5 +18,6 @@ public class ChecklistResponseDto {
 	private int checkedDocs;
 	private LocalDate reqstStartDate;
 	private LocalDate reqstEndDate;
+	private LocalDate pubDate;
 	private List<DocumentItemDto> checklist;
 }
