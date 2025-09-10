@@ -213,23 +213,14 @@ public class ChatService {
 
 	@Transactional
 	public void markMessagesAsRead(Long roomId, Long memberId) {
-		System.out.println("⭐⭐⭐⭐⭐⭐⭐들어온 roomId = " + roomId);
-		System.out.println("⭐⭐⭐⭐⭐⭐⭐들어온memberId = " + memberId);
-		// 1. 해당 방의 모든 메시지를 가져온다.
-		List<ChatMessageResponse> messages = chatRoomMapper.getChatMessagesByRoomId(roomId);
-		System.out.println("⭐⭐⭐⭐⭐⭐⭐messages = " + messages);
-		if (messages.isEmpty()) {
-			return; // 읽을 메시지가 없으면 종료
+		// 해당 방의 마지막 메시지 ID 조회
+		Long lastMessageId = chatRoomMapper.findLastMessageId(roomId);
+		if (lastMessageId == null) {
+			return; // 메시지가 없으면 종료
 		}
 
-		// 2. 마지막 메시지의 ID를 찾는다.
-		Long lastMessageId = messages.get(messages.size() - 1).getChatMessageId();
-		System.out.println("⭐⭐⭐⭐⭐⭐⭐lastMessageId = " + lastMessageId);
-
-		// 3. 해당 사용자의 읽음 상태를 마지막 메시지 ID로 업데이트한다.
-		readStatusMapper.updateLastReadMessage(roomId, memberId, lastMessageId);
-
-
+		// chat_room_state에 마지막 읽은 메시지 ID 업데이트
+		chatRoomStateMapper.updateLastReadMessage(roomId, memberId, lastMessageId);
 	}
 
 	public List<MyChatListResponse> getMyChatRooms(MemberVO memberVO) {

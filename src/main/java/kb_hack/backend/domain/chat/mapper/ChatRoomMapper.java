@@ -3,10 +3,7 @@ package kb_hack.backend.domain.chat.mapper;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageResponse;
@@ -27,12 +24,6 @@ public interface ChatRoomMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "chatRoomId", keyColumn = "chat_room_id")
 	int save(ChatRoom newChatRoom);
 
-// 	@Select("""
-// 		SELECT cm.chat_message_id, cm.chat_room_id, cm.sender_id, cm.content, cm.created_at
-// 		FROM chat_message cm
-// 		WHERE cm.chat_room_id = #{roomId}
-// 		ORDER BY cm.created_at ASC
-// """)
 	List<ChatMessageResponse> getChatMessagesByRoomId(Long roomId);
 
 	@Insert("""
@@ -48,4 +39,14 @@ public interface ChatRoomMapper {
 	ChatMessage findMessageById(Long chatMessageId);
 
 	int leaveChatRoom(Long roomId, Long memberId);
+
+	// 마지막 메시지 ID 가져오기
+	@Select("""
+    SELECT MAX(chat_message_id)
+    FROM chat_message
+    WHERE chat_room_id = #{roomId}
+""")
+	Long findLastMessageId(Long roomId);
+
+
 }

@@ -2,16 +2,20 @@ package kb_hack.backend.domain.chat.mapper;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.entity.ChatRoomState;
 
 @Mapper
 public interface ChatRoomStateMapper {
+
+	@Update("""
+    UPDATE chat_room_state
+    SET last_read_message_id = #{lastMessageId}
+    WHERE chat_room_id = #{roomId} AND member_id = #{memberId}
+""")
+	int updateLastReadMessage(Long roomId, Long memberId, Long lastMessageId);
 
 	@Insert("""
 			INSERT INTO chat_room_state (chat_room_id, member_id, last_read_message_id)
