@@ -70,4 +70,11 @@ public interface ChatRoomStateMapper {
     		WHERE chat_room_id = #{chatRoomId}
     """)
 	void deleteByRoomId(Long chatRoomId);
+
+	@Insert("""
+    INSERT INTO chat_room_state (chat_room_id, member_id, last_read_message_id)
+    VALUES (#{roomId}, #{memberId}, NULL)
+    ON DUPLICATE KEY UPDATE chat_room_id = chat_room_id
+""")
+	int insertIfNotExists(Long roomId, Long memberId);
 }
