@@ -31,6 +31,7 @@
     <select id="findAll" resultType="kb_hack.backend.domain.sos.dto.SosListResponse">
         SELECT
             s.sos_id,
+            s.member_id,
             b.business_nm AS businessName,
             s.sos_title,
             s.sos_type,
@@ -71,6 +72,13 @@
         SELECT *
         FROM sos
         WHERE sos_id = #{sosId}
+    </select>
+
+    <select id="findByMemberId" resultType="kb_hack.backend.domain.sos.entity.Sos">
+        SELECT *
+        FROM sos
+        WHERE member_id = #{memberId}
+            LIMIT 1
     </select>
 
 </mapper>
