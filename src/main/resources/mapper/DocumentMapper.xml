@@ -51,32 +51,32 @@
 
     <!-- 공고별 -->
     <select id="findDocumentsByMemberAndAnnounce" resultType="kb_hack.backend.domain.document.dto.DocumentResponseDto">
-        SELECT
-            d.document_id   AS documentId,
-            d.announce_id   AS announceId,
-            d.title         AS title,
-            d.description   AS description,
-            COALESCE(mdc.status, 0) AS checked,
-            a.announce_title AS announceTitle,
-            a.reqst_end_date AS deadline,
-            -- 🔑 공고 단위 총 문서 개수
-            (SELECT COUNT(*)
-             FROM document d2
-             WHERE d2.announce_id = d.announce_id) AS totalDocs,
-            -- 🔑 공고 단위 체크된 문서 개수
-            (SELECT COUNT(*)
-             FROM member_document_check mdc2
-                      JOIN document d3 ON mdc2.document_id = d3.document_id
-             WHERE d3.announce_id = d.announce_id
-               AND mdc2.member_id = #{memberId}
-               AND mdc2.status = 1) AS checkedDocs
-        FROM document d
-                 JOIN announce a ON d.announce_id = a.announce_id
-                 LEFT JOIN member_document_check mdc
-                           ON d.document_id = mdc.document_id
-                               AND mdc.member_id = #{memberId}
-        WHERE d.announce_id = #{announceId}
-    </select>
+    SELECT
+        d.document_id   AS documentId,
+        d.announce_id   AS announceId,
+        d.title         AS title,
+        d.description   AS description,
+        COALESCE(mdc.status, 0) AS checked,
+        a.announce_title AS announceTitle,
+        a.reqst_start_date AS reqstStartDate,  -- ✅ 추가
+        a.reqst_end_date   AS reqstEndDate,    -- ✅ 변경
+        (SELECT COUNT(*)
+         FROM document d2
+         WHERE d2.announce_id = d.announce_id) AS totalDocs,
+        (SELECT COUNT(*)
+         FROM member_document_check mdc2
+                  JOIN document d3 ON mdc2.document_id = d3.document_id
+         WHERE d3.announce_id = d.announce_id
+           AND mdc2.member_id = #{memberId}
+           AND mdc2.status = 1) AS checkedDocs
+    FROM document d
+             JOIN announce a ON d.announce_id = a.announce_id
+             LEFT JOIN member_document_check mdc
+                       ON d.document_id = mdc.document_id
+                           AND mdc.member_id = #{memberId}
+    WHERE d.announce_id = #{announceId}
+</select>
+
 
 
 
