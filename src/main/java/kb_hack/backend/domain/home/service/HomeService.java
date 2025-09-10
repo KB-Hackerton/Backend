@@ -1,6 +1,8 @@
 package kb_hack.backend.domain.home.service;
 
+import kb_hack.backend.domain.announce.dto.AnnounceRankingDTO;
 import kb_hack.backend.domain.announce.dto.RecentViewAnnounceDTO;
+import kb_hack.backend.domain.announce.service.AnnounceRankingService;
 import kb_hack.backend.domain.announce.service.RecentAnnounceService;
 import kb_hack.backend.domain.home.dto.request.RecentAnnounceDTO;
 import kb_hack.backend.domain.home.dto.request.RecentArticleDTO;
@@ -21,16 +23,24 @@ public class HomeService {
 
     private final HomeMapper homeMapper;
     private final RecentAnnounceService recentAnnounceService;
+    private final AnnounceRankingService announceRankingService;
 
     @Transactional
     public HomeResponse getHomeData(){
         List<RecentAnnounceDTO> recentAnnounce;
         List<RecentFestivalDTO> recentFestival;
         List<RecentArticleDTO> recentArticle;
+        List<AnnounceRankingDTO> announceRanking;
 
         try {
             recentAnnounce = homeMapper.getRecentAnnounce();
         } catch (Exception e) {
+            throw new ServerErrorException(BadStatusCode.FAIL_TO_GET_RECENT_ANNOUNCE_EXCEPTION);
+        }
+
+        try{
+            announceRanking = announceRankingService.getTopN(3);
+        }catch (Exception e) {
             throw new ServerErrorException(BadStatusCode.FAIL_TO_GET_RECENT_ANNOUNCE_EXCEPTION);
         }
 
@@ -47,6 +57,6 @@ public class HomeService {
         }
 
         List<RecentViewAnnounceDTO> recentAnnounceList = recentAnnounceService.getRecentAnnounceList();
-        return new HomeResponse(recentAnnounce,recentFestival,recentArticle,recentAnnounceList);
+        return new HomeResponse(announceRanking,recentAnnounce,recentFestival,recentArticle,recentAnnounceList);
     }
 }

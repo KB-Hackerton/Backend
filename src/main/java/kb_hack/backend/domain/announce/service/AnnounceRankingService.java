@@ -52,5 +52,9 @@ public class AnnounceRankingService {
         }
         return results;
     }
+
+    public void increaseView(Long announceId) {
+        announceMapper.increaseViewNum(announceId);
+    }
 }
 

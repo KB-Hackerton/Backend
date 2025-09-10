@@ -51,10 +51,4 @@ public class announceController {
         return SuccessResponse.makeResponse(SuccessStatusCode.ANNOUNCE_GET_SUCCESS, dto);
     }
 
-    @PostMapping("/test")
-    public SuccessResponse<Void> test(){
-        announceRankingService.increaseView(1L);
-        return SuccessResponse.makeResponse(SuccessStatusCode.EMAIL_VERIFY_CODE_SUCCESS);
-    }
-
 }
