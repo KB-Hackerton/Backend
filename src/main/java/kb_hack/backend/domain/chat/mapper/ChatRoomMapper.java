@@ -47,5 +47,10 @@ public interface ChatRoomMapper {
 
 	ChatMessage findMessageById(Long chatMessageId);
 
-	int leaveChatRoom(Long roomId, Long memberId);
+
+	List<ChatRoom> findAllBySosId(Long sosId);
+
+
+	int updateIsComplete(Long chatRoomId);
+
 }
