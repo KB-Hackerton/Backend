@@ -142,7 +142,6 @@ public class ChatService {
 	/**
 	 * 1:1 채팅방 생성
 	 * @param sosId
-	 * @param otherMemberId
 	 * @return
 	 */
 	public Long createPrivateChatRoom(MemberVO memberVO, Long sosId) {
@@ -232,18 +231,52 @@ public class ChatService {
 			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
 		}
 		// 2. 자신이 속한 채팅방 목록 조회
-		List<ChatRoom> chatRooms = chatRoomStateMapper.findChatRoomsByMemberId(member.getMemberId());
-		List<MyChatListResponse> myChatListResponses = new ArrayList<>();
-		for (ChatRoom c : chatRooms) {
-			Long count = readStatusMapper.countUnreadMessages(c.getChatRoomId(), member.getMemberId());
-			MyChatListResponse dto = MyChatListResponse.builder()
-				.roomId(c.getChatRoomId())
-				.roomName(c.getRoomName())
-				.unReadCount(count)
-				.build();
-			myChatListResponses.add(dto);
-		}
-		return myChatListResponses;
+
+
+		// 1. 단 한 번의 쿼리로 모든 필요한 정보를 가져옵니다.
+		List<MyChatListResponse> queryResults = chatRoomStateMapper.findMyChatList(member.getMemberId());
+
+		// 2. Mapper 결과를 최종 DTO로 변환합니다. (DB 접근 없음)
+		return queryResults.stream()
+			.map(result -> MyChatListResponse.builder()
+				.roomId(result.getRoomId())
+				.roomName(result.getRoomName())
+				.unReadCount(result.getUnReadCount())
+				.lastMessage(result.getLastMessage())
+				.lastMessageTime(result.getLastMessageTime())
+				.bussinessName(result.getBussinessName())
+				.memberProfileImage(result.getMemberProfileImage())
+				.build())
+			.collect(Collectors.toList());
+
+		// List<ChatRoom> chatRooms = chatRoomStateMapper.findChatRoomsByMemberId(member.getMemberId());
+		// List<MyChatListResponse> myChatListResponses = new ArrayList<>();
+		// for (ChatRoom c : chatRooms) {
+		// 	Long count = readStatusMapper.countUnreadMessages(c.getChatRoomId(), member.getMemberId());
+		//
+		// 	ChatMessage lastReadMessage = chatRoomStateMapper.findLastReadMessage(c.getChatRoomId());
+		// 	List<Member> membersByRoomId = chatRoomStateMapper.findMembersByRoomId(c.getChatRoomId());
+		// 	String bussinessName = "";
+		// 	for (Member member1 : membersByRoomId) {
+		// 		log.info("membersByRoomId member1: {}", member1);
+		// 		if(member1.getMemberId().equals(member.getMemberId())) {
+		// 			continue;
+		// 		}
+		// 		else {
+		// 			bussinessName = member1.getMemberName();
+		// 			break;
+		// 		}
+		// 	}
+		// 	MyChatListResponse dto = MyChatListResponse.builder()
+		// 		.roomId(c.getChatRoomId())
+		// 		.roomName(c.getRoomName())
+		// 		.unReadCount(count)
+		// 		.lastMessage(lastReadMessage.getContent())
+		// 		.lastMessageTime(lastReadMessage.getCreatedAt())
+		// 		.bussinessName(bussinessName)
+		// 		.build();
+		// 	myChatListResponses.add(dto);
+		// }
 	}
 
 
