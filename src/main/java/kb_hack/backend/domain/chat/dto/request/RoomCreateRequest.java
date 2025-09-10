@@ -10,6 +10,5 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RoomCreateRequest {
 	private Long sosId;
-	private Long otherMemberId;
 
 }
