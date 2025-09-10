@@ -50,16 +50,18 @@
   <![CDATA[
         UPDATE chat_room_state s
             JOIN (
-            SELECT COALESCE(MAX(chat_message_id), 0) AS last_other_id
-            FROM chat_message
+            SELECT MAX(last_read_message_id) AS other_last_read
+            FROM chat_room_state
             WHERE chat_room_id = #{roomId}
-            AND sender_id <> #{myId}
+            AND member_id <> #{myId}
             ) x
-        SET s.last_read_message_id = GREATEST(s.last_read_message_id, x.last_other_id)
+        SET s.last_read_message_id = GREATEST(s.last_read_message_id, x.other_last_read)
         WHERE s.chat_room_id = #{roomId}
-          AND s.member_id    = #{myId}
+          AND s.member_id    = #{myId};
+
         ]]>
-    </update>
+</update>
+
 
 
     <select id="selectLatestMessages" resultType="kb_hack.backend.domain.SosChatting.dto.ChattingMessageItem">
@@ -126,11 +128,19 @@
           AND member_id    = #{otherId}
     </update>
 
+
     <select id="selectIsReadByOther" resultType="boolean">
         SELECT (s.last_read_message_id >= #{newId}) AS is_read
         FROM chat_room_state s
         WHERE s.chat_room_id = #{roomId}
           AND s.member_id    = #{otherId}
+    </select>
+
+    <select id="isMemberInRoom" resultType="java.lang.Boolean">
+        SELECT COUNT(*) > 0
+        FROM chat_room_state
+        WHERE chat_room_id = #{roomId}
+          AND member_id    = #{myId}
     </select>
 
 

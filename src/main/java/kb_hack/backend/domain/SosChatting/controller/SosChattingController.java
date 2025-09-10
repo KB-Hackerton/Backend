@@ -43,6 +43,7 @@ public class SosChattingController {
 
         long myId = user.getMemberVO().getMemberId();
 
+        sosChattingService.validateRoomMembership(roomId, myId);
         // 방 입장 시 1회: 상대 메시지 읽음 처리
         sosChattingService.markOthersMessagesAsRead(roomId, myId);
 
@@ -55,7 +56,7 @@ public class SosChattingController {
         return ResponseEntity.ok(messages);
     }
 
-    // 시나리오 3) 메시지 전송
+    // 시나리오 3) 메시지 전송 (완료)
     @PostMapping("/{roomId}/messages")
     public ResponseEntity<ChattingMessageItem> sendMessage(
             @PathVariable long roomId,

@@ -29,4 +29,6 @@ public interface SosChattingMapper {
     int bumpOtherReadToNew(@Param("roomId") long roomId, @Param("otherId") long otherId, @Param("newId") long newId);
 
     boolean selectIsReadByOther(@Param("roomId") long roomId, @Param("otherId") long otherId, @Param("newId") long newId);
+
+    boolean isMemberInRoom(@Param("roomId") long roomId, @Param("myId") long myId);
 }

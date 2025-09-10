@@ -4,6 +4,9 @@ import kb_hack.backend.domain.SosChatting.dto.ChattingMessageInsertParam;
 import kb_hack.backend.domain.SosChatting.dto.ChattingMessageItem;
 import kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem;
 import kb_hack.backend.domain.SosChatting.mapper.SosChattingMapper;
+import kb_hack.backend.global.common.exception.enums.BadStatusCode;
+import kb_hack.backend.global.common.exception.type.CustomException;
+import kb_hack.backend.global.common.exception.type.ForbiddenException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -27,7 +30,7 @@ public class SosChattingService{
     //방 입장시 상대방 메세지 읽음 표시
     public void markOthersMessagesAsRead(long roomId, long myId) {
         int updated = sosChattingMapper.updateReadUpToOthersMax(roomId, myId);
-        log.info("Room {}: {} messages marked as read for member {}", roomId, updated, myId);
+        log.info("⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐Room {}: {} messages marked as read for member {}", roomId, updated, myId);
     }
 
     // 방에 처음 입장할 때 최신 메시지 묶음을 가져올 때 사용
@@ -89,6 +92,15 @@ public class SosChattingService{
                 .content(content)
                 .createdAt(null) // createdAt은 selectLatestMessages 호출 때 가져올 수도 있음
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public void validateRoomMembership(long roomId, long myId) {
+        boolean isMember = sosChattingMapper.isMemberInRoom(roomId, myId);
+        if (!isMember) {
+            throw new ForbiddenException(BadStatusCode.CHAT_ROOM_ACCESS_DENIED);
+
+        }
     }
 
 
