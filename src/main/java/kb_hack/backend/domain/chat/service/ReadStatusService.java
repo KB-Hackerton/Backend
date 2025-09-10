@@ -19,4 +19,9 @@ public class ReadStatusService {
 		int updatedCount = readStatusMapper.markAsRead(roomId, memberId);
 		log.info("Updated {} messages as read in room {}", updatedCount, roomId);
 	}
+
+	public Long getUnreadCount(Long roomId, Long memberId) {
+		return readStatusMapper.countUnreadMessages(roomId, memberId);
+	}
+
 }

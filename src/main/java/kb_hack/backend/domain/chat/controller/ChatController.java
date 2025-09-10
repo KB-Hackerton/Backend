@@ -2,8 +2,6 @@ package kb_hack.backend.domain.chat.controller;
 
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import kb_hack.backend.domain.chat.dto.request.RoomCreateRequest;
+import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
+import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.service.ChatService;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public class ChatController {
 	public ResponseEntity<?> getChatHistory(@PathVariable Long roomId,
 		@AuthenticationPrincipal SecurityCustomUser customUser) {
 
-		List<ChatMessageResponse> chatHistory =
+		List<ChatMessageHistoryDto> chatHistory =
 			chatService.getChatHistory(roomId, customUser.getMemberVO().getMemberId());
 
 		return ResponseEntity.ok(chatHistory);
@@ -70,6 +70,13 @@ public class ChatController {
 
 		chatService.markMessagesAsRead(roomId, customUser.getMemberVO().getMemberId());
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/room/detail/{roomId}")
+	public ResponseEntity<?> getChatDetail(@PathVariable Long roomId,
+		@AuthenticationPrincipal SecurityCustomUser customUser) {
+		ChatRoom chatRoomDetail = chatService.getChatRoomDetail(roomId, customUser.getMemberVO());
+		return ResponseEntity.ok(chatRoomDetail);
 	}
 
 	@GetMapping("/my/rooms")
