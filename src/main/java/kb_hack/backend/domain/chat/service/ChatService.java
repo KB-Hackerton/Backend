@@ -279,4 +279,30 @@ public class ChatService {
 		return chatRoom;
 	}
 
+	public void leaveChatRoom(Long roomId, MemberVO memberVO) {
+		// 1. 현재 로그인한 사용자 조회
+		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
+		if (member == null) {
+			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
+		}
+		// 2. 채팅방 조회
+		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
+		if (chatRoom == null) {
+			throw new CustomException(CHAT_ROOM_NOT_FOUND);
+		}
+		// 3. 참여자 여부 체크
+		List<ChatRoomState> chatRoomStates = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
+		boolean check = false;
+		for (ChatRoomState c : chatRoomStates) {
+			if (c.getMemberId().equals(member.getMemberId())) {
+				check = true;
+			}
+		}
+		if (!check) {
+			throw new CustomException(CHAT_ROOM_NOT_PARTICIPANT);
+		}
+		// 4. 채팅방에서 나가기
+		chatRoomMapper.leaveChatRoom(roomId, member.getMemberId());
+
+	}
 }

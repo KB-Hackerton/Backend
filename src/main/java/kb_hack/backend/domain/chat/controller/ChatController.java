@@ -52,7 +52,10 @@ public class ChatController {
 		return ResponseEntity.ok().body(chatRoomId);
 	}
 
-	// 이전 메시지 조회
+	@Operation(
+		summary = "채팅방 대화 내역 조회",
+		description = "특정 채팅방의 대화 내역을 조회합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
+	)
 	@GetMapping("/history/{roomId}")
 	public ResponseEntity<?> getChatHistory(@PathVariable Long roomId,
 		@AuthenticationPrincipal SecurityCustomUser customUser) {
@@ -64,7 +67,11 @@ public class ChatController {
 	}
 
 
-	@PostMapping("/chat/room/{roomId}/read")
+	@Operation(
+		summary = "채팅방 메시지 읽음 처리",
+		description = "특정 채팅방의 모든 메시지를 읽음 처리합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
+	)
+	@PostMapping("/room/{roomId}/read")
 	public ResponseEntity<Void> markAsRead(@PathVariable Long roomId,
 		@AuthenticationPrincipal SecurityCustomUser customUser) {
 
@@ -72,6 +79,10 @@ public class ChatController {
 		return ResponseEntity.ok().build();
 	}
 
+	@Operation(
+		summary = "채팅방 상세 정보 조회",
+		description = "특정 채팅방의 상세 정보를 조회합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
+	)
 	@GetMapping("/room/detail/{roomId}")
 	public ResponseEntity<?> getChatDetail(@PathVariable Long roomId,
 		@AuthenticationPrincipal SecurityCustomUser customUser) {
@@ -79,10 +90,26 @@ public class ChatController {
 		return ResponseEntity.ok(chatRoomDetail);
 	}
 
+	@Operation(
+		summary = "내가 속한 채팅방 목록 조회",
+		description = "현재 로그인한 사용자가 속한 모든 채팅방의 목록을 조회합니다."
+	)
 	@GetMapping("/my/rooms")
 	public ResponseEntity<?> getMyChatRooms(@AuthenticationPrincipal SecurityCustomUser customUser) {
 		List<MyChatListResponse> chatRooms = chatService.getMyChatRooms(customUser.getMemberVO());
 		return ResponseEntity.ok(chatRooms);
 	}
+
+	@Operation(
+		summary = "채팅방 나가기",
+		description = "특정 채팅방에서 나갑니다. 사용자는 해당 채팅방의 참여자여야 합니다."
+	)
+	@PostMapping("/room/{roomId}/leave")
+	public ResponseEntity<?> leaveChatRoom(@PathVariable Long roomId,
+		@AuthenticationPrincipal SecurityCustomUser customUser) {
+		chatService.leaveChatRoom(roomId, customUser.getMemberVO());
+		return ResponseEntity.ok().build();
+	}
+
 
 }

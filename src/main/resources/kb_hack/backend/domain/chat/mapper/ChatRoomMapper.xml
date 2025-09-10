@@ -11,6 +11,9 @@
         <result property="isComplete" column="is_complete"/>
         <result property="createdAt" column="created_at"/>
     </resultMap>
+    <update id="leaveChatRoom">
+        UPDATE chat_room SET is_complete = 1 WHERE chat_room_id = #{roomId}
+    </update>
 
     <select id="findByRoomId" resultMap="ChatMapper">
         SELECT *
