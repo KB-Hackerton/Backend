@@ -50,7 +50,6 @@ public class announceService {
             return null;
         }
 
-
         // 로그인한 사용자 ID
         Long memberId = getLoginMemberId();
 
