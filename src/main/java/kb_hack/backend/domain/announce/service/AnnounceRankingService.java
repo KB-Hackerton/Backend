@@ -52,14 +52,5 @@ public class AnnounceRankingService {
         }
         return results;
     }
-
-
-    public void increaseView(Long announceId) {
-        // DB 업데이트
-        announceMapper.increaseViewNum(announceId);
-
-        // Redis 업데이트
-        redisTemplate.opsForZSet().incrementScore(RANKING_KEY, announceId.toString(), 1);
-    }
 }
 

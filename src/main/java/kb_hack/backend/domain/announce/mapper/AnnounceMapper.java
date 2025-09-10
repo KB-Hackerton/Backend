@@ -16,5 +16,5 @@ public interface AnnounceMapper {
     List<AnnounceRankingDTO> findTopAnnounces(@Param("limit") int limit);
 
     AnnounceRankingDTO findByAnnounceId(Long announceId);
-    void increaseViewNum(@Param("announceid") Long announceId);
+    int increaseViewNum(@Param("announceId") Long announceId);
 }

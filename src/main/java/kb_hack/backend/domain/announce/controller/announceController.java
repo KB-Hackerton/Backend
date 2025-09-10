@@ -52,8 +52,9 @@ public class announceController {
     }
 
     @PostMapping("/test")
-    public SuccessResponse<List<AnnounceRankingDTO>> test(){
-        return SuccessResponse.makeResponse(SuccessStatusCode.EMAIL_VERIFY_CODE_SUCCESS,announceRankingService.getTopN(5));
+    public SuccessResponse<Void> test(){
+        announceRankingService.increaseView(1L);
+        return SuccessResponse.makeResponse(SuccessStatusCode.EMAIL_VERIFY_CODE_SUCCESS);
     }
 
 }

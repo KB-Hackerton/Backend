@@ -65,6 +65,7 @@
         WHERE announce_id = #{announceId}
     </update>
 
+
     <select id="findAll" resultMap="announceResultMap">
         select
             announce_id,
