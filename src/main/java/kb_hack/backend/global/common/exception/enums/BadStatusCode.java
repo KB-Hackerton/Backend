@@ -64,6 +64,7 @@
             FAIL_TO_SEND_ALARM(HttpStatus.INTERNAL_SERVER_ERROR,"사용자가 수신거부한 알림입니다."),
             FAIL_TO_SEND_ALARM2(HttpStatus.INTERNAL_SERVER_ERROR,"사용자가 수신거부한 시간대 입니다"),
             FAILT_TO_GET_RANKING_ANNOUNCE(HttpStatus.INTERNAL_SERVER_ERROR,"인기 공고 불러오는데 실패 했습니다."),
+            FILE_DELETE_FAILED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"파일 삭제에 실패했습니다."),
 
 
             // 크롤링 관련 5xx

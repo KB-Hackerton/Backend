@@ -6,6 +6,7 @@ import kb_hack.backend.domain.sos.dto.SosCreateResponse;
 import kb_hack.backend.domain.sos.dto.SosDetailResponse;
 import kb_hack.backend.domain.sos.dto.SosDetailRow;
 import kb_hack.backend.domain.sos.dto.SosListResponse;
+import kb_hack.backend.domain.sos.dto.SosUpdateRequest;
 import kb_hack.backend.domain.sos.entity.Sos;
 import kb_hack.backend.domain.sos.entity.SosImage;
 import kb_hack.backend.domain.sos.entity.SosType;
@@ -93,43 +94,54 @@ public class SosServiceImpl implements SosService {
 
 	@Override
 	@Transactional
-	public void update(Long sosId, SosCreateRequest req) {
+	public void update(Long sosId, SosUpdateRequest req) {
 		// 1) 만료일 파싱
 		LocalDateTime expiresAt = parseExpiresAt(req.getExpiresAt());
 
 		// 2) SOS row 수정
 		Sos sos = Sos.builder()
-				.sosId(sosId)
-				.sosTitle(req.getSosTitle())
-				.sosType(req.getSosType())
-				.sosContent(req.getSosContent())
-				.expiresAt(expiresAt)
-				.build();
+			.sosId(sosId)
+			.sosTitle(req.getSosTitle())
+			.sosType(req.getSosType())
+			.sosContent(req.getSosContent())
+			.expiresAt(expiresAt)
+			.build();
 
 		int updated = sosMapper.update(sos);
 		if (updated == 0) {
 			throw new IllegalArgumentException("해당 SOS가 존재하지 않거나 삭제된 상태입니다.");
 		}
 
+		// 3) 삭제할 이미지 처리 (DB + S3)
+		if (req.getDeleteImageIds() != null) {
+			for (Long imageId : req.getDeleteImageIds()) {
+				SosImage image = sosImageMapper.findById(imageId);
+				if (image != null) {
+					storageService.delete(image.getStorageKey()); // S3 삭제
+					sosImageMapper.deleteById(imageId);          // DB 삭제
+				}
+			}
+		}
 
-		List<MultipartFile> files = req.getImages();
-		if (files != null && !files.isEmpty()) {
-			//  기존 이미지 삭제
-			List<SosImage> oldImages = sosImageMapper.findBySosId(sosId);
-
-			sosImageMapper.deleteBySosId(sosId);
-
-			List<String> keys = storageService.uploadAll(files, sosId);
+		// 4) 새 이미지 업로드 → insert
+		if (req.getNewImages() != null && !req.getNewImages().isEmpty()) {
+			List<String> keys = storageService.uploadAll(req.getNewImages(), sosId);
 			for (String key : keys) {
 				SosImage image = SosImage.builder()
-						.sosId(sosId)
-						.storageKey(key)
-						.isDeleted(false)
-						.build();
+					.sosId(sosId)
+					.storageKey(key)
+					.build();
 				sosImageMapper.insert(image);
 			}
 		}
+
+		// 5) 최종 개수 검증
+		List<SosImage> currentImages = sosImageMapper.findBySosId(sosId);
+		if (currentImages.size() > 3) {
+			throw new IllegalArgumentException("이미지는 최대 3개까지 저장할 수 있습니다.");
+		}
 	}
+
 
 
 	@Override
