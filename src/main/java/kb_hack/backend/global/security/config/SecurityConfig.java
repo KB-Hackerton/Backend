@@ -79,6 +79,7 @@ public class SecurityConfig {
                         //실제 permitall 할 ul
                         .requestMatchers("/auth/login","/auth/refresh","/auth/password","/check","/test/*","/email/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/member-info").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/auth/email").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/auth/member-info").hasRole("Member")
                         .requestMatchers(HttpMethod.PATCH,"/auth/member-info").hasRole("Member")
                         .requestMatchers(HttpMethod.DELETE, "/password").hasRole("Member")

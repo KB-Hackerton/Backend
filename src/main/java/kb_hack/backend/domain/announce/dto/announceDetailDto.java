@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import kb_hack.backend.domain.announce.Announce;
+import kb_hack.backend.domain.document.dto.DocumentItemDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -38,6 +40,7 @@ public class announceDetailDto {
     private String callCompany;
     private String printFilePathName;
     private String printFileName;
+    private List<DocumentItemDto> checklist;
 
 
     public static announceDetailDto from(Announce announce) {

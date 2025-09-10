@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -13,5 +14,9 @@ import java.util.List;
 public class ChecklistResponseDto {
 	private Long announceId;
 	private String announceTitle;
+	private int totalDocs;
+	private int checkedDocs;
+	private LocalDate reqstStartDate;
+	private LocalDate reqstEndDate;
 	private List<DocumentItemDto> checklist;
 }
