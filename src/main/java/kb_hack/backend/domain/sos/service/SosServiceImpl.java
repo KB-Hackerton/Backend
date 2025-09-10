@@ -56,10 +56,13 @@ public class SosServiceImpl implements SosService {
 	@Override
 	@Transactional
 	public SosCreateResponse create(SosCreateRequest req) {
-		// 1) 만료일 파싱
-		LocalDateTime expiresAt = parseExpiresAt(req.getExpiresAt());
+		// member_id로 이미 SOS가 있는지 확인
+		Sos existing = sosMapper.findByMemberId(req.getMemberId());
+		if (existing != null) {
+			throw new IllegalArgumentException("이미 SOS가 존재합니다. (member_id=" + req.getMemberId() + ")");
+		}
 
-		// 2) SOS row 생성
+		LocalDateTime expiresAt = parseExpiresAt(req.getExpiresAt());
 		Sos sos = Sos.builder()
 			.memberId(req.getMemberId())
 			.sosTitle(req.getSosTitle())
@@ -69,13 +72,9 @@ public class SosServiceImpl implements SosService {
 			.isComplete(false)
 			.isDeleted(false)
 			.build();
-		sosMapper.insert(sos); // generatedKeys로 sosId 세팅됨
+		sosMapper.insert(sos);
 
-		// 3) 이미지 업로드 (storage_key 리스트 생성)
-		List<MultipartFile> files = req.getImages();
-		List<String> keys = storageService.uploadAll(files, sos.getSosId());
-
-
+		List<String> keys = storageService.uploadAll(req.getImages(), sos.getSosId());
 		for (String key : keys) {
 			SosImage image = SosImage.builder()
 				.sosId(sos.getSosId())
@@ -85,12 +84,12 @@ public class SosServiceImpl implements SosService {
 			sosImageMapper.insert(image);
 		}
 
-
 		return SosCreateResponse.builder()
 			.sosId(sos.getSosId())
 			.imageKeys(keys)
 			.build();
 	}
+
 
 	@Override
 	@Transactional

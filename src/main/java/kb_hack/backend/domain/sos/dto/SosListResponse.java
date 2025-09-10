@@ -20,6 +20,8 @@ public class SosListResponse {
 	@Schema(description = "SOS ID", example = "101")
 	private Long sosId;
 
+	private Long memberId;
+
 	@Schema(description = "가게 이름", example = "동욱타이어")
 	private String businessName;    // business.business_nm
 

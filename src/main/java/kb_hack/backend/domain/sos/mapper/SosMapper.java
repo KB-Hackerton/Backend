@@ -27,4 +27,6 @@ public interface SosMapper {
 	List<SosDetailRow> findDetail(Long sosId);
 
 	Sos findById(Long sosId);
+	Sos findByMemberId(Long memberId);
+
 }
