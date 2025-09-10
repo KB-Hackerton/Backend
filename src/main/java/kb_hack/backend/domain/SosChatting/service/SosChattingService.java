@@ -51,6 +51,9 @@ public class SosChattingService{
 
     //이거 로직 뭐야 ?
     public ChattingMessageItem sendMessage(long roomId, long myId, String content) {
+        System.out.println("⭐⭐⭐⭐⭐roomId = " + roomId);
+        System.out.println("⭐⭐⭐⭐⭐myId = " + myId);
+        System.out.println("⭐⭐⭐⭐⭐content = " + content);
         // 1. 메시지 저장
         ChattingMessageInsertParam param = ChattingMessageInsertParam.builder()
                 .roomId(roomId)
@@ -62,22 +65,23 @@ public class SosChattingService{
         if (result < 1) {
             throw new RuntimeException("메시지 저장 실패");
         }
+
         long newId = param.getId();
 
         // 2. 내 포인터를 새 메시지로 업데이트
         sosChattingMapper.bumpMyReadToNew(roomId, myId, newId);
 
-        // 3. (옵션) 상대방이 방 안에 있으면 즉시 읽음 처리
-        Long otherId = getOtherMemberId(roomId, myId);
-        if (otherId != null) {
-            sosChattingMapper.bumpOtherReadToNew(roomId, otherId, newId);
-        }
-
-        // 4. 읽음 여부 확인
-        boolean readByOther = false;
-        if (otherId != null) {
-            readByOther = sosChattingMapper.selectIsReadByOther(roomId, otherId, newId);
-        }
+//        // 3. (옵션) 상대방이 방 안에 있으면 즉시 읽음 처리
+//        Long otherId = getOtherMemberId(roomId, myId);
+//        if (otherId != null) {
+//            sosChattingMapper.bumpOtherReadToNew(roomId, otherId, newId);
+//        }
+//
+//        // 4. 읽음 여부 확인
+//        boolean readByOther = false;
+//        if (otherId != null) {
+//            readByOther = sosChattingMapper.selectIsReadByOther(roomId, otherId, newId);
+//        }
 
         return ChattingMessageItem.builder()
                 .id(newId)

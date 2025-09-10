@@ -2,6 +2,7 @@ package kb_hack.backend.domain.SosChatting.controller;
 
 import kb_hack.backend.domain.SosChatting.dto.ChattingMessageItem;
 import kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem;
+import kb_hack.backend.domain.SosChatting.dto.request.ChattingMessageDTO;
 import kb_hack.backend.domain.SosChatting.service.SosChattingService;
 import kb_hack.backend.domain.chat.dto.request.RoomCreateRequest;
 import kb_hack.backend.domain.chat.service.ChatService;
@@ -22,7 +23,7 @@ public class SosChattingController {
     private final SosChattingService sosChattingService;
     private final ChatService chatService;
 
-    // 시나리오 1) 채팅 탭 진입 → 채팅방 리스트 조회
+    // 시나리오 1) 채팅 탭 진입 → 채팅방 리스트 조회 (완료)
     @GetMapping
     public ResponseEntity<List<ChattingRoomListItem>> getChatRooms(
             @AuthenticationPrincipal SecurityCustomUser user) {
@@ -58,15 +59,15 @@ public class SosChattingController {
     @PostMapping("/{roomId}/messages")
     public ResponseEntity<ChattingMessageItem> sendMessage(
             @PathVariable long roomId,
-            @RequestParam String content,
+            @RequestBody ChattingMessageDTO chattingMessageDTO,
             @AuthenticationPrincipal SecurityCustomUser user) {
 
         long myId = user.getMemberVO().getMemberId();
-        ChattingMessageItem message = sosChattingService.sendMessage(roomId, myId, content);
+        ChattingMessageItem message = sosChattingService.sendMessage(roomId, myId,chattingMessageDTO.getContent());
         return ResponseEntity.ok(message);
     }
 
-    //채팅방 생성
+    //채팅방 생성 (완료)
     @PostMapping("")
     public ResponseEntity<Long> getOrCreatePrivateChatRoom(@RequestBody RoomCreateRequest request,
                                                            @AuthenticationPrincipal SecurityCustomUser customUser) {
