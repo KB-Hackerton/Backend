@@ -21,6 +21,11 @@
             expires_at  = #{expiresAt}
         WHERE sos_id = #{sosId}
     </update>
+    <update id="updateIsComplete">
+        UPDATE sos
+        SET is_complete = 1
+        WHERE sos_id = #{sosId}
+    </update>
 
     <!-- 하드 삭제 -->
     <delete id="hardDelete" parameterType="long">

@@ -54,5 +54,15 @@ public class StorageServiceStub implements StorageService {
 			}
 		}).collect(Collectors.toList());
 	}
+
+	@Override
+	public void delete(String key) {
+		try {
+			s3Template.deleteObject(bucket, key.replace("https://" + bucket + ".s3." + region + ".amazonaws.com/", ""));
+		} catch (Exception e) {
+			throw new ServerErrorException(BadStatusCode.FILE_DELETE_FAILED_EXCEPTION);
+		}
+	}
+
 }
 

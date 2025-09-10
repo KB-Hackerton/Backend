@@ -20,6 +20,7 @@ public class DocumentResponseDto {
 	private String announceTitle; // 공고 제목
 	private LocalDate reqstStartDate;
 	private LocalDate reqstEndDate;   // announce.reqst_end_date
+	private LocalDate pubDate;
 	private int totalDocs;        // 총 서류 개수
 	private int checkedDocs;      // 체크한 서류 개수
 }

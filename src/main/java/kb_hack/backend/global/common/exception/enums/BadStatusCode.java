@@ -64,6 +64,7 @@
             FAIL_TO_SEND_ALARM(HttpStatus.INTERNAL_SERVER_ERROR,"사용자가 수신거부한 알림입니다."),
             FAIL_TO_SEND_ALARM2(HttpStatus.INTERNAL_SERVER_ERROR,"사용자가 수신거부한 시간대 입니다"),
             FAILT_TO_GET_RANKING_ANNOUNCE(HttpStatus.INTERNAL_SERVER_ERROR,"인기 공고 불러오는데 실패 했습니다."),
+            FILE_DELETE_FAILED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR,"파일 삭제에 실패했습니다."),
 
 
             // 크롤링 관련 5xx
@@ -78,7 +79,11 @@
             CHAT_SOS_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 SOS"),
             CHAT_ROOM_CREATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "채팅방 생성 실패"),
             CHAT_MESSAGE_SAVE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "메시지 저장 실패"),
-            CHAT_ROOM_NOT_PARTICIPANT(HttpStatus.INTERNAL_SERVER_ERROR, "채팅방 참여자가 아님"),;
+            CHAT_ROOM_NOT_PARTICIPANT(HttpStatus.INTERNAL_SERVER_ERROR, "채팅방 참여자가 아님"),
+            CHATROOM_NOT_FOUND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "채팅방을 찾을 수 없습니다."),
+            SOS_NOT_FOUND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "SOS를 찾을 수 없습니다."),
+            FORBIDDEN_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "권한이 없습니다."),
+            ALREADY_COMPLETED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "이미 완료된 SOS입니다."),;
 
             private final HttpStatus httpStatus;
             private final String message;
