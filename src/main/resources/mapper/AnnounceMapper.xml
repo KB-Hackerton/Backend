@@ -57,6 +57,12 @@
                                  created_at     = now()
     </insert>
 
+    <update id="increaseViewNum" parameterType="long">
+        UPDATE announce
+        SET view_num = view_num + 1
+        WHERE announce_id = #{announceId}
+    </update>
+
     <select id="findAll" resultMap="announceResultMap">
         select
             announce_id,
@@ -88,5 +94,23 @@
                how_to_register, call_company ,print_file_name , print_file_path_name
         from announce
         where announce_id=#{announceId}
+    </select>
+
+    <select id="findTopAnnounces" resultType="kb_hack.backend.domain.announce.dto.AnnounceRankingDTO">
+            SELECT announce_id,
+                   announce_title,
+                   view_num
+            FROM announce
+            ORDER BY view_num DESC
+                LIMIT #{limit}
+
+    </select>
+    <select id="findByAnnounceId" resultType="kb_hack.backend.domain.announce.dto.AnnounceRankingDTO">
+        SELECT announce_id,
+               announce_title,
+               view_num
+        FROM announce
+            WHERE announce_id = #{announceId}
+
     </select>
 </mapper>
