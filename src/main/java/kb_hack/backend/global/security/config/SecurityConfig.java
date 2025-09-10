@@ -90,7 +90,7 @@ public class SecurityConfig {
                         .requestMatchers("/test").hasRole("Member")
                         .requestMatchers("/crawl/admin").hasRole("Admin")
                         .requestMatchers("/admin/ingest/gyeongsang").hasRole("Admin")
-                        .requestMatchers("/api/bizinfo").hasRole("Member")
+                        .requestMatchers("/api/bizinfo").hasRole("Admin")
                         .requestMatchers("/favorites/**").hasRole("Member")
                         .requestMatchers("/sos/**").hasRole("Member")
                         .requestMatchers("/profile-image/**").hasRole("Member")

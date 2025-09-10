@@ -24,5 +24,4 @@ public class SuccessResponse<T> {
         return new SuccessResponse<>(successStatusCode.getHttpStatus().value(), successStatusCode.getMessage(), null);
     }
 
-
 }
