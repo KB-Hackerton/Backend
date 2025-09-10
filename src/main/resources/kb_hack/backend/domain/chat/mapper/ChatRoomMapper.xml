@@ -53,29 +53,29 @@
     </select>
     <select id="getChatMessagesByRoomId" resultType="kb_hack.backend.domain.chat.dto.response.ChatMessageResponse">
         SELECT
-        cm.chat_message_id,
-        cm.chat_room_id,
-        cm.sender_id,
-        m.member_email AS senderEmail, -- sender의 이메일도 함께 조회
-        cm.content,
-        cm.created_at,
-        -- [핵심] 이 메시지를 읽지 않은 참여자의 수를 계산합니다.
-        (SELECT COUNT(crm.member_id)
-        FROM chat_room_member crm
-        LEFT JOIN read_status rs ON crm.member_id = rs.member_id AND crm.chat_room_id = cm.chat_room_id
-        WHERE crm.chat_room_id = cm.chat_room_id -- 현재 채팅방의 멤버 중에서
-        AND crm.member_id != cm.sender_id -- 메시지를 보낸 사람은 제외
-
-            AND (<![CDATA[rs.chat_message_id IS NULL OR rs.chat_message_id < cm.chat_message_id]]>)
-        ) AS unreadCount
-        FROM
-        chat_message cm
-        JOIN
-        member m ON cm.sender_id = m.member_id -- sender 정보 조인을 위해 추가
-        WHERE
-        cm.chat_room_id = #{roomId}
-        ORDER BY
-        cm.created_at ASC;
+            cm.chat_message_id,
+            cm.chat_room_id,
+            cm.sender_id,
+            m.member_email AS senderEmail,
+            cm.content,
+            cm.created_at,
+            -- [핵심] 이 메시지를 읽지 않은 참여자 수
+            (
+                SELECT COUNT(crs.member_id)
+                FROM chat_room_state crs
+                         LEFT JOIN read_status rs
+                                   ON crs.member_id = rs.member_id
+                                       AND crs.chat_room_id = cm.chat_room_id
+                                       AND rs.chat_message_id = cm.chat_message_id
+                WHERE crs.chat_room_id = cm.chat_room_id
+                  AND crs.member_id != cm.sender_id  -- 보낸 사람 제외
+            AND (rs.is_read = 0 OR rs.read_status_id IS NULL) -- 안 읽은 경우
+            ) AS unreadCount
+        FROM chat_message cm
+            JOIN member m
+        ON cm.sender_id = m.member_id
+        WHERE cm.chat_room_id = #{roomId}
+        ORDER BY cm.created_at ASC;
     </select>
 
     <select id="findMessageById" resultType="kb_hack.backend.domain.chat.entity.ChatMessage">

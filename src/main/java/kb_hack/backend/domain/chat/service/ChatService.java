@@ -145,7 +145,7 @@ public class ChatService {
 	 * @param otherMemberId
 	 * @return
 	 */
-	public Long createPrivateChatRoom(MemberVO memberVO, Long sosId, Long otherMemberId) {
+	public Long createPrivateChatRoom(MemberVO memberVO, Long sosId) {
 		// 1-1. 현재 로그인한 사용자 조회
 		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
 		// 1.2. sos 조회

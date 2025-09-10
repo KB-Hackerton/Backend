@@ -49,7 +49,7 @@ public class ChatController {
 	public ResponseEntity<Long> getOrCreatePrivateChatRoom(@RequestBody RoomCreateRequest request,
 	@AuthenticationPrincipal SecurityCustomUser customUser) {
 		Long chatRoomId = chatService.
-			createPrivateChatRoom(customUser.getMemberVO(), request.getSosId(), request.getOtherMemberId());
+			createPrivateChatRoom(customUser.getMemberVO(), request.getSosId());
 
 		return ResponseEntity.ok().body(chatRoomId);
 	}
