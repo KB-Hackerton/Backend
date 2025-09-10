@@ -60,6 +60,7 @@
         a.announce_title AS announceTitle,
         a.reqst_start_date AS reqstStartDate,  -- ✅ 추가
         a.reqst_end_date   AS reqstEndDate,    -- ✅ 변경
+        a.pub_date         AS pubDate,
         (SELECT COUNT(*)
          FROM document d2
          WHERE d2.announce_id = d.announce_id) AS totalDocs,
