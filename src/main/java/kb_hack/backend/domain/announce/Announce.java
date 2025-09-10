@@ -22,6 +22,7 @@ private String lcategory;
 private LocalDate pubDate;
 private LocalDate startDate;
 private LocalDate endDate;
+private String hashtags;
 private String targetName;
 private Integer viewNum;
 private String filePathName;

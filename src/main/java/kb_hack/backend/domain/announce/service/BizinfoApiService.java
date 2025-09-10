@@ -104,6 +104,7 @@ public class BizinfoApiService {
                         .pubDate(pubDate)
                         .startDate(startDate)
                         .endDate(endDate)
+                        .hashtags(hashtags)
                         .targetName(targetName)
                         .viewNum(item.path("inqireCo").asInt(0))
                         .filePathName(item.path("flpthNm").asText(null))

@@ -49,13 +49,34 @@
     <insert id="insert">
         insert into notification  (member_id, title, content, noti_type, is_read)
         values  (#{p.memberId}, #{p.title}, #{p.content}, #{p.notiType}, 0)
-        </insert>
+    </insert>
 
     <select id="findByMemberId" resultMap="NotificationMap">
-        SELECT * FROM notification
-        WHERE member_id = #{memberId}
-        ORDER BY created_at DESC
+        SELECT n.*
+        FROM notification n
+                 JOIN alarm_preference np ON n.member_id = np.member_id
+        WHERE n.member_id = #{memberId}
+          and(
+              n.noti_type in ("notice" ,"festival")
+              or(n.noti_type='sos' and np.sos_preference=1)
+              or (n.noti_type='announce' and np.announce_preference=1)
+            )
+          AND (
+            np.is_alarm = 0
+                OR (
+                np.is_alarm = 1
+                    AND NOT (
+                    (np.alarm_start_time &lt; np.alarm_end_time
+                        AND n.created_at BETWEEN np.alarm_start_time AND np.alarm_end_time)
+                        OR
+                    (np.alarm_start_time &gt; np.alarm_end_time
+                        AND (n.created_at &gt;= np.alarm_start_time OR n.created_at &lt;= np.alarm_end_time))
+                    )
+                )
+            )
+        ORDER BY n.created_at DESC
     </select>
+
 
     <update id="markRead">
         update notification

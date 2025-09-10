@@ -15,6 +15,7 @@
         <result property="endDate" column="reqst_end_date"/>
         <result property="targetName" column="taget_name"/>
         <result property="viewNum" column="view_num"/>
+        <result property="hashtags" column="hashtags"/>
         <result property="filePathName" column="file_path_name"/>
         <result property="fileName" column="file_name"/>
         <result property="howToRegister" column="how_to_register"/>
@@ -27,12 +28,12 @@
     <insert id="insertAnnounce" parameterType="kb_hack.backend.domain.announce.Announce">
         insert into announce
         (  announce_title, link, author, exc_insttNm, description,
-           lcategory, pub_date, reqst_start_date, reqst_end_date,
+           lcategory, pub_date, reqst_start_date, reqst_end_date,hashtags,
            taget_name, view_num, file_path_name, file_name,
         how_to_register, call_company ,print_file_name , print_file_path_name)
         values (
                    #{announceTitle}, #{link}, #{author}, #{excInsttNm}, #{description},
-                   #{lcategory}, #{pubDate}, #{startDate}, #{endDate},
+                   #{lcategory}, #{pubDate}, #{startDate}, #{endDate}, #{hashtags} ,
                    #{targetName}, #{viewNum}, #{filePathName}, #{fileName},
                    #{howToRegister}, #{callCompany} ,#{printFileName} ,#{printFilePathName}
                )
@@ -44,6 +45,7 @@
                                  description    = values(description),
                                  lcategory      = values(lcategory),
                                  pub_date       = values(pub_date),
+                                 hashtags       = values(hashtags),
                                  reqst_start_date = values(reqst_start_date),
                                  reqst_end_date   = values(reqst_end_date),
                                  taget_name     = values(taget_name),
@@ -77,6 +79,7 @@
             reqst_end_date,
             taget_name,
             view_num,
+            hashtags,
             file_path_name,
             file_name,
             how_to_register,
@@ -90,7 +93,7 @@
     <select id="findById" resultMap="announceResultMap">
         select announce_id,announce_title, link, author, exc_insttNm, description,
                lcategory, pub_date, reqst_start_date, reqst_end_date,
-               taget_name, view_num, file_path_name, file_name,
+               taget_name, view_num, file_path_name, file_name,hashtags,
                how_to_register, call_company ,print_file_name , print_file_path_name
         from announce
         where announce_id=#{announceId}
