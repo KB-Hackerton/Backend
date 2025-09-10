@@ -59,7 +59,7 @@
             cm.sender_id       AS senderId,
             m.member_email     AS senderEmail,
             CASE
-                -- 내가 보낸 메시지면 상대방의 last_read_message_id 기준으로 읽음 여부 판단
+                -- 내가 보낸 메시지면, 상대방의 last_read_message_id 기준
                 WHEN cm.sender_id = #{memberId} THEN
                     CASE
                         WHEN EXISTS (
@@ -67,11 +67,12 @@
                             FROM chat_room_state crs2
                             WHERE crs2.chat_room_id = cm.chat_room_id
                               AND crs2.member_id != #{memberId}
+                          AND crs2.last_read_message_id IS NOT NULL
                           AND crs2.last_read_message_id >= cm.chat_message_id
                         )
                             THEN 1 ELSE 0
                         END
-                -- 내가 아닌 다른 사람이 보낸 메시지면, 내 last_read_message_id 기준
+                -- 다른 사람이 보낸 메시지면, 내 last_read_message_id 기준
                 ELSE
                     CASE
                         WHEN crs.last_read_message_id IS NULL

@@ -214,13 +214,14 @@ public class ChatService {
 
 	@Transactional
 	public void markMessagesAsRead(Long roomId, Long memberId) {
-		// 해당 방의 마지막 메시지 ID 조회
+		// row 없으면 생성
+		chatRoomStateMapper.insertIfNotExists(roomId, memberId);
+
 		Long lastMessageId = chatRoomMapper.findLastMessageId(roomId);
 		if (lastMessageId == null) {
 			return; // 메시지가 없으면 종료
 		}
 
-		// chat_room_state에 마지막 읽은 메시지 ID 업데이트
 		chatRoomStateMapper.updateLastReadMessage(roomId, memberId, lastMessageId);
 	}
 
