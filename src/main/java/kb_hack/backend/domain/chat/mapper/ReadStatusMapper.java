@@ -36,13 +36,10 @@ public interface ReadStatusMapper {
 	int markAsRead(Long roomId, Long memberId);
 
 	@Select("""
-
-	SELECT COUNT(*)
-	FROM read_status rs
-	JOIN chat_message cm ON rs.chat_message_id = cm.chat_message_id
-	WHERE rs.chat_room_id = #{chatRoomId}
-	  AND rs.member_id = #{memberId}
-	  AND rs.is_read = 0
-	""")
-	Long countUnreadMessages(Long chatRoomId, Long memberId);
+		
+		SELECT COUNT(*)
+		FROM read_status
+		WHERE chat_room_id = #{roomId}  AND chat_message_id = #{chatMessageId} AND is_read = 0
+		""")
+	Long countUnreadMessages(Long roomId, Long chatMessageId);
 }

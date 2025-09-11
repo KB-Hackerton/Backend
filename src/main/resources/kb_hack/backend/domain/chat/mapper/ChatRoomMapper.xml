@@ -99,6 +99,7 @@
         FROM chat_message
         WHERE chat_message_id = #{messageId}
     </select>
+
     <select id="findAllBySosId" resultType="kb_hack.backend.domain.chat.entity.ChatRoom">
         SELECT *
         FROM chat_room

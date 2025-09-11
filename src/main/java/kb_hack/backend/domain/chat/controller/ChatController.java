@@ -16,8 +16,8 @@ import kb_hack.backend.domain.chat.dto.request.RoomCreateRequest;
 import kb_hack.backend.domain.chat.dto.request.SosCompleteRequest;
 import kb_hack.backend.domain.chat.dto.response.ChatMemberListResponse;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
+import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailResponse;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
-import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.service.ChatService;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import lombok.extern.slf4j.Slf4j;
@@ -98,7 +98,7 @@ public class ChatController {
 	@GetMapping("/room/detail/{roomId}")
 	public ResponseEntity<?> getChatDetail(@PathVariable Long roomId,
 		@AuthenticationPrincipal SecurityCustomUser customUser) {
-		ChatRoom chatRoomDetail = chatService.getChatRoomDetail(roomId, customUser.getMemberVO());
+		ChatRoomDetailResponse chatRoomDetail = chatService.getChatRoomDetail(roomId, customUser.getMemberVO());
 		return ResponseEntity.ok(chatRoomDetail);
 	}
 
