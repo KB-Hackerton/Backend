@@ -87,7 +87,7 @@ public class SecurityConfig {
                         .requestMatchers("/articles/list").hasRole("Member")
                         .requestMatchers("/notice/*").hasRole("Member")
                         .requestMatchers("/test").hasRole("Member")
-                        .requestMatchers("/chatbot").hasRole("Member")
+                        .requestMatchers("/chatbot").permitAll()
                         .requestMatchers("/crawl/admin").hasRole("Admin")
                         .requestMatchers("/admin/ingest/gyeongsang").hasRole("Admin")
                         .requestMatchers("/api/bizinfo").hasRole("Admin")
