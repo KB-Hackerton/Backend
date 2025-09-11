@@ -49,6 +49,8 @@
                  LEFT JOIN member m ON s.member_id = m.member_id
                  LEFT JOIN business b ON b.member_id = m.member_id
                  LEFT JOIN profile_image i ON i.member_id = m.member_id
+        where s.is_complete = 0
+          AND s.expires_at > NOW()
         ORDER BY s.created_at DESC;
     </select>
 

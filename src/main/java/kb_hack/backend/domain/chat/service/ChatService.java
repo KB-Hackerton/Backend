@@ -21,9 +21,9 @@ import kb_hack.backend.domain.chat.entity.ChatMessage;
 import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.entity.ChatRoomState;
 import kb_hack.backend.domain.chat.entity.ReadStatus;
-import kb_hack.backend.domain.chat.mapper.ChatMessageMapper;
 import kb_hack.backend.domain.chat.mapper.ChatRoomMapper;
 import kb_hack.backend.domain.chat.mapper.ChatRoomStateMapper;
+import kb_hack.backend.domain.chat.mapper.ProfileImageMapper;
 import kb_hack.backend.domain.chat.mapper.ReadStatusMapper;
 import kb_hack.backend.domain.member.domain.Member;
 import kb_hack.backend.domain.member.mapper.MemberMapper;
@@ -32,7 +32,6 @@ import kb_hack.backend.domain.sos.mapper.SosMapper;
 import kb_hack.backend.global.common.exception.type.CustomException;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import kb_hack.backend.global.security.entity.MemberVO;
-import kb_hack.backend.global.util.JwtProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +46,7 @@ public class ChatService {
 	private final SosMapper sosMapper;
 	private final ReadStatusMapper readStatusMapper;
 	private final ChatRoomStateMapper chatRoomStateMapper;
-	private final ChatMessageMapper chatMessageMapper;
+	private final ProfileImageMapper profileImageMapper;
 
 	public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
 		ChatRoomState chatRoomState = ChatRoomState.builder()
@@ -336,9 +335,6 @@ public class ChatService {
 		// 6. 모든 채팅방의 모든 참여자 목록을 중복 없이 가져오기
 
 		// Set을 사용하여 중복 자동 제거
-		for (ChatRoom allRelatedChatRoom : allRelatedChatRooms) {
-			log.info(allRelatedChatRoom.getRoomName());
-		}
 
 		Set<Member> allParticipants = new HashSet<>();
 		for (ChatRoom chatRoom : allRelatedChatRooms) {
@@ -353,6 +349,7 @@ public class ChatService {
 			.map(member -> ChatMemberListResponse.builder()
 				.memberId(member.getMemberId())
 				.memberName(member.getMemberName())
+				.imageURL(profileImageMapper.findProfileImageByMemberId(member.getMemberId()))
 				.build())
 			.collect(Collectors.toList());
 	}
@@ -390,7 +387,7 @@ public class ChatService {
 		}
 
 		// 4. 원본 SOS의 상태를 '완료'로 변경
-		sosMapper.updateIsComplete(sosId);
+		sosMapper.hardDelete(sosId);
 
 		// 5. (선택사항) 도움을 준 사용자(helper)에게 보상 제공
 		if (helperMemberIds != null && !helperMemberIds.isEmpty()) {
