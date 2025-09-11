@@ -157,5 +157,12 @@
         WHERE
             cr.chat_room_id = #{roomId};
     </select>
+
+
+<!--    <select id="countChatRoomsBySosId" resultType="int">-->
+<!--        SELECT COUNT(*)-->
+<!--        FROM chat_room-->
+<!--        WHERE sos_id = #{sosId}-->
+<!--    </select>-->
 </mapper>
 
