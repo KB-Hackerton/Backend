@@ -34,4 +34,20 @@
         WHERE business_id = #{businessId}
     </update>
 
+    <select id="findBusinessAndClassInfoByMemberId" resultType="kb_hack.backend.domain.business.BusinessPlus">
+        SELECT
+            b.business_id,
+            b.business_class_id,
+            b.business_nm,
+            b.business_addr,
+            b.business_addr_detail,
+            b.business_code,
+            b.business_open_date,
+            bc.major_name AS businessClassMajorName,
+            bc.middle_name AS businessClassMiddleName,
+            bc.minor_name AS businessClassMinorName
+        FROM business b
+                 LEFT JOIN business_class bc ON b.business_class_id = bc.business_class_id
+        WHERE b.member_id = #{memberId}
+    </select>
 </mapper>

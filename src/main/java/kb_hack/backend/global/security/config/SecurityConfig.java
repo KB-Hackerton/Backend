@@ -95,6 +95,7 @@ public class SecurityConfig {
                         .requestMatchers("/profile-image/**").hasRole("Member")
                         .requestMatchers("/connect/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/alarm/admin/**").hasRole("Admin")
+                        .requestMatchers("/api/recommendation").hasRole("Member")
                     .anyRequest().authenticated()
                 );
 
