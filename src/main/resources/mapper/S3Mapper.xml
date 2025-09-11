@@ -12,4 +12,11 @@
         VALUES (#{memberId})
     </insert>
 
+    <update id="updateProfileImageByUser">
+        UPDATE profile_image
+        SET storage_key = #{storageKey}
+        WHERE member_id = #{memberId}
+    </update>
+
+
 </mapper>

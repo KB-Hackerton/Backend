@@ -63,6 +63,31 @@ public class S3Service {
         }
     }
 
+    public String updateFile(MultipartFile file) {
+        try {
+            MemberVO vo = getMemberVO();
+
+            if (file == null || file.isEmpty()) {
+                throw new BadRequestException(BadStatusCode.INVALID_FILE_UPLOAD_EXCEPTION);
+            }
+
+            String key = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            s3Template.upload(bucket, key, file.getInputStream());
+            String url = "https://" + bucket + ".s3." + region + ".amazonaws.com/" + key;
+
+            int result = s3Mapper.updateProfileImageByUser(url, vo.getMemberId());
+            if (result <= 0) {
+                throw new ServerErrorException(BadStatusCode.DATABASE_PROCESSING_EXCEPTION);
+            }
+
+            return url;
+
+        } catch (IOException e) {
+            throw new ServerErrorException(BadStatusCode.FILE_UPLOAD_FAILED_EXCEPTION);
+        }
+    }
+
+
     private static MemberVO getMemberVO() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof SecurityCustomUser)) {
