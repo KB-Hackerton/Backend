@@ -106,5 +106,48 @@
         WHERE sos_id = #{sosId}
         ORDER BY created_at DESC
     </select>
+
+
+    <select id="findChatRoomDetail" resultType="kb_hack.backend.domain.chat.dto.response.ChatRoomDetailQueryResult">
+        SELECT
+            cr.room_name AS roomName,
+            s.sos_type AS sosType,
+            s.sos_id AS sosId,
+            cr.is_complete AS isComplete,
+            s.created_at AS createdAt,
+            s.member_id AS ownerId,
+            owner.badge AS ownerBadge,
+            -- 현재 사용자의 마지막 읽은 메시지 ID (안읽은 메시지 수 계산용)
+            crs_me.last_read_message_id AS lastReadMessageId,
+            -- 상대방의 상호 bussiness_nm (bussinessName)
+            (
+                SELECT b.business_nm
+                FROM chat_room_state crs_ou
+                         JOIN business b ON crs_ou.member_id = b.member_id
+                WHERE crs_ou.chat_room_id = cr.chat_room_id AND crs_ou.member_id != #{memberId}
+                LIMIT 1
+            ) AS partnerName,
+            -- 상대방의 프로필 이미지
+            (
+        SELECT pi.storage_key
+        FROM chat_room_state crs_ou
+            JOIN member m ON crs_ou.member_id = m.member_id
+            LEFT JOIN profile_image pi ON m.member_id = pi.member_id
+        WHERE crs_ou.chat_room_id = cr.chat_room_id AND crs_ou.member_id != #{memberId}
+            LIMIT 1
+            ) AS partnerImage
+        FROM
+            chat_room cr
+            -- 채팅방 참여자인지 확인 및 last_read_message_id를 가져오기 위한 JOIN
+            JOIN
+            chat_room_state crs_me ON cr.chat_room_id = crs_me.chat_room_id AND crs_me.member_id = #{memberId}
+            -- SOS 및 Owner 정보를 가져오기 위한 JOIN
+            JOIN
+            sos s ON cr.sos_id = s.sos_id
+            JOIN
+            member owner ON s.member_id = owner.member_id
+        WHERE
+            cr.chat_room_id = #{roomId};
+    </select>
 </mapper>
 
