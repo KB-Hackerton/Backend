@@ -36,7 +36,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/connect")
-			.setAllowedOrigins("http://localhost:5173")
+			.setAllowedOrigins("http://localhost:5173","https://gyeongsang-app.vercel.app")
 			.setHandshakeHandler(new CustomHandshakeHandler())
 
 			// ws://가 아닌 http:// 엔드포인트 사용할 수 있게 해주는 sockJs 라이브러리를 통한 요청 허용하는 설정
