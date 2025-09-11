@@ -137,55 +137,50 @@
 
 
     <select id="findMyChatList" resultType="kb_hack.backend.domain.chat.dto.response.MyChatListResponse">
-        SELECT cr.chat_room_id AS roomId,
-               cr.room_name    AS roomName,
-               lm.content      AS lastMessage,
-               lm.created_at   AS lastMessageTime,
+        SELECT
+            cr.chat_room_id AS roomId,
+            cr.room_name AS roomName,
+            lm.content AS lastMessage,
+            lm.created_at AS lastMessageTime,
 
-               -- 1. 상대방의 '사업장 이름(bussinessName)'을 조회합니다.
-               (SELECT b.business_nm
+            -- 1. 상대방의 '사업장 이름(bussinessName)'을 조회합니다.
+            (
+                SELECT b.business_nm
                 FROM chat_room_state crs_ou
                          JOIN Business b ON crs_ou.member_id = b.member_id
-                WHERE crs_ou.chat_room_id = cr.chat_room_id
-                  AND crs_ou.member_id != #{memberId}
+                WHERE crs_ou.chat_room_id = cr.chat_room_id AND crs_ou.member_id != #{memberId}
             LIMIT 1
             ) AS bussinessName,
 
-               -- 2. 상대방 프로필 이미지를 조회합니다.
+            -- 2. 상대방 프로필 이미지를 조회합니다.
             (
         SELECT pi.storage_key
         FROM chat_room_state crs_ou
-            JOIN member m
-        ON crs_ou.member_id = m.member_id
+            JOIN member m ON crs_ou.member_id = m.member_id
             LEFT JOIN profile_image pi ON m.member_id = pi.member_id
-        WHERE crs_ou.chat_room_id = cr.chat_room_id
-          AND crs_ou.member_id != #{memberId}
+        WHERE crs_ou.chat_room_id = cr.chat_room_id AND crs_ou.member_id != #{memberId}
             LIMIT 1
-            ) AS memberProfileImage
-            ,
+            ) AS memberProfileImage,
 
         -- 3. 안 읽은 메시지 수를 효율적인 방식으로 계산합니다.
             (
-        SELECT COUNT (*)
+        SELECT COUNT(*)
         FROM chat_message cm_uc
         WHERE cm_uc.chat_room_id = cr.chat_room_id
-          AND (crs_me.last_read_message_id IS NULL
-           OR cm_uc.chat_message_id
-            > crs_me.last_read_message_id)
+          AND (crs_me.last_read_message_id IS NULL OR cm_uc.chat_message_id > crs_me.last_read_message_id)
             ) AS unReadCount
 
         FROM
             chat_room_state crs_me
             JOIN
-            chat_room cr
-        ON crs_me.chat_room_id = cr.chat_room_id
+            chat_room cr ON crs_me.chat_room_id = cr.chat_room_id
             LEFT JOIN
             (
             SELECT
             cm.chat_room_id, cm.content, cm.created_at
             FROM chat_message cm
             JOIN (
-            SELECT chat_room_id, MAX (chat_message_id) AS max_id
+            SELECT chat_room_id, MAX(chat_message_id) AS max_id
             FROM chat_message
             GROUP BY chat_room_id
             ) AS latest_msg ON cm.chat_room_id = latest_msg.chat_room_id AND cm.chat_message_id = latest_msg.max_id
