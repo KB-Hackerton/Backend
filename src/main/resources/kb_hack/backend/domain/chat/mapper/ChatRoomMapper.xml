@@ -116,7 +116,6 @@
             cr.is_complete AS isComplete,
             s.created_at AS createdAt,
             s.member_id AS ownerId,
-            owner.badge AS ownerBadge,
             -- 현재 사용자의 마지막 읽은 메시지 ID (안읽은 메시지 수 계산용)
             crs_me.last_read_message_id AS lastReadMessageId,
             -- 상대방의 상호 bussiness_nm (bussinessName)
@@ -127,6 +126,15 @@
                 WHERE crs_ou.chat_room_id = cr.chat_room_id AND crs_ou.member_id != #{memberId}
                 LIMIT 1
             ) AS partnerName,
+            -- 상대방 뱃지
+            (
+                SELECT m.badge
+                FROM chat_room_state crs_ou
+                         JOIN member m ON crs_ou.member_id = m.member_id
+                WHERE crs_ou.chat_room_id = cr.chat_room_id AND crs_ou.member_id != #{memberId}
+                LIMIT 1
+            ) AS partnerBadge,
+
             -- 상대방의 프로필 이미지
             (
         SELECT pi.storage_key
