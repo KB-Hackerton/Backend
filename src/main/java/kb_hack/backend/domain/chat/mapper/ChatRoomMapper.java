@@ -61,4 +61,11 @@ public interface ChatRoomMapper {
 
 	Optional<ChatRoomDetailQueryResult> findChatRoomDetail(Long roomId, Long memberId);
 
+	@Select("""
+        SELECT COUNT(*)
+        FROM chat_room
+        WHERE sos_id = #{sosId}
+    """)
+	int countChatRoomsBySosId(Long sosId);
+
 }
