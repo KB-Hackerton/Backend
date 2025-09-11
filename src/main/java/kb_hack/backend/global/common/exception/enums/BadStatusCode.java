@@ -31,6 +31,7 @@
 
             // 403 Forbidden (주로 인가)
             INSUFFICIENT_PERMISSION_EXCEPTION(HttpStatus.FORBIDDEN,"접근 권한이 없습니다."),
+            CHAT_ROOM_ACCESS_DENIED(HttpStatus.FORBIDDEN,"채팅방에 속해 있지 않습니다"),
 
             // 404 Not Found
             ANNOUNCE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 공고번호 입니다."),
