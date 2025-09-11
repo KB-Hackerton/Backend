@@ -66,6 +66,7 @@
             s.sos_type       AS sosType,
             s.sos_content    AS sosContent,
             s.expires_at     AS expiresAt,
+            si.sos_image_id  AS sosImageId,
             si.storage_key   AS imageKey,
             s.created_at
         FROM sos s

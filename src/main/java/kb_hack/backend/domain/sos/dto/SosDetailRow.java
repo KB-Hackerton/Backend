@@ -25,4 +25,6 @@ public class SosDetailRow {
 	private LocalDateTime expiresAt;
 	private Date createdAt;
 	private String imageKey;           // sos_image.storage_key
+	private Long sosImageId;
+
 }

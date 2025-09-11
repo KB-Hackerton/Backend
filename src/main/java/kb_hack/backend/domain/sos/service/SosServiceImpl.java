@@ -23,6 +23,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import kb_hack.backend.domain.sos.dto.SosDetailRow;
 
 
@@ -166,6 +168,10 @@ public class SosServiceImpl implements SosService {
 		if (rows.isEmpty()) {
 			throw new IllegalArgumentException("존재하지 않는 SOS ID: " + sosId);
 		}
+		List<Long> imageIds = rows.stream()
+			.map(SosDetailRow::getSosImageId)
+			.filter(Objects::nonNull)
+			.toList();
 
 		SosDetailRow first = rows.get(0);
 		List<String> imageKeys = rows.stream()
@@ -187,6 +193,7 @@ public class SosServiceImpl implements SosService {
 				.expiresAt(first.getExpiresAt())
 				.createdAt(first.getCreatedAt())
 				.imageKeys(imageKeys)
+				.imageIds(imageIds)
 				.minorName(minorName)
 				.build();
 

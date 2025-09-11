@@ -53,6 +53,8 @@ public class SosDetailResponse {
 		example = "[\"sos/2025/09/01/uuid1.jpg\", \"sos/2025/09/01/uuid2.png\"]")
 	private List<String> imageKeys;
 
+	private List<Long> imageIds;
+
 
 
 }
