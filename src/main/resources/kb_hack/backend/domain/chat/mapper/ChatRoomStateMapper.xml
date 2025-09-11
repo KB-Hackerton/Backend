@@ -147,7 +147,7 @@
             (
                 SELECT b.business_nm
                 FROM chat_room_state crs_ou
-                         JOIN Business b ON crs_ou.member_id = b.member_id
+                         JOIN business b ON crs_ou.member_id = b.member_id
                 WHERE crs_ou.chat_room_id = cr.chat_room_id AND crs_ou.member_id != #{memberId}
             LIMIT 1
             ) AS bussinessName,
