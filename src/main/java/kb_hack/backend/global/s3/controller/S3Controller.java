@@ -54,5 +54,21 @@ public class S3Controller {
         return SuccessResponse.makeResponse(SuccessStatusCode.IMAGE_UPLOAD_SUCCESS, s3Service.uploadFile(file));
     }
 
+    @Operation(
+        summary = "프로필 이미지 수정",
+        description = "기존 프로필 이미지를 새로운 이미지로 교체합니다.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PutMapping("/update")
+    public SuccessResponse<String> update(
+        @RequestPart("file") MultipartFile file
+    ) {
+        return SuccessResponse.makeResponse(
+            SuccessStatusCode.IMAGE_UPLOAD_SUCCESS,
+            s3Service.updateFile(file)
+        );
+    }
+
+
 
 }
