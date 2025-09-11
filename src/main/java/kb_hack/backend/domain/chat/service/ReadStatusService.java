@@ -20,8 +20,8 @@ public class ReadStatusService {
 		log.info("Updated {} messages as read in room {}", updatedCount, roomId);
 	}
 
-	public Long getUnreadCount(Long roomId, Long memberId) {
-		return readStatusMapper.countUnreadMessages(roomId, memberId);
+	public Long getUnreadCount(Long roomId,Long chatMessageId) {
+		return readStatusMapper.countUnreadMessages(roomId,chatMessageId);
 	}
 
 }

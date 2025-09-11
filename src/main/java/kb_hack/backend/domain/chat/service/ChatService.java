@@ -15,6 +15,7 @@ import kb_hack.backend.domain.chat.dto.response.ChatMemberListResponse;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.ChatMessageDto;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageResponse;
+import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailResponse;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
 import kb_hack.backend.domain.chat.entity.ChatRoom;
@@ -282,7 +283,7 @@ public class ChatService {
 
 
 
-	public ChatRoom getChatRoomDetail(Long roomId, MemberVO memberVO) {
+	public ChatRoomDetailResponse getChatRoomDetail(Long roomId, MemberVO memberVO) {
 		// 1. 현재 로그인한 사용자 조회
 		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
 		if (member == null) {
@@ -304,7 +305,25 @@ public class ChatService {
 		if (!check) {
 			throw new CustomException(CHAT_ROOM_NOT_PARTICIPANT);
 		}
-		return chatRoom;
+
+		// 4. 참여자 목록 조회
+		Member owner = memberMapper.getMemberByMemberId(chatRoom.getOwnerId());
+
+		// 5. SOS 정보 조회
+		Long sosId = chatRoom.getSosId();
+		Sos sos = sosMapper.findById(sosId);
+		// 긴급도 설정
+
+
+		// 6. 채팅방 상세 정보 DTO 생성 및 반환
+		return ChatRoomDetailResponse.builder()
+			.roomName(chatRoom.getRoomName())
+			.sosType(chatRoom.getRoomType())
+			.isComplete(chatRoom.getIsComplete() == 1)
+			.memberBadge(owner.getBadge())
+			.isOwner(chatRoom.getOwnerId().equals(member.getMemberId()))
+			.createdAt(sos.getCreatedAt())
+			.build();
 	}
 
 	public List<ChatMemberListResponse> leaveSelectMember(Long roomId, MemberVO memberVO) {
