@@ -19,5 +19,5 @@ public class MyChatListResponse {
 	private LocalDateTime lastMessageTime;
 	private String bussinessName;
 	private String memberProfileImage;
-
+	private Long ownerId;
 }

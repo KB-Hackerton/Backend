@@ -251,6 +251,7 @@ public class ChatService {
 				.lastMessageTime(result.getLastMessageTime())
 				.bussinessName(result.getBussinessName())
 				.memberProfileImage(result.getMemberProfileImage())
+				.ownerId(result.getOwnerId())
 				.build())
 			.collect(Collectors.toList());
 
@@ -300,7 +301,7 @@ public class ChatService {
 			.roomName(result.getRoomName())
 			.sosType(result.getSosType())
 			.sosId(result.getSosId())
-			.memberBadge(result.getOwnerBadge())
+			.memberBadge(result.getPartnerBadge())
 			.isComplete(result.getIsComplete())
 			.isOwner(result.getOwnerId().equals(currentMemberId))
 			.createdAt(result.getCreatedAt())

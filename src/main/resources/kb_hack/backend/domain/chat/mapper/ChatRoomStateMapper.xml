@@ -142,6 +142,7 @@
             cr.room_name AS roomName,
             lm.content AS lastMessage,
             lm.created_at AS lastMessageTime,
+            cr.owner_id AS ownerId,
 
             -- 1. 상대방의 '사업장 이름(bussinessName)'을 조회합니다.
             (

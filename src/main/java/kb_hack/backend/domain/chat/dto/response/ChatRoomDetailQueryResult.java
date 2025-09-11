@@ -15,7 +15,7 @@ public class ChatRoomDetailQueryResult {
     private Boolean isComplete;
     private LocalDateTime createdAt;
     private Long ownerId;
-    private String ownerBadge;
+    private String partnerBadge;
 
 
     // 상대방 정보
