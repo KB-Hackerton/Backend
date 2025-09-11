@@ -236,6 +236,7 @@ public class ChatService {
 		// 1. 단 한 번의 쿼리로 모든 필요한 정보를 가져옵니다.
 		List<MyChatListResponse> queryResults = chatRoomStateMapper.findMyChatList(member.getMemberId());
 
+
 		if(queryResults == null) {
 			throw new CustomException(CHAT_ROOM_NOT_FOUND);
 		}
