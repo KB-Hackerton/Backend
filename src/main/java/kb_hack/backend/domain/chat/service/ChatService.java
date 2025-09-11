@@ -387,7 +387,7 @@ public class ChatService {
 		}
 
 		// 4. 원본 SOS의 상태를 '완료'로 변경
-		sosMapper.updateIsComplete(sosId);
+		sosMapper.hardDelete(sosId);
 
 		// 5. (선택사항) 도움을 준 사용자(helper)에게 보상 제공
 		if (helperMemberIds != null && !helperMemberIds.isEmpty()) {
