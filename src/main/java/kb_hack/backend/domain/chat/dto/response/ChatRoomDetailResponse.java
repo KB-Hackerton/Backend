@@ -16,6 +16,7 @@ public class ChatRoomDetailResponse {
 	private String memberBadge;    // 멤버 뱃지
 	private Boolean isComplete;     // SOS 완료 여부
 	private Boolean isOwner;      	// 현재 사용자가 SOS 소유자인지 여부
-	private LocalDateTime createdAt;  // 긴급 상태 (예: "EMERGENCY", "NORMAL", "ETC")
-
+	private LocalDateTime createdAt;  // 채팅방 생성 시간
+	private String partnerImage; // 상대방 프로필 이미지 URL
+	private int unReadCount; // 읽지 않은 메시지 수
 }
