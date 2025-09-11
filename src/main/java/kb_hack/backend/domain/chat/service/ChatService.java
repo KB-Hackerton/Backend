@@ -14,12 +14,14 @@ import kb_hack.backend.domain.chat.dto.response.ChatMemberListResponse;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.ChatMessageDto;
 
+import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailQueryResult;
 import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailResponse;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
 import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.entity.ChatRoomState;
 import kb_hack.backend.domain.chat.entity.ReadStatus;
+import kb_hack.backend.domain.chat.mapper.ChatMessageMapper;
 import kb_hack.backend.domain.chat.mapper.ChatRoomMapper;
 import kb_hack.backend.domain.chat.mapper.ChatRoomStateMapper;
 import kb_hack.backend.domain.chat.mapper.ReadStatusMapper;
@@ -43,10 +45,9 @@ public class ChatService {
 	private final ChatRoomMapper chatRoomMapper;
 	private final MemberMapper memberMapper;
 	private final SosMapper sosMapper;
-	private final JwtProcessor jwtProcessor;
 	private final ReadStatusMapper readStatusMapper;
-
 	private final ChatRoomStateMapper chatRoomStateMapper;
+	private final ChatMessageMapper chatMessageMapper;
 
 	public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
 		ChatRoomState chatRoomState = ChatRoomState.builder()
@@ -233,8 +234,9 @@ public class ChatService {
 		// 2. 자신이 속한 채팅방 목록 조회
 
 
-		// 1. 단 한 번의 쿼리로 모든 필요한 정보를 가져옵니다.
+		// 3. 단 한 번의 쿼리로 모든 필요한 정보를 가져옵니다.
 		List<MyChatListResponse> queryResults = chatRoomStateMapper.findMyChatList(member.getMemberId());
+
 
 		if(queryResults == null) {
 			throw new CustomException(CHAT_ROOM_NOT_FOUND);
@@ -286,47 +288,24 @@ public class ChatService {
 
 
 	public ChatRoomDetailResponse getChatRoomDetail(Long roomId, MemberVO memberVO) {
-		// 1. 현재 로그인한 사용자 조회
-		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
-		if (member == null) {
-			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
-		}
-		// 2. 채팅방 조회
-		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
-		if (chatRoom == null) {
-			throw new CustomException(CHAT_ROOM_NOT_FOUND);
-		}
-		// 3. 참여자 여부 체크
-		List<ChatRoomState> chatRoomStates = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
-		boolean check = false;
-		for (ChatRoomState c : chatRoomStates) {
-			if (c.getMemberId().equals(member.getMemberId())) {
-				check = true;
-			}
-		}
-		if (!check) {
-			throw new CustomException(CHAT_ROOM_NOT_PARTICIPANT);
-		}
+		Long currentMemberId = memberVO.getMemberId();
 
-		// 4. 참여자 목록 조회
-		Member owner = memberMapper.getMemberByMemberId(chatRoom.getOwnerId());
-
-		// 5. SOS 정보 조회
-		Long sosId = chatRoom.getSosId();
-		Sos sos = sosMapper.findById(sosId);
-		// 긴급도 설정
+		// 1. 단 한 번의 쿼리로 모든 정보를 조회 (참여자 체크 포함)
+		ChatRoomDetailQueryResult result = chatRoomMapper.findChatRoomDetail(roomId, currentMemberId)
+			.orElseThrow(() -> new CustomException(CHATROOM_NOT_FOUND_EXCEPTION));
 
 
-		// 6. 채팅방 상세 정보 DTO 생성 및 반환
+		// 3. 최종 DTO로 변환하여 반환
 		return ChatRoomDetailResponse.builder()
-			.roomName(chatRoom.getRoomName())
-			.sosType(chatRoom.getRoomType())
-			.isComplete(chatRoom.getIsComplete() == 1)
-			.memberBadge(owner.getBadge())
-			.isOwner(chatRoom.getOwnerId().equals(member.getMemberId()))
-			.createdAt(sos.getCreatedAt())
-			// .unReadCount()
-			// .partnerImage(owner.getProfileImage())
+			.roomName(result.getRoomName())
+			.sosType(result.getSosType())
+			.sosId(result.getSosId())
+			.memberBadge(result.getOwnerBadge())
+			.isComplete(result.getIsComplete())
+			.isOwner(result.getOwnerId().equals(currentMemberId))
+			.createdAt(result.getCreatedAt())
+			.partnerImage(result.getPartnerImage()) // 실제 상대방 이미지
+			.bussinessName(result.getPartnerName()) // 실제 상대방 이름
 			.build();
 	}
 
