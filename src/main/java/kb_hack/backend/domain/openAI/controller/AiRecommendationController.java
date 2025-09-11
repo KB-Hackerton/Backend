@@ -29,8 +29,6 @@ public class AiRecommendationController {
     )
     @GetMapping
     public Mono<SuccessResponse<Announce>> getRecommendedAnnounce(@RequestParam Long memberId) {
-        // AiRecommendationService가 Mono<Announce>를 반환하도록 변경했으므로,
-        // 컨트롤러도 Mono를 반환하도록 수정해야 합니다.
         return aiRecommendationService.recommendAnnounce(memberId)
                 .map(recommendedAnnounce ->
                         SuccessResponse.makeResponse(
