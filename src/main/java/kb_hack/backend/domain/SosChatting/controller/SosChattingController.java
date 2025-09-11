@@ -28,7 +28,10 @@ public class SosChattingController {
     public ResponseEntity<List<ChattingRoomListItem>> getChatRooms(
             @AuthenticationPrincipal SecurityCustomUser user) {
         long myId = user.getMemberVO().getMemberId();
+
         List<ChattingRoomListItem> rooms = sosChattingService.getChatRooms(myId);
+
+
         return ResponseEntity.ok(rooms);
     }
 

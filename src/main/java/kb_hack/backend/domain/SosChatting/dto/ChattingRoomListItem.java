@@ -20,4 +20,6 @@ public class ChattingRoomListItem {
     private String lastMessageSenderId;
     private String lastMessageContent;
     private LocalDateTime lastMessageAt;
+    private String otherProfileImageUrl;
+    private String otherBusinessName;
 }

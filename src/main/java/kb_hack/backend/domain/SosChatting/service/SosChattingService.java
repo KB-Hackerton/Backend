@@ -1,8 +1,6 @@
 package kb_hack.backend.domain.SosChatting.service;
 
-import kb_hack.backend.domain.SosChatting.dto.ChattingMessageInsertParam;
-import kb_hack.backend.domain.SosChatting.dto.ChattingMessageItem;
-import kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem;
+import kb_hack.backend.domain.SosChatting.dto.*;
 import kb_hack.backend.domain.SosChatting.mapper.SosChattingMapper;
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 import kb_hack.backend.global.common.exception.type.CustomException;
@@ -12,7 +10,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -21,11 +22,64 @@ import java.util.List;
 public class SosChattingService{
     private final SosChattingMapper sosChattingMapper;
 
+    //        return sosChattingMapper.selectRoomListWithLastAndUnread(myId);
     //채팅방 리스트에서 채팅방 가져오기
     @Transactional(readOnly = true)
     public List<ChattingRoomListItem> getChatRooms(long myId) {
-        return sosChattingMapper.selectRoomListWithLastAndUnread(myId);
+
+        // 1. 내가 속한 채팅방 목록 (roomId, roomName만 가져옴)
+        List<ChattingRoomListItem> rooms = sosChattingMapper.selectMyChatRooms(myId);
+        if (rooms.isEmpty()) {
+            return rooms;
+        }
+
+        // 채팅방 ID만 추출
+        List<Long> roomIds = rooms.stream()
+                .map(ChattingRoomListItem::getChatRoomId)
+                .toList();
+
+        // 2. 각 방의 마지막 메시지 가져오기
+        List<ChattingRoomListItem> lastMessages = sosChattingMapper.selectLastMessages(roomIds);
+        Map<Long, ChattingRoomListItem> lastMessageMap = lastMessages.stream()
+                .collect(Collectors.toMap(ChattingRoomListItem::getChatRoomId, lm -> lm));
+
+        // 3. 각 방의 안 읽은 메시지 개수 가져오기
+        List<UnreadCountDTO> unreadCounts = sosChattingMapper.selectUnreadCounts(myId, roomIds);
+        Map<Long, Integer> unreadMap = unreadCounts.stream()
+                .collect(Collectors.toMap(UnreadCountDTO::getChatRoomId, UnreadCountDTO::getUnreadCount));
+
+        // 4. 상대방 프로필 가져오기
+        List<OtherProfileDTO> otherProfiles = sosChattingMapper.selectOtherMemberProfiles(myId, roomIds);
+        Map<Long, String> profileMap = otherProfiles.stream()
+                .collect(Collectors.toMap(
+                        OtherProfileDTO::getChatRoomId,
+                        OtherProfileDTO::getProfileImageUrl,
+                        (a, b) -> a // 같은 roomId면 첫 값 유지
+                ));
+
+        // 5. 결과 병합
+        for (ChattingRoomListItem room : rooms) {
+            ChattingRoomListItem lm = lastMessageMap.get(room.getChatRoomId());
+            if (lm != null) {
+                room.setLastMessageId(lm.getLastMessageId());
+                room.setLastMessageSenderId(lm.getLastMessageSenderId());
+                room.setLastMessageContent(lm.getLastMessageContent());
+                room.setLastMessageAt(lm.getLastMessageAt());
+            }
+            room.setUnreadCount(unreadMap.getOrDefault(room.getChatRoomId(), 0));
+            room.setOtherProfileImageUrl(profileMap.get(room.getChatRoomId()));
+        }
+
+        // 마지막 메시지 시간 기준으로 정렬 (최신순)
+        rooms.sort(Comparator.comparing(
+                ChattingRoomListItem::getLastMessageAt,
+                Comparator.nullsLast(Comparator.reverseOrder())
+        ));
+
+        return rooms;
     }
+
+
 
     //방 입장시 상대방 메세지 읽음 표시
     public void markOthersMessagesAsRead(long roomId, long myId) {

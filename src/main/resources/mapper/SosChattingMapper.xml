@@ -143,5 +143,75 @@
           AND member_id    = #{myId}
     </select>
 
+    <select id="selectMyChatRooms" resultType="kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem">
+        SELECT r.chat_room_id   AS chatRoomId,
+               r.room_name      AS roomName
+        FROM chat_room_state s
+                 JOIN chat_room r ON r.chat_room_id = s.chat_room_id
+        WHERE s.member_id = #{myId}
+        ORDER BY r.created_at DESC
+    </select>
+
+    <select id="selectLastMessages" resultType="kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem">
+        SELECT m.chat_room_id        AS chatRoomId,
+        m.chat_message_id     AS lastMessageId,
+        CAST(m.sender_id AS CHAR) AS lastMessageSenderId,
+        m.content             AS lastMessageContent,
+        m.created_at          AS lastMessageAt
+        FROM chat_message m
+        INNER JOIN (
+        SELECT chat_room_id, MAX(chat_message_id) AS last_id
+        FROM chat_message
+        WHERE chat_room_id IN
+        <foreach collection="roomIds" item="roomId" open="(" separator="," close=")">
+            #{roomId}
+        </foreach>
+        GROUP BY chat_room_id
+        ) lm ON m.chat_room_id = lm.chat_room_id
+        AND m.chat_message_id = lm.last_id
+    </select>
+
+    <select id="selectUnreadCounts" resultType="kb_hack.backend.domain.SosChatting.dto.UnreadCountDTO">
+        <![CDATA[
+    SELECT s.chat_room_id AS roomId,
+           COUNT(*)       AS unreadCount
+    FROM chat_room_state s
+             JOIN chat_message m
+                  ON m.chat_room_id = s.chat_room_id
+                      AND m.chat_message_id > COALESCE(s.last_read_message_id, 0)
+                      AND m.sender_id <> #{myId}
+    WHERE s.member_id = #{myId}
+      AND s.chat_room_id IN
+]]>
+        <foreach collection="roomIds" item="roomId" open="(" separator="," close=")">
+            #{roomId}
+        </foreach>
+        GROUP BY s.chat_room_id
+    </select>
+
+    <select id="selectOtherMemberProfiles"
+            resultType="kb_hack.backend.domain.SosChatting.dto.OtherProfileDTO">
+        <![CDATA[         SELECT
+                              s.chat_room_id   AS chatRoomId,
+                              m.member_id      AS memberId,
+                              p.storage_key    AS profileImageUrl,
+                              b.business_nm    AS businessName
+                          FROM chat_room_state s
+                                   JOIN member m ON s.member_id = m.member_id
+                                   LEFT JOIN profile_image p ON p.member_id = m.member_id
+                                   LEFT JOIN business b ON b.member_id = m.member_id
+                          WHERE s.chat_room_id IN
+        <foreach collection="roomIds" item="roomId" open="(" separator="," close=")">
+                              #{roomId}
+                              </foreach>
+                            AND s.member_id <> #{myId}
+
+
+]]>
+
+    </select>
+
+
+
 
 </mapper>

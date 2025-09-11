@@ -1,8 +1,6 @@
 package kb_hack.backend.domain.SosChatting.mapper;
 
-import kb_hack.backend.domain.SosChatting.dto.ChattingMessageInsertParam;
-import kb_hack.backend.domain.SosChatting.dto.ChattingMessageItem;
-import kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem;
+import kb_hack.backend.domain.SosChatting.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -31,4 +29,14 @@ public interface SosChattingMapper {
     boolean selectIsReadByOther(@Param("roomId") long roomId, @Param("otherId") long otherId, @Param("newId") long newId);
 
     boolean isMemberInRoom(@Param("roomId") long roomId, @Param("myId") long myId);
+
+    //-----------------------------------------------------------------------------------------------------------------
+    List<ChattingRoomListItem> selectMyChatRooms(@Param("myId") long myId);
+    List<ChattingRoomListItem> selectLastMessages(@Param("roomIds") List<Long> roomIds);
+
+    List<UnreadCountDTO> selectUnreadCounts(@Param("myId") long myId,
+                                            @Param("roomIds") List<Long> roomIds);
+
+    List<OtherProfileDTO> selectOtherMemberProfiles(@Param("myId") long myId,
+                                                    @Param("roomIds") List<Long> roomIds);
 }
