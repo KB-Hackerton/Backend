@@ -19,8 +19,15 @@
     </select>
 
     <select id="getRecentArticle" resultType="kb_hack.backend.domain.home.dto.request.RecentArticleDTO">
-        SELECT title, article_id
+        SELECT title, article_id,article_url
         FROM articles
+        ORDER BY created_at DESC
+            LIMIT 3
+    </select>
+
+    <select id="getNotice" resultType="kb_hack.backend.domain.notice.dto.response.NoticeDTO">
+        SELECT notice_id, title
+        FROM notice
         ORDER BY created_at DESC
             LIMIT 3
     </select>
