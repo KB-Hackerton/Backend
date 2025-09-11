@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.*;
 
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageResponse;
+import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailQueryResult;
+import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailResponse;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
 
@@ -56,5 +58,7 @@ public interface ChatRoomMapper {
 
 	int updateIsComplete(Long chatRoomId);
 
+
+	Optional<ChatRoomDetailQueryResult> findChatRoomDetail(Long roomId, Long memberId);
 
 }
