@@ -16,8 +16,8 @@ import kb_hack.backend.domain.chat.dto.request.RoomCreateRequest;
 import kb_hack.backend.domain.chat.dto.request.SosCompleteRequest;
 import kb_hack.backend.domain.chat.dto.response.ChatMemberListResponse;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
+import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailResponse;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
-import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.service.ChatService;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import lombok.extern.slf4j.Slf4j;
@@ -71,14 +71,10 @@ public class ChatController {
 	}
 
 
+	//-------------------------------------------------------------------------------------------------------------------
 
 
-
-
-
-
-
-
+// 여기가 문제
 	@Operation(
 		summary = "채팅방 메시지 읽음 처리",
 		description = "특정 채팅방의 모든 메시지를 읽음 처리합니다. 사용자는 해당 채팅방의 참여자여야 합니다."
@@ -92,13 +88,7 @@ public class ChatController {
 	}
 
 
-
-
-
-
-
-
-
+	//-----------------------------------------------------마지막 ----------------------------------------------------
 
 
 	@Operation(
@@ -108,7 +98,7 @@ public class ChatController {
 	@GetMapping("/room/detail/{roomId}")
 	public ResponseEntity<?> getChatDetail(@PathVariable Long roomId,
 		@AuthenticationPrincipal SecurityCustomUser customUser) {
-		ChatRoom chatRoomDetail = chatService.getChatRoomDetail(roomId, customUser.getMemberVO());
+		ChatRoomDetailResponse chatRoomDetail = chatService.getChatRoomDetail(roomId, customUser.getMemberVO());
 		return ResponseEntity.ok(chatRoomDetail);
 	}
 
@@ -132,14 +122,7 @@ public class ChatController {
 	}
 
 
-
-
-
-
-
-
-
-
+//==================================================================================================================
 
 	@Operation(
 		summary = "채팅방 나가기",

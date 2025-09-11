@@ -3,6 +3,7 @@ package kb_hack.backend.domain.sos.controller;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import kb_hack.backend.domain.sos.dto.SosUpdateRequest;
 import kb_hack.backend.global.common.response.success.SuccessResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -99,42 +100,26 @@ public class SosController {
 	@PutMapping(value = "/{sosId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public SuccessResponse<Void> updateSos(
 		@PathVariable Long sosId,
-//		@RequestParam(required = false) String sos_title,
-//		@RequestParam SosType sos_type,
-//		@RequestParam String sos_content,
-//		@RequestParam String expires_at,
-//		@RequestPart(required = false) List<MultipartFile> images
-			@Parameter(description = "SOS 요청 제목", example = "급히 타이어 구합니다")
-			@RequestParam(required = false) String sos_title,
-
-			@Parameter(description = "SOS 요청 카테고리", example = "stock",
-					schema = @Schema(allowableValues = {"stock","labor","equipment","etc"}))
-			@RequestParam SosType sos_type,
-
-			@Parameter(description = "SOS 요청 상세 내용", example = "오늘 안에 타이어 4개 필요합니다")
-			@RequestParam String sos_content,
-
-			@Parameter(description = "요청 만료 시각 (yyyy-MM-dd HH:mm)", example = "2025-09-07 23:59")
-			@RequestParam (required = false) String expires_at,
-
-			@Parameter(description = "첨부 이미지 파일들")
-			@Schema(type = "string", format = "binary")
-			@RequestPart(required = false) List<MultipartFile> images
-
-
+		@RequestParam(required = false) String sos_title,
+		@RequestParam SosType sos_type,
+		@RequestParam String sos_content,
+		@RequestParam(required = false) String expires_at,
+		@RequestParam(required = false) List<Long> deleteImageIds,
+		@RequestPart(required = false) List<MultipartFile> newImages
 	) {
-		Long memberId = getLoginMemberId();
-		SosCreateRequest req = SosCreateRequest.builder()
-				.memberId(memberId)
-				.sosTitle(sos_title)
-				.sosType(sos_type)
-				.sosContent(sos_content)
-				.expiresAt(expires_at)
-				.images(images)
-				.build();
+		SosUpdateRequest req = SosUpdateRequest.builder()
+			.sosTitle(sos_title)
+			.sosType(sos_type)
+			.sosContent(sos_content)
+			.expiresAt(expires_at)
+			.deleteImageIds(deleteImageIds)
+			.newImages(newImages)
+			.build();
+
 		sosService.update(sosId, req);
 		return SuccessResponse.makeResponse(SuccessStatusCode.SOS_UPDATE_SUCCESS);
 	}
+
 
 	@Operation(summary = "SOS 삭제", description = "SOS 요청을 완전히 삭제합니다 (하드 딜리트).",security = @SecurityRequirement(name = "bearerAuth"))
 	@ApiResponses(value = {

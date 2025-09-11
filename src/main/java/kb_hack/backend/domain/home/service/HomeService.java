@@ -9,6 +9,7 @@ import kb_hack.backend.domain.home.dto.request.RecentArticleDTO;
 import kb_hack.backend.domain.home.dto.request.RecentFestivalDTO;
 import kb_hack.backend.domain.home.dto.response.HomeResponse;
 import kb_hack.backend.domain.home.mapper.HomeMapper;
+import kb_hack.backend.domain.notice.dto.response.NoticeDTO;
 import kb_hack.backend.global.common.exception.enums.BadStatusCode;
 import kb_hack.backend.global.common.exception.type.ServerErrorException;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class HomeService {
         List<RecentFestivalDTO> recentFestival;
         List<RecentArticleDTO> recentArticle;
         List<AnnounceRankingDTO> announceRanking;
+        List<NoticeDTO> notice;
 
         try {
             recentAnnounce = homeMapper.getRecentAnnounce();
@@ -56,7 +58,13 @@ public class HomeService {
             throw new ServerErrorException(BadStatusCode.FAIL_TO_GET_RECENT_ARTICLE_EXCEPTION);
         }
 
+        try {
+            notice = homeMapper.getNotice();
+        } catch (Exception e) {
+            throw new ServerErrorException(BadStatusCode.FAIL_TO_GET_RECENT_NOTICE_EXCEPTION);
+        }
+
         List<RecentViewAnnounceDTO> recentAnnounceList = recentAnnounceService.getRecentAnnounceList();
-        return new HomeResponse(announceRanking,recentAnnounce,recentFestival,recentArticle,recentAnnounceList);
+        return new HomeResponse(announceRanking,recentAnnounce,recentFestival,recentArticle,recentAnnounceList,notice);
     }
 }

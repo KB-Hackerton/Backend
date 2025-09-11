@@ -2,7 +2,6 @@ package kb_hack.backend.domain.chat.service;
 
 import static kb_hack.backend.global.common.exception.enums.BadStatusCode.*;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import kb_hack.backend.domain.chat.dto.response.ChatMemberListResponse;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.ChatMessageDto;
-import kb_hack.backend.domain.chat.dto.response.ChatMessageResponse;
+
+import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailQueryResult;
+import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailResponse;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
 import kb_hack.backend.domain.chat.entity.ChatRoom;
@@ -22,6 +23,7 @@ import kb_hack.backend.domain.chat.entity.ChatRoomState;
 import kb_hack.backend.domain.chat.entity.ReadStatus;
 import kb_hack.backend.domain.chat.mapper.ChatRoomMapper;
 import kb_hack.backend.domain.chat.mapper.ChatRoomStateMapper;
+import kb_hack.backend.domain.chat.mapper.ProfileImageMapper;
 import kb_hack.backend.domain.chat.mapper.ReadStatusMapper;
 import kb_hack.backend.domain.member.domain.Member;
 import kb_hack.backend.domain.member.mapper.MemberMapper;
@@ -30,7 +32,6 @@ import kb_hack.backend.domain.sos.mapper.SosMapper;
 import kb_hack.backend.global.common.exception.type.CustomException;
 import kb_hack.backend.global.security.dto.SecurityCustomUser;
 import kb_hack.backend.global.security.entity.MemberVO;
-import kb_hack.backend.global.util.JwtProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,10 +44,9 @@ public class ChatService {
 	private final ChatRoomMapper chatRoomMapper;
 	private final MemberMapper memberMapper;
 	private final SosMapper sosMapper;
-	private final JwtProcessor jwtProcessor;
 	private final ReadStatusMapper readStatusMapper;
-
 	private final ChatRoomStateMapper chatRoomStateMapper;
+	private final ProfileImageMapper profileImageMapper;
 
 	public void addParticipantToRoom(ChatRoom chatRoom, Member member) {
 		ChatRoomState chatRoomState = ChatRoomState.builder()
@@ -142,7 +142,6 @@ public class ChatService {
 	/**
 	 * 1:1 채팅방 생성
 	 * @param sosId
-	 * @param otherMemberId
 	 * @return
 	 */
 	public Long createPrivateChatRoom(MemberVO memberVO, Long sosId) {
@@ -214,23 +213,15 @@ public class ChatService {
 
 	@Transactional
 	public void markMessagesAsRead(Long roomId, Long memberId) {
-		System.out.println("⭐⭐⭐⭐⭐⭐⭐들어온 roomId = " + roomId);
-		System.out.println("⭐⭐⭐⭐⭐⭐⭐들어온memberId = " + memberId);
-		// 1. 해당 방의 모든 메시지를 가져온다.
-		List<ChatMessageResponse> messages = chatRoomMapper.getChatMessagesByRoomId(roomId);
-		System.out.println("⭐⭐⭐⭐⭐⭐⭐messages = " + messages);
-		if (messages.isEmpty()) {
-			return; // 읽을 메시지가 없으면 종료
+		// row 없으면 생성
+		chatRoomStateMapper.insertIfNotExists(roomId, memberId);
+
+		Long lastMessageId = chatRoomMapper.findLastMessageId(roomId);
+		if (lastMessageId == null) {
+			return; // 메시지가 없으면 종료
 		}
 
-		// 2. 마지막 메시지의 ID를 찾는다.
-		Long lastMessageId = messages.get(messages.size() - 1).getChatMessageId();
-		System.out.println("⭐⭐⭐⭐⭐⭐⭐lastMessageId = " + lastMessageId);
-
-		// 3. 해당 사용자의 읽음 상태를 마지막 메시지 ID로 업데이트한다.
-		readStatusMapper.updateLastReadMessage(roomId, memberId, lastMessageId);
-
-
+		chatRoomStateMapper.updateLastReadMessage(roomId, memberId, lastMessageId);
 	}
 
 	public List<MyChatListResponse> getMyChatRooms(MemberVO memberVO) {
@@ -240,46 +231,82 @@ public class ChatService {
 			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
 		}
 		// 2. 자신이 속한 채팅방 목록 조회
-		List<ChatRoom> chatRooms = chatRoomStateMapper.findChatRoomsByMemberId(member.getMemberId());
-		List<MyChatListResponse> myChatListResponses = new ArrayList<>();
-		for (ChatRoom c : chatRooms) {
-			Long count = readStatusMapper.countUnreadMessages(c.getChatRoomId(), member.getMemberId());
-			MyChatListResponse dto = MyChatListResponse.builder()
-				.roomId(c.getChatRoomId())
-				.roomName(c.getRoomName())
-				.unReadCount(count)
-				.build();
-			myChatListResponses.add(dto);
+
+
+		// 3. 단 한 번의 쿼리로 모든 필요한 정보를 가져옵니다.
+		List<MyChatListResponse> queryResults = chatRoomStateMapper.findMyChatList(member.getMemberId());
+
+
+		if(queryResults == null) {
+			throw new CustomException(CHAT_ROOM_NOT_FOUND);
 		}
-		return myChatListResponses;
+		// 2. Mapper 결과를 최종 DTO로 변환합니다. (DB 접근 없음)
+		return queryResults.stream()
+			.map(result -> MyChatListResponse.builder()
+				.roomId(result.getRoomId())
+				.roomName(result.getRoomName())
+				.unReadCount(result.getUnReadCount())
+				.lastMessage(result.getLastMessage())
+				.lastMessageTime(result.getLastMessageTime())
+				.bussinessName(result.getBussinessName())
+				.memberProfileImage(result.getMemberProfileImage())
+				.ownerId(result.getOwnerId())
+				.build())
+			.collect(Collectors.toList());
+
+		// List<ChatRoom> chatRooms = chatRoomStateMapper.findChatRoomsByMemberId(member.getMemberId());
+		// List<MyChatListResponse> myChatListResponses = new ArrayList<>();
+		// for (ChatRoom c : chatRooms) {
+		// 	Long count = readStatusMapper.countUnreadMessages(c.getChatRoomId(), member.getMemberId());
+		//
+		// 	ChatMessage lastReadMessage = chatRoomStateMapper.findLastReadMessage(c.getChatRoomId());
+		// 	List<Member> membersByRoomId = chatRoomStateMapper.findMembersByRoomId(c.getChatRoomId());
+		// 	String bussinessName = "";
+		// 	for (Member member1 : membersByRoomId) {
+		// 		log.info("membersByRoomId member1: {}", member1);
+		// 		if(member1.getMemberId().equals(member.getMemberId())) {
+		// 			continue;
+		// 		}
+		// 		else {
+		// 			bussinessName = member1.getMemberName();
+		// 			break;
+		// 		}
+		// 	}
+		// 	MyChatListResponse dto = MyChatListResponse.builder()
+		// 		.roomId(c.getChatRoomId())
+		// 		.roomName(c.getRoomName())
+		// 		.unReadCount(count)
+		// 		.lastMessage(lastReadMessage.getContent())
+		// 		.lastMessageTime(lastReadMessage.getCreatedAt())
+		// 		.bussinessName(bussinessName)
+		// 		.build();
+		// 	myChatListResponses.add(dto);
+		// }
 	}
 
 
 
 
-	public ChatRoom getChatRoomDetail(Long roomId, MemberVO memberVO) {
-		// 1. 현재 로그인한 사용자 조회
-		Member member = memberMapper.getMemberByMemberId(memberVO.getMemberId());
-		if (member == null) {
-			throw new CustomException(USER_NOT_FOUND_EXCEPTION);
-		}
-		// 2. 채팅방 조회
-		ChatRoom chatRoom = chatRoomMapper.findByRoomId(roomId);
-		if (chatRoom == null) {
-			throw new CustomException(CHAT_ROOM_NOT_FOUND);
-		}
-		// 3. 참여자 여부 체크
-		List<ChatRoomState> chatRoomStates = chatRoomStateMapper.findByChatRoom(chatRoom.getChatRoomId());
-		boolean check = false;
-		for (ChatRoomState c : chatRoomStates) {
-			if (c.getMemberId().equals(member.getMemberId())) {
-				check = true;
-			}
-		}
-		if (!check) {
-			throw new CustomException(CHAT_ROOM_NOT_PARTICIPANT);
-		}
-		return chatRoom;
+	public ChatRoomDetailResponse getChatRoomDetail(Long roomId, MemberVO memberVO) {
+		Long currentMemberId = memberVO.getMemberId();
+
+		// 1. 단 한 번의 쿼리로 모든 정보를 조회 (참여자 체크 포함)
+		ChatRoomDetailQueryResult result = chatRoomMapper.findChatRoomDetail(roomId, currentMemberId)
+			.orElseThrow(() -> new CustomException(CHATROOM_NOT_FOUND_EXCEPTION));
+
+
+		// 3. 최종 DTO로 변환하여 반환
+		return ChatRoomDetailResponse.builder()
+			.roomName(result.getRoomName())
+			.sosType(result.getSosType())
+			.sosId(result.getSosId())
+			.memberBadge(result.getPartnerBadge())
+			.isComplete(result.getIsComplete())
+			.isOwner(result.getOwnerId().equals(currentMemberId))
+			.createdAt(result.getCreatedAt())
+			.partnerImage(result.getPartnerImage()) // 실제 상대방 이미지
+			.bussinessName(result.getPartnerName()) // 실제 상대방 이름
+			.build();
 	}
 
 	public List<ChatMemberListResponse> leaveSelectMember(Long roomId, MemberVO memberVO) {
@@ -308,9 +335,6 @@ public class ChatService {
 		// 6. 모든 채팅방의 모든 참여자 목록을 중복 없이 가져오기
 
 		// Set을 사용하여 중복 자동 제거
-		for (ChatRoom allRelatedChatRoom : allRelatedChatRooms) {
-			log.info(allRelatedChatRoom.getRoomName());
-		}
 
 		Set<Member> allParticipants = new HashSet<>();
 		for (ChatRoom chatRoom : allRelatedChatRooms) {
@@ -325,6 +349,7 @@ public class ChatService {
 			.map(member -> ChatMemberListResponse.builder()
 				.memberId(member.getMemberId())
 				.memberName(member.getMemberName())
+				.imageURL(profileImageMapper.findProfileImageByMemberId(member.getMemberId()))
 				.build())
 			.collect(Collectors.toList());
 	}

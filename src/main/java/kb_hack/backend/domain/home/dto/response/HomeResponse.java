@@ -7,6 +7,7 @@ import kb_hack.backend.domain.announce.dto.RecentViewAnnounceDTO;
 import kb_hack.backend.domain.home.dto.request.RecentAnnounceDTO;
 import kb_hack.backend.domain.home.dto.request.RecentArticleDTO;
 import kb_hack.backend.domain.home.dto.request.RecentFestivalDTO;
+import kb_hack.backend.domain.notice.dto.response.NoticeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -22,4 +23,5 @@ public class HomeResponse {
 
     List<RecentArticleDTO> recentArticle;
     List<RecentViewAnnounceDTO> recentViewAnnounce;
+    List<NoticeDTO> notice;
 }

@@ -7,4 +7,5 @@ import org.apache.ibatis.annotations.Param;
 public interface S3Mapper {
     int insertProfileImageByUser(@Param("storageKey") String storageKey, @Param("memberId") Long memberId);
     int insertDefaultProfileImage(Long memberId);
+    int updateProfileImageByUser(@Param("storageKey") String storageKey, @Param("memberId") Long memberId);
 }

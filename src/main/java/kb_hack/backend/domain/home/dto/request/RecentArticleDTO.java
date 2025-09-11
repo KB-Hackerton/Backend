@@ -16,4 +16,5 @@ import lombok.NoArgsConstructor;
 public class RecentArticleDTO {
     private String title;
     private Long articleId;
+    private String articleUrl;
 }
