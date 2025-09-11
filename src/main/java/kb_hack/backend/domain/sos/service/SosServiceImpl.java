@@ -1,6 +1,7 @@
 package kb_hack.backend.domain.sos.service;
 
 import kb_hack.backend.domain.business.mapper.BusinessMapper;
+import kb_hack.backend.domain.chat.mapper.ChatRoomMapper;
 import kb_hack.backend.domain.sos.dto.SosCreateRequest;
 import kb_hack.backend.domain.sos.dto.SosCreateResponse;
 import kb_hack.backend.domain.sos.dto.SosDetailResponse;
@@ -36,6 +37,7 @@ public class SosServiceImpl implements SosService {
 	private final SosImageMapper sosImageMapper;
 	private final StorageService storageService;
 	private final BusinessMapper businessMapper;
+	private final ChatRoomMapper chatRoomMapper;
 
 	// 지원하는 날짜 포맷
 	private static final List<DateTimeFormatter> EXPIRES_FORMATS = List.of(
@@ -168,6 +170,7 @@ public class SosServiceImpl implements SosService {
 		if (rows.isEmpty()) {
 			throw new IllegalArgumentException("존재하지 않는 SOS ID: " + sosId);
 		}
+
 		List<Long> imageIds = rows.stream()
 			.map(SosDetailRow::getSosImageId)
 			.filter(Objects::nonNull)
@@ -176,28 +179,30 @@ public class SosServiceImpl implements SosService {
 		SosDetailRow first = rows.get(0);
 		List<String> imageKeys = rows.stream()
 			.map(SosDetailRow::getImageKey)
-			.filter(k -> k != null)
+			.filter(Objects::nonNull)
 			.toList();
 
 		String minorName = businessMapper.findMinorNameByBusinessId(first.getBusinessId());
 
-		SosDetailResponse result = SosDetailResponse.builder()
-				.sosId(first.getSosId())
-				.businessName(first.getBusinessName())
-				.badge(first.getBadge())
-				.businessAddr(first.getBusinessAddr())
-				.businessAddrDetail(first.getBusinessAddrDetail())
-				.sosTitle(first.getSosTitle())
-				.sosType(first.getSosType())
-				.sosContent(first.getSosContent())
-				.expiresAt(first.getExpiresAt())
-				.createdAt(first.getCreatedAt())
-				.imageKeys(imageKeys)
-				.imageIds(imageIds)
-				.minorName(minorName)
-				.build();
+		// 🔥 sosId로 채팅방 개수 조회
+		int chatRoomCount = chatRoomMapper.countChatRoomsBySosId(sosId);
 
-		return result;
+		return SosDetailResponse.builder()
+			.sosId(first.getSosId())
+			.businessName(first.getBusinessName())
+			.badge(first.getBadge())
+			.businessAddr(first.getBusinessAddr())
+			.businessAddrDetail(first.getBusinessAddrDetail())
+			.sosTitle(first.getSosTitle())
+			.sosType(first.getSosType())
+			.sosContent(first.getSosContent())
+			.expiresAt(first.getExpiresAt())
+			.createdAt(first.getCreatedAt())
+			.imageKeys(imageKeys)
+			.imageIds(imageIds)
+			.minorName(minorName)
+			.chatRoomCount(chatRoomCount) // ✅ 추가됨
+			.build();
 	}
 
 

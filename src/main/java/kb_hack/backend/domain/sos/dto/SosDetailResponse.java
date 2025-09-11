@@ -55,6 +55,8 @@ public class SosDetailResponse {
 
 	private List<Long> imageIds;
 
+	private int chatRoomCount;
+
 
 
 }

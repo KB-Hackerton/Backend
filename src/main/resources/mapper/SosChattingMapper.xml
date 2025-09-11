@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kb_hack.backend.domain.SosChatting.mapper.SosChattingMapper">
+
+    <select id="selectRoomListWithLastAndUnread"
+            resultType="kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem">
+  <![CDATA[
+        WITH last_msg AS (
+            SELECT chat_room_id, MAX(chat_message_id) AS last_id
+            FROM chat_message
+            GROUP BY chat_room_id
+        ),
+             unread AS (
+                 SELECT
+                     s.chat_room_id,
+                     COUNT(*) AS unread_count
+                 FROM chat_room_state s
+                          JOIN chat_message m
+                               ON m.chat_room_id = s.chat_room_id
+                                   AND m.chat_message_id > COALESCE(s.last_read_message_id, 0)
+                                   AND m.sender_id <> #{myId}
+                 WHERE s.member_id = #{myId}
+                 GROUP BY s.chat_room_id
+             )
+        SELECT
+            r.chat_room_id         AS chatRoomId,
+            r.room_name            AS roomName,
+            COALESCE(u.unread_count, 0) AS unreadCount,
+            lm.last_id             AS lastMessageId,
+            CAST(ml.sender_id AS CHAR) AS lastMessageSenderId, -- senderId를 String으로 매핑
+            ml.content             AS lastMessageContent,
+            ml.created_at          AS lastMessageAt
+        FROM chat_room_state s
+                 JOIN chat_room r      ON r.chat_room_id = s.chat_room_id
+                 LEFT JOIN last_msg lm ON lm.chat_room_id = r.chat_room_id
+                 LEFT JOIN chat_message ml
+                           ON ml.chat_room_id = lm.chat_room_id
+                               AND ml.chat_message_id = lm.last_id
+                 LEFT JOIN unread u    ON u.chat_room_id = r.chat_room_id
+        WHERE s.member_id = #{myId}
+        ORDER BY (ml.created_at IS NULL), ml.created_at DESC
+        ]]>
+</select>
+
+
+    <update id="updateReadUpToOthersMax">
+  <![CDATA[
+        UPDATE chat_room_state s
+            JOIN (
+            SELECT MAX(last_read_message_id) AS other_last_read
+            FROM chat_room_state
+            WHERE chat_room_id = #{roomId}
+            AND member_id <> #{myId}
+            ) x
+        SET s.last_read_message_id = GREATEST(s.last_read_message_id, x.other_last_read)
+        WHERE s.chat_room_id = #{roomId}
+          AND s.member_id    = #{myId};
+
+        ]]>
+</update>
+
+
+
+    <select id="selectLatestMessages" resultType="kb_hack.backend.domain.SosChatting.dto.ChattingMessageItem">
+        SELECT
+            m.chat_message_id AS id,
+            m.sender_id       AS senderId,
+            m.content         AS content,
+            m.created_at      AS createdAt
+        FROM chat_message m
+        WHERE m.chat_room_id = #{roomId}
+        ORDER BY m.chat_message_id DESC
+            LIMIT #{size}
+
+    </select>
+    <select id="selectMessagesBefore" resultType="kb_hack.backend.domain.SosChatting.dto.ChattingMessageItem">
+        <![CDATA[
+        SELECT
+            m.chat_message_id AS id,
+            m.sender_id       AS senderId,
+            m.content         AS content,
+            m.created_at      AS createdAt
+        FROM chat_message m
+        WHERE m.chat_room_id = #{roomId}
+          AND m.chat_message_id < #{beforeId}
+        ORDER BY m.chat_message_id DESC
+            LIMIT #{size}
+        ]]>
+
+    </select>
+
+    <!-- 상대 member_id -->
+    <select id="selectOtherMemberId" resultType="long">
+
+        <![CDATA[
+        SELECT s.member_id
+        FROM chat_room_state s
+        WHERE s.chat_room_id = #{roomId}
+          AND s.member_id <> #{myId}
+            LIMIT 1
+
+        ]]>
+
+    </select>
+
+
+    <!-- 시나리오 3) 메시지 전송 -->
+    <insert id="insertMessage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO chat_message (chat_room_id, sender_id, content, created_at)
+        VALUES (#{roomId}, #{senderId}, #{content}, NOW())
+    </insert>
+
+
+    <update id="bumpMyReadToNew">
+        UPDATE chat_room_state
+        SET last_read_message_id = GREATEST(last_read_message_id, #{newId})
+        WHERE chat_room_id = #{roomId}
+          AND member_id    = #{myId}
+    </update>
+
+    <update id="bumpOtherReadToNew">
+        UPDATE chat_room_state
+        SET last_read_message_id = GREATEST(last_read_message_id, #{newId})
+        WHERE chat_room_id = #{roomId}
+          AND member_id    = #{otherId}
+    </update>
+
+
+    <select id="selectIsReadByOther" resultType="boolean">
+        SELECT (s.last_read_message_id >= #{newId}) AS is_read
+        FROM chat_room_state s
+        WHERE s.chat_room_id = #{roomId}
+          AND s.member_id    = #{otherId}
+    </select>
+
+    <select id="isMemberInRoom" resultType="java.lang.Boolean">
+        SELECT COUNT(*) > 0
+        FROM chat_room_state
+        WHERE chat_room_id = #{roomId}
+          AND member_id    = #{myId}
+    </select>
+
+    <select id="selectMyChatRooms" resultType="kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem">
+        SELECT r.chat_room_id   AS chatRoomId,
+               r.room_name      AS roomName
+        FROM chat_room_state s
+                 JOIN chat_room r ON r.chat_room_id = s.chat_room_id
+        WHERE s.member_id = #{myId}
+        ORDER BY r.created_at DESC
+    </select>
+
+    <select id="selectLastMessages" resultType="kb_hack.backend.domain.SosChatting.dto.ChattingRoomListItem">
+        SELECT m.chat_room_id        AS chatRoomId,
+        m.chat_message_id     AS lastMessageId,
+        CAST(m.sender_id AS CHAR) AS lastMessageSenderId,
+        m.content             AS lastMessageContent,
+        m.created_at          AS lastMessageAt
+        FROM chat_message m
+        INNER JOIN (
+        SELECT chat_room_id, MAX(chat_message_id) AS last_id
+        FROM chat_message
+        WHERE chat_room_id IN
+        <foreach collection="roomIds" item="roomId" open="(" separator="," close=")">
+            #{roomId}
+        </foreach>
+        GROUP BY chat_room_id
+        ) lm ON m.chat_room_id = lm.chat_room_id
+        AND m.chat_message_id = lm.last_id
+    </select>
+
+    <select id="selectUnreadCounts" resultType="kb_hack.backend.domain.SosChatting.dto.UnreadCountDTO">
+        <![CDATA[
+    SELECT s.chat_room_id AS roomId,
+           COUNT(*)       AS unreadCount
+    FROM chat_room_state s
+             JOIN chat_message m
+                  ON m.chat_room_id = s.chat_room_id
+                      AND m.chat_message_id > COALESCE(s.last_read_message_id, 0)
+                      AND m.sender_id <> #{myId}
+    WHERE s.member_id = #{myId}
+      AND s.chat_room_id IN
+]]>
+        <foreach collection="roomIds" item="roomId" open="(" separator="," close=")">
+            #{roomId}
+        </foreach>
+        GROUP BY s.chat_room_id
+    </select>
+
+    <select id="selectOtherMemberProfiles"
+            resultType="kb_hack.backend.domain.SosChatting.dto.OtherProfileDTO">
+        <![CDATA[         SELECT
+                              s.chat_room_id   AS chatRoomId,
+                              m.member_id      AS memberId,
+                              p.storage_key    AS profileImageUrl,
+                              b.business_nm    AS businessName
+                          FROM chat_room_state s
+                                   JOIN member m ON s.member_id = m.member_id
+                                   LEFT JOIN profile_image p ON p.member_id = m.member_id
+                                   LEFT JOIN business b ON b.member_id = m.member_id
+                          WHERE s.chat_room_id IN
+        <foreach collection="roomIds" item="roomId" open="(" separator="," close=")">
+                              #{roomId}
+                              </foreach>
+                            AND s.member_id <> #{myId}
+
+
+]]>
+
+    </select>
+
+
+
+
+</mapper>
