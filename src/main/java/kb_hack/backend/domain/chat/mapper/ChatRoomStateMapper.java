@@ -2,18 +2,30 @@ package kb_hack.backend.domain.chat.mapper;
 
 import java.util.List;
 
+
+import org.apache.ibatis.annotations.*;
+
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
+import kb_hack.backend.domain.chat.entity.ChatMessage;
 import kb_hack.backend.domain.chat.entity.ChatRoom;
 import kb_hack.backend.domain.chat.entity.ChatRoomState;
 import kb_hack.backend.domain.member.domain.Member;
 
 @Mapper
 public interface ChatRoomStateMapper {
+
+	@Update("""
+    UPDATE chat_room_state
+    SET last_read_message_id = #{lastMessageId}
+    WHERE chat_room_id = #{roomId} AND member_id = #{memberId}
+""")
+	int updateLastReadMessage(Long roomId, Long memberId, Long lastMessageId);
 
 	@Insert("""
 			INSERT INTO chat_room_state (chat_room_id, member_id, last_read_message_id)
@@ -27,8 +39,8 @@ public interface ChatRoomStateMapper {
 		FROM chat_room_state
 		WHERE chat_room_id = #{chatRoomId}
 	""")
-
 	List<ChatRoomState> findByChatRoom(Long chatRoomId);
+
 	@Select("""
 		SELECT cr.*
 		FROM chat_room cr
@@ -59,4 +71,23 @@ public interface ChatRoomStateMapper {
     		WHERE chat_room_id = #{chatRoomId}
     """)
 	void deleteByRoomId(Long chatRoomId);
+
+	@Insert("""
+    INSERT INTO chat_room_state (chat_room_id, member_id, last_read_message_id)
+    VALUES (#{roomId}, #{memberId}, NULL)
+    ON DUPLICATE KEY UPDATE chat_room_id = chat_room_id
+""")
+	int insertIfNotExists(Long roomId, Long memberId);
+
+	@Select("""
+		SELECT cm.*
+		FROM chat_message cm
+		JOIN chat_room_state crs ON cm.chat_message_id = crs.last_read_message_id
+		WHERE crs.chat_room_id = #{chatRoomId} AND crs.member_id = #{memberId}
+	""")
+	ChatMessage findLastReadMessage(Long chatRoomId);
+
+
+
+	List<MyChatListResponse> findMyChatList(Long memberId);
 }

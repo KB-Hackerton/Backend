@@ -51,31 +51,47 @@
         ORDER BY
             cm.created_at ASC
     </select>
+
     <select id="getChatMessagesByRoomId"
             resultType="kb_hack.backend.domain.chat.dto.response.ChatMessageResponse">
         SELECT
-            cm.chat_message_id    AS chatMessageId,
-            cm.sender_id          AS senderId,
-            m.member_email        AS senderEmail,
-            0                     AS isRead,       -- ✅ 기본값
-            (
-                SELECT COUNT(crs.member_id)
-                FROM chat_room_state crs
-                         LEFT JOIN read_status rs
-                                   ON crs.member_id = rs.member_id
-                                       AND crs.chat_room_id = cm.chat_room_id
-                                       AND rs.chat_message_id = cm.chat_message_id
-                WHERE crs.chat_room_id = cm.chat_room_id
-                  AND crs.member_id != cm.sender_id
-            AND (rs.is_read = 0 OR rs.read_status_id IS NULL)
-            ) AS unreadCount,
-            cm.content            AS content,
-            cm.created_at         AS createdAt
+            cm.chat_message_id AS chatMessageId,
+            cm.sender_id       AS senderId,
+            m.member_email     AS senderEmail,
+            CASE
+                -- 내가 보낸 메시지면, 상대방의 last_read_message_id 기준
+                WHEN cm.sender_id = #{memberId} THEN
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM chat_room_state crs2
+                            WHERE crs2.chat_room_id = cm.chat_room_id
+                              AND crs2.member_id != #{memberId}
+                          AND crs2.last_read_message_id IS NOT NULL
+                          AND crs2.last_read_message_id >= cm.chat_message_id
+                        )
+                            THEN 1 ELSE 0
+                        END
+                -- 다른 사람이 보낸 메시지면, 내 last_read_message_id 기준
+                ELSE
+                    CASE
+                        WHEN crs.last_read_message_id IS NULL
+                            OR cm.chat_message_id > crs.last_read_message_id
+                            THEN 0 ELSE 1
+                        END
+                END AS isRead,
+            cm.content   AS content,
+            cm.created_at AS createdAt
         FROM chat_message cm
-            JOIN member m ON cm.sender_id = m.member_id
+                 JOIN member m ON cm.sender_id = m.member_id
+                 LEFT JOIN chat_room_state crs
+                           ON crs.chat_room_id = cm.chat_room_id
+                               AND crs.member_id = #{memberId}
         WHERE cm.chat_room_id = #{roomId}
         ORDER BY cm.created_at ASC;
     </select>
+
+
 
 
     <select id="findMessageById" resultType="kb_hack.backend.domain.chat.entity.ChatMessage">
