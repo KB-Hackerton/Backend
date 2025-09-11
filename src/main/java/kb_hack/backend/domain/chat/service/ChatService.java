@@ -2,7 +2,6 @@ package kb_hack.backend.domain.chat.service;
 
 import static kb_hack.backend.global.common.exception.enums.BadStatusCode.*;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kb_hack.backend.domain.chat.dto.response.ChatMemberListResponse;
 import kb_hack.backend.domain.chat.dto.response.ChatMessageHistoryDto;
 import kb_hack.backend.domain.chat.dto.ChatMessageDto;
-import kb_hack.backend.domain.chat.dto.response.ChatMessageResponse;
+
 import kb_hack.backend.domain.chat.dto.response.ChatRoomDetailResponse;
 import kb_hack.backend.domain.chat.dto.response.MyChatListResponse;
 import kb_hack.backend.domain.chat.entity.ChatMessage;
@@ -323,6 +322,8 @@ public class ChatService {
 			.memberBadge(owner.getBadge())
 			.isOwner(chatRoom.getOwnerId().equals(member.getMemberId()))
 			.createdAt(sos.getCreatedAt())
+			// .unReadCount()
+			// .partnerImage(owner.getProfileImage())
 			.build();
 	}
 
