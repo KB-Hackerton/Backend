@@ -80,9 +80,11 @@ public class WebClientConfig {
     }
     @Bean
     @Qualifier("openAiWebClient")
-    public WebClient openAiWebClient(@Value("${openai.api.key}") String openAiKey) {
+    public WebClient openAiWebClient(
+            @Value("${openai.api.key}") String openAiKey,
+            @Value("${openai.api.url}") String openAiBaseUrl) {
         return WebClient.builder()
-                .baseUrl("https://api.openai.com/v1/chat/completions")
+                .baseUrl(openAiBaseUrl)
                 .defaultHeader("Authorization", "Bearer " + openAiKey)
                 .defaultHeader("Content-Type", "application/json")
                 .build();

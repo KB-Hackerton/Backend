@@ -11,6 +11,7 @@ import java.util.Optional;
 @Mapper
 public interface AnnounceMapper {
     void insertAnnounce(Announce announce);
+
     List<Announce> findAll();
 
     Announce findById(@Param("announceId") Long announceId);

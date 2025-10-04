@@ -13,6 +13,7 @@
         FROM business_class
         WHERE minor_name = #{minorName}
     </select>
+
     <select id="findMinorNameByBusinessId" resultType="java.lang.String">
         SELECT bc.minor_name
         FROM business b

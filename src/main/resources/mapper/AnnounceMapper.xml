@@ -120,6 +120,7 @@
                   call_company,
                   print_file_name,
                   print_file_path_name
+        from announce
         where announce_id=#{id}
     </select>
 

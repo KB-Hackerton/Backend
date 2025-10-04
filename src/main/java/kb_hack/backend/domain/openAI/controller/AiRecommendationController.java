@@ -28,13 +28,18 @@ public class AiRecommendationController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @GetMapping
-    public Mono<SuccessResponse<Announce>> getRecommendedAnnounce(@RequestParam Long memberId) {
-        return aiRecommendationService.recommendAnnounce(memberId)
-                .map(recommendedAnnounce ->
-                        SuccessResponse.makeResponse(
-                                SuccessStatusCode.RECOMMENDATION_SUCCESS,
-                                recommendedAnnounce
-                        )
-                );
+    public SuccessResponse<Announce> getRecommendedAnnounce(@RequestParam Long memberId) {
+        // Service는 동기적으로 Announce 객체를 반환합니다.
+        Announce recommendedAnnounce = aiRecommendationService.recommendAnnounce(memberId);
+
+        if (recommendedAnnounce == null) {
+            // 추천 실패 시 적절한 예외 또는 응답 처리
+            throw new RuntimeException("AI 추천에 적합한 공고를 찾을 수 없습니다.");
+        }
+
+        return SuccessResponse.makeResponse(
+                SuccessStatusCode.RECOMMENDATION_SUCCESS,
+                recommendedAnnounce
+        );
     }
 }
