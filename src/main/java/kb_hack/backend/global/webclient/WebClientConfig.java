@@ -10,6 +10,9 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Configuration
@@ -75,9 +78,16 @@ public class WebClientConfig {
                 .defaultHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
                 .build();
     }
+    @Bean
+    @Qualifier("openAiWebClient")
+    public WebClient openAiWebClient(
+            @Value("${openai.api.key}") String openAiKey,
+            @Value("${openai.api.url}") String openAiBaseUrl) {
+        return WebClient.builder()
+                .baseUrl(openAiBaseUrl)
+                .defaultHeader("Authorization", "Bearer " + openAiKey)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
 
-
-
-
-
+    }
 }

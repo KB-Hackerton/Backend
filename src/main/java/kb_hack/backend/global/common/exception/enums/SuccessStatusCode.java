@@ -36,8 +36,9 @@ public enum SuccessStatusCode {
 
     ALARM_SETTING_GET_SUCCESS(HttpStatus.OK,"알림 선호 설정 데이터 불러오기 성공!"),
     ALARM_SETTING_PATCH_SUCCESS(HttpStatus.OK,"알림 선호 알림 설정  성공!"),
-    ALARM_LIST_GET_SUCCESS(HttpStatus.OK,"알림리스트 불러오기 성공!");
+    ALARM_LIST_GET_SUCCESS(HttpStatus.OK,"알림리스트 불러오기 성공!"),
 
+    RECOMMENDATION_SUCCESS(HttpStatus.OK, "AI 불러오기 성공!");
     private final HttpStatus httpStatus;
     private final String message;
 

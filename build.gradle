@@ -90,3 +90,7 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+springBoot {
+	mainClass = 'kb_hack.backend.DemoApplication'
+}
